@@ -32,6 +32,7 @@ Table {
 	"WIS":20
 }
 
+
 This desk might look something like this:
 Desk {
 	"Health" : Table { "STR":2, "VIT":5 },
@@ -288,7 +289,7 @@ public class Table : Dictionary<string, float> {
 	public bool ContainsColor(string s) { return ContainsKey(s+".r") && ContainsKey(s+".g") && ContainsKey(s+".b") && ContainsKey(s+".a"); }
 	public bool ContainsVector2(string s) { return ContainsKey(s+".x") && ContainsKey(s+".y"); }
 	public bool ContainsVector3(string s) { return ContainsKey(s+".x") && ContainsKey(s+".y") && ContainsKey(s+".z"); }
-		
+	
 	public Color GetColor(string s) { return new Color(this[s+".r"], this[s+".g"], this[s+".b"], this[s+".a"]); }
 	public Vector2 GetVector2(string s) { return new Vector2(this[s+".x"], this[s+".y"]); }
 	public Vector3 GetVector3(string s) { return new Vector3(this[s+".x"], this[s+".y"], this[s+".z"]); }

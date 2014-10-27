@@ -44,6 +44,8 @@ public class V3 {
 		}
 	}
 	
+	public float sqrMagnitude { get { return x*x + y*y + z*z; } }
+	
 	public float magnitude {
 		get {
 			return Mathf.Sqrt(x*x + y*y + z*z);
@@ -89,7 +91,7 @@ public class V3 {
 	
 	public float Angle(V3 other) { return Angle(this, other); }
 	public static float Angle(V3 a, V3 b) {
-		return Mathf.Acos(Dot(a, b) / Mathf.Pow(a.magnitude, 2));
+		return Mathf.Acos(Dot(a, b) / a.sqrMagnitude);
 	}
 
 	public V3 Ortho(V3 other) { return Ortho(this, other); }

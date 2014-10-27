@@ -94,8 +94,8 @@ public static class FloatUtils {
 		return  a * (1-f) + b * f;
 	}
 	
-	public static bool IsInside(this float f, float a, float b) {
-		return (f >= Mathf.Min(a, b) && f <= Mathf.Max(a, b));
+	public static bool IsInside(this float f, float a, float b, float epsilon = .0001f) {
+		return (f >= Mathf.Min(a, b)-epsilon && f <= Mathf.Max(a, b)+epsilon);
 	}
 	
 	public static bool IsBetween(this float f, float a, float b) {

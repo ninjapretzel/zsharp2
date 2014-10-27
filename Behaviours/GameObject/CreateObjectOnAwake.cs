@@ -8,7 +8,7 @@ public class CreateObjectOnAwake : MonoBehaviour {
 	
 	void Awake() {
 		Transform obj = Instantiate(target, transform.position + offset, transform.rotation) as Transform;
-		if (parentIt) { obj.parent = transform; }
+		if (parentIt) { obj.parent = transform.parent; }
 		Destroy(this);
 	}
 	

@@ -3,6 +3,8 @@ using System.Collections;
 
 ///Makes a material's color pulse over time.
 public class MaterialPulse : MonoBehaviour {
+	public int targetMaterial = 0;
+	
 	private Color baseColor;
 	public string targetChannel = "_Emission";
 	public Oscillator osc;
@@ -10,7 +12,7 @@ public class MaterialPulse : MonoBehaviour {
 	
 	void Start() {
 		if (!renderer) { Destroy(this);	return; }
-		baseColor = renderer.material.GetColor(targetChannel);
+		baseColor = renderer.materials[targetMaterial].GetColor(targetChannel);
 	}
 	
 	void Update() {
@@ -19,7 +21,7 @@ public class MaterialPulse : MonoBehaviour {
 		if (!pulseAlpha) {
 			c.a = baseColor.a;
 		}
-		renderer.material.SetColor(targetChannel, c);
+		renderer.materials[targetMaterial].SetColor(targetChannel, c);
 	}
 	
 	

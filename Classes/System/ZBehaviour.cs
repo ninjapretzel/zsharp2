@@ -3,7 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class ZBehaviour : MonoBehaviour {
-
+	
+	#region Other stuff
+	
+	public void SendMSG(string msg) { SendMessage(msg, SendMessageOptions.DontRequireReceiver); }
+	public void SendMSG(string msg, System.Object val) { SendMessage(msg, val, SendMessageOptions.DontRequireReceiver); }
+	
+	public void Broadcast(string msg) { BroadcastMessage(msg, SendMessageOptions.DontRequireReceiver); }
+	public void Broadcast(string msg, System.Object val) { BroadcastMessage(msg, val, SendMessageOptions.DontRequireReceiver); }
+	
+	
+	public void Log(string msg) { Debug.Log("" + this + ": " + msg); }
+	public void LogWarning(string msg) { Debug.LogWarning("" + this + ": " + msg); }
+	
+	#endregion
+	
 	#region GUI Extensions
 	public static void Label(string s, params GUILayoutOption[] options) { GUILayout.Label(s, options); }
 	public static void Label(Texture s, params GUILayoutOption[] options) { GUILayout.Label(s, options); }

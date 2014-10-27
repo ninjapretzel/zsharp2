@@ -7,7 +7,7 @@ using System.Text;
 /**
 Desks and tables are best buddies.
 
-
+ass
 
 */
 public class Desk : Dictionary<string, Table> {

@@ -22,8 +22,15 @@ public class Bar {
 	public Color frontColor = Color.green;
 	public Color backColor = Color.black;
 	
+	public Vector2 iconRepeat {
+		get { return new Vector2(repeat.width, repeat.height); }
+		set { repeat.width = value.x; repeat.height = value.y; }
+	}
+	public Rect normalizedArea;
 	
-	public Rect area;
+	public Rect area {
+		get { return normalizedArea.Denormalized(); }
+	}
 	public Rect repeat;
 	
 	//Padding for 'back'
@@ -37,7 +44,7 @@ public class Bar {
 	
 	public Bar(Rect a, float pad = 2f) {
 		Init();
-		area = a;
+		normalizedArea = a;
 		padding = pad;
 	}
 	
@@ -63,14 +70,14 @@ public class Bar {
 	}
 	
 	public Bar(Rect a, Texture2D front, Texture2D back, float pad = 2f) {
-		area = a;
+		normalizedArea = a;
 		frontGraphic = front;
 		backGraphic = back;
 		padding = pad;
 	}
 	
 	public Bar(Rect a, Texture2D front, Texture2D back, Color frontC, float pad = 2f) {
-		area = a;
+		normalizedArea = a;
 		frontGraphic = front;
 		backGraphic = back;
 		frontColor = frontC;
@@ -79,7 +86,7 @@ public class Bar {
 	
 	
 	public Bar(Rect a, Texture2D front, Texture2D back, Color frontC, Color backC, float pad = 2f) {
-		area = a;
+		normalizedArea = a;
 		frontGraphic = front;
 		backGraphic = back;
 		frontColor = frontC;
@@ -88,19 +95,21 @@ public class Bar {
 	}
 	
 	void Init() {
-		area = Screen.Bottom(.1f);
+		normalizedArea = new Rect(0, .9f, 0, .1f);
 		repeat = new Rect(0, 0, 1, 1);
-		frontGraphic = pixel;
-		backGraphic = pixel;
 	}
 	
 	#endregion
 	
 	
 	public void Draw(Rect area, float fill) {
+		if (frontGraphic == null) { frontGraphic = pixel; }
+		if (backGraphic == null) { backGraphic = pixel; }
+		
 		if (mode == Mode.Normal) { DrawNormal(area, fill); }
 		else if (mode == Mode.Fixed) { DrawFixed(area, fill); }
-		else if (mode == Mode.Repeat) { DrawRepeat(area, fill); }
+		else if (mode == Mode.Repeat) { DrawRepeat(area, repeat, fill); }
+		else if (mode == Mode.Icons) { DrawIcons(area, iconRepeat, fill); }
 	}
 	
 	public void Draw(float fill) {
@@ -150,8 +159,9 @@ public class Bar {
 		GUI.DrawTexture(brush, backGraphic);
 	}
 	
-	public void DrawRepeat(float fill) { DrawRepeat(area, fill); }
-	public void DrawRepeat(Rect area, float fill) {
+	//Use default area when just a fill is passed in
+	public void DrawRepeat(float fill) { DrawRepeat(area, repeat, fill); }
+	public void DrawRepeat(Rect area, Rect repeat, float fill) {
 		Rect brush = area.Pad(padding);
 		float p = Mathf.Clamp01(fill);
 		
@@ -183,11 +193,27 @@ public class Bar {
 		GUI.DrawTextureWithTexCoords(filled, frontGraphic, filledReps);
 	}
 	
-	public void DrawIcons(float fill) { DrawIcons(area, fill); }
-	public void DrawIcons(Rect area, float fill) {
-		Bars.graphic = frontGraphic;
-		Bars.vertical = frontGraphic;
-		Bars.Draw(area, repeat, fill, frontColor, backColor);
+	//Draws the bar as a number of icons across a number of rows
+	//Use Default area when just a float and Vector2 is passed in.
+	public void DrawIcons(int count, int lines, float fill) {
+		Vector2 reps = new Vector2(count/lines, lines);
+		DrawIcons(area, reps, fill);
+	}
+	
+	public void DrawIcons(Vector2 iconRepeat, float fill) { DrawIcons(area, iconRepeat, fill); }
+	public void DrawIcons(Rect area, Vector2 iconRepeat, float fill) {
+		float numRows = Mathf.Floor(iconRepeat.y);
+		Rect row = new Rect(area.x, area.y, area.width, area.height / numRows);
+		Rect iconReps = new Rect(0, 0, iconRepeat.x, 1);
+		
+		for (int i = (int)numRows-1; i >= 0; i--) {
+			float p = (fill*numRows) - i;
+			DrawRepeat(row, iconReps, p);
+			
+			row = row.MoveDown();
+			
+			
+		}
 	}
 	
 	

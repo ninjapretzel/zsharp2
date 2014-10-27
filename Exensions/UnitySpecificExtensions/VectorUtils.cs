@@ -13,6 +13,10 @@ public static class VectorUtils {
 		float y = ((1+i) % 2 == 1) ? 1 : -1;
 		return new Vector2(x, y);
 	}
+
+	public static float DistanceTo(this Vector3 a, Vector3 b) {
+		return (b - a).magnitude;
+	}
 	
 	public static int Hash(this Vector2 v) {
 		int x = v.x.GetHashCode();

@@ -7,6 +7,7 @@ using System.Collections;
 ///By default, will affect the mainTexture
 ///Other target texture2d samplers can be specified using the targets array
 public class MaterialPanner : MonoBehaviour {
+	public int targetMaterial = 0;
 	public Vector2 speed = new Vector2(1, 0);
 	public float scale = 1.0f;
 	public bool clamp01 = true;
@@ -15,8 +16,8 @@ public class MaterialPanner : MonoBehaviour {
 	public string[] targets;
 	
 	public Material material {
-		get { return renderer.material; }
-		set { renderer.material = value; }
+		get { return renderer.materials[targetMaterial]; }
+		set { renderer.materials[targetMaterial] = value; }
 	}
 	
 	void Awake() {

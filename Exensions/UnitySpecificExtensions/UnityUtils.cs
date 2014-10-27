@@ -64,6 +64,14 @@ public static class UnityUtils {
 		return null;
 	}
 	
+	public static void SendMSG(this Component c, string message) {
+		c.SendMessage(message, SendMessageOptions.DontRequireReceiver);
+	}
+	
+	public static void SendMSG(this Component c, string message, System.Object o) {
+		c.SendMessage(message, o, SendMessageOptions.DontRequireReceiver);
+	}
+	
 	public static void Broadcast(this Component c, string message) {
 		c.SendMessage(message, SendMessageOptions.DontRequireReceiver);
 	}

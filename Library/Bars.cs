@@ -16,16 +16,15 @@ public static class Bars {
 	}
 	
 	//General drawing functions
-	public static void Draw(Rect area, float pp) { Draw(area, pp, Color.white, Color.black, defaultPadding); }
-	public static void Draw(Rect area, float pp, Color tint) { Draw(area, pp, tint, Color.black, defaultPadding); }
-	public static void Draw(Rect area, float pp, Color tint, Color back) { Draw(area, pp, tint, back, defaultPadding); }
-	public static void Draw(Rect area, float pp, Color tint, Color back, int padding) {
+	public static void Draw(Rect area, float pp, Texture2D tex) { Draw(area, pp, tex, Color.white, Color.black, defaultPadding); }
+	public static void Draw(Rect area, float pp, Texture2D tex, Color tint) { Draw(area, pp, tex, tint, Color.black, defaultPadding); }
+	public static void Draw(Rect area, float pp, Texture2D tex, Color tint, Color back) { Draw(area, pp, tex, tint, back, defaultPadding); }
+	public static void Draw(Rect area, float pp, Texture2D tex, Color tint, Color back, int padding) {
 		Rect brush = area.Trim(-padding);
 		float p = Mathf.Clamp01(pp);
-		Texture2D g = GetGraphic(area);
 		
 		GUI.color = back;
-		GUI.DrawTexture(brush, g);
+		GUI.DrawTexture(brush, tex);
 		
 		brush = brush.Trim(padding);
 		if (area.width > area.height) { brush.width *= p; }
@@ -34,7 +33,7 @@ public static class Bars {
 			brush.height *= p;
 		}
 		GUI.color = tint;
-		GUI.DrawTexture(brush, g);
+		GUI.DrawTexture(brush, tex);
 	}
 	
 	

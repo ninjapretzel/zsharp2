@@ -109,6 +109,12 @@ public static class StringUtils {
 		int ir = (int)f;
 		float fr = f - ir;
 		string s = "";
+		if (dec > 0 && ir == 0 && fr < Mathf.Pow(10, -dec)) {
+			s = "0.";
+			if (f < 0) { s = "-" + s; }
+			for (int i = 0; i < dec; i++) { s += "0"; }
+			return s;
+		}
 		if (dec > 0 && fr > 0) {
 			s = "" + fr;
 			if (s.Length <= dec+1) { s = s.Substring(1); }

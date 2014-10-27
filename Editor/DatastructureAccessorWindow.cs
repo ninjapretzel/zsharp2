@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR && !UNITY_WEBPLAYER
 using UnityEngine;
 using UnityEditor;
+using System;
 using System.IO;
 using System.Text;
 using System.Collections;
@@ -49,6 +50,7 @@ public class DatastructureAccessorWindow : ZEditorWindow {
 	
 	void Build() {
 		foreach (string filePath in list) { Build(filePath); }
+		
 		AssetDatabase.Refresh();
 	}
 	
@@ -112,7 +114,11 @@ public class DatastructureAccessorWindow : ZEditorWindow {
 	}
 	
 	class Settings {
+		const string imports = "using UnityEngine;\n\n";
 		public string header;
+		//Holds associations of variable names to some table
+		//An example:
+		//("public string float stats", ("level", "hp", "str", "dex", "vit"))
 		public Dictionary<string, List<string>> associations;
 		
 		string activeAssociation = "";
@@ -141,6 +147,8 @@ public class DatastructureAccessorWindow : ZEditorWindow {
 			
 			//Debug.Log(associations.Count);
 			
+			str.Append(imports);
+			str.Append("//This is an auto generated file\n\n");
 			str.Append(header + " {\n");
 			foreach (string collection in associations.Keys) {
 				str.Append("\n" + GetLines(collection) + "\n");
@@ -151,14 +159,22 @@ public class DatastructureAccessorWindow : ZEditorWindow {
 			return str.ToString();
 		}
 		
-		//Get a single line for a corr
+		//Get a all lines of a collection's fields
 		public string GetLines(string collection) {
 			string[] mods = collection.Split(' ');
 			bool isStatic = false;
 			bool isPublic = false;
 			string collectionName = mods[mods.Length-1];
-			string typeFrom = mods[mods.Length-3];
 			string typeTo = mods[mods.Length-2];
+			string typeFrom = mods[mods.Length-3];
+			
+			string castTo = "";
+			if (typeTo.IndexOf(":") > 0) {
+				string[] typesTo = typeTo.Split(':');
+				
+				typeTo = typesTo[0];
+				castTo = typesTo[1];
+			}
 			
 			for (int i = 0; i < mods.Length; i++) {
 				string mod = mods[i];
@@ -171,26 +187,41 @@ public class DatastructureAccessorWindow : ZEditorWindow {
 			StringBuilder str = new StringBuilder(2047);
 			List<string> things = associations[collection];
 			bool stringIndex = (typeFrom == "string");
+			
 			foreach (string thing in things) {
 				mods = thing.Split(',');
 				string name = mods[0];
 				string index = name;
 				if (mods.Length > 1) { index = mods[1]; }
 				
-				string id = collectionName + "[";
-				if (stringIndex) { id += "\""; }
-				id += index;
-				if (stringIndex) { id += "\""; }
-				id += "]";
+				string id = collectionName;
+				
+				if (typeFrom != "thru") {
+					id += "[";
+					if (stringIndex) { id += "\""; }
+					id += index;
+					if (stringIndex) { id += "\""; }
+					id += "]";
+				} else {
+					id += "." + index;
+				}
 				
 				StringBuilder line = new StringBuilder(511);
 				line.Append("\t");
 				if (isPublic) { line.Append("public "); }
 				if (isStatic) { line.Append("static "); }
-				line.Append(typeTo + " ");
+				
+				if (castTo == "") {
+					line.Append(typeTo + " ");
+				} else {
+					line.Append(castTo + " ");
+				}
 				line.Append(name + " ");
 				
-				line.Append("{ get { return " + id + "; } set { " + id + " = value; } }\n");
+				//line.Append("{ get { return " + id + "; } set { " + id + " = value; } }\n");
+				line.Append("{ get { return " + CastGetLogic(typeTo, castTo, id) + " } ");
+				line.Append("set { " + CastSetLogic(typeTo, castTo, id) + " } }\n");
+				
 				str.Append(line.ToString());
 				
 			}
@@ -210,6 +241,31 @@ public class DatastructureAccessorWindow : ZEditorWindow {
 			}
 			list.Add(stuff);
 			
+		}
+		
+		public string CastSetLogic(string type, string cast, string id) {
+			//if (cast == "") { return id + " = value;"; }
+			if (type == "float" && cast == "bool") {
+				return id + " = value ? 1 : 0;";
+			}
+			
+			if (type == "int" && cast == "bool") {
+				return id + " = value ? 1 : 0;";
+			}
+			
+			return id + " = value; ";
+		}
+		
+		public string CastGetLogic(string type, string cast, string id) {
+			if (type == "float" && cast == "bool") {
+				return "" + id + " == 1f;";
+			}
+			
+			if (type == "int" && cast == "bool") {
+				return "" + id + " != 0;";
+			}
+			
+			return id + ";";
 		}
 		
 		public bool ReadLine(string line) {
