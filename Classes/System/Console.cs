@@ -28,6 +28,7 @@ public class Console : MonoBehaviour {
 	private static List<string> previousCommands = new List<string>();
 	private static Dictionary<string, string> aliases = new Dictionary<string, string>();
 	private static Dictionary<KeyCode, string> binds = new Dictionary<KeyCode, string>();
+	private static Dictionary<string, string> axisMappings = new Dictionary<string, string>();
 	public static string configPath { get { return Application.persistentDataPath + "/config.cfg"; } }
 	public static string autoexecPath;
 	//private static Message message = new Message();
@@ -54,6 +55,7 @@ public class Console : MonoBehaviour {
 			aliases.Add("ehco", "Echo");
 			aliases.Add("unalias", "Unalias");
 			aliases.Add("unbind", "Unbind");
+			aliases.Add("poll", "Poll");
 			SaveConfigFile();
 		}
 
@@ -74,6 +76,25 @@ public class Console : MonoBehaviour {
 							Execute('-' + binds[bind].Substring(1));
 						}
 					}
+				}
+			}
+			foreach(string mapping in axisMappings.Keys) {
+				if(mapping[mapping.Length - 1] == '-') {
+					string axis = mapping.Substring(0, mapping.Length - 1);
+					if(Input.GetAxisRaw(axis) < 0) {
+						Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
+					} else {
+						Execute(axisMappings[mapping].Replace("%value%", "0").Replace("%nvalue%", "0"));
+					}
+				} else if(mapping[mapping.Length - 1] == '+') {
+					string axis = mapping.Substring(0, mapping.Length - 1);
+					if(Input.GetAxisRaw(axis) > 0) {
+						Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
+					} else {
+						Execute(axisMappings[mapping].Replace("%value%", "0").Replace("%nvalue%", "0"));
+					}
+				} else {
+					Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(mapping).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(mapping)).ToString()));
 				}
 			}
 		}
@@ -654,6 +675,10 @@ public class Console : MonoBehaviour {
 		if(mainField != null && mainField.FieldType == targetClass && IsAccessible(mainField)) {
 			return mainField.GetValue(null);
 		}
+		mainField = targetClass.GetField("instance", BindingFlags.Public | BindingFlags.Static);
+		if(mainField != null && mainField.FieldType == targetClass && IsAccessible(mainField)) {
+			return mainField.GetValue(null);
+		}
 		return null;
 	}
 
@@ -780,7 +805,11 @@ public class Console : MonoBehaviour {
 				try {
 					 targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), parameters[0]);
 				} catch(System.ArgumentException) {
-					Echo(parameters[0] + " is not a valid KeyCode");
+					if(axisMappings.ContainsKey(parameters[0])) {
+						Echo(parameters[0] + " is " + axisMappings[parameters[0]]);
+					} else {
+						Echo(parameters[0] + " is not a valid KeyCode or the axis is not bound!");
+					}
 					break;
 				}
 				if(binds.ContainsKey(targetKeyCode)) {
@@ -806,27 +835,48 @@ public class Console : MonoBehaviour {
 	}
 
 	public static void Bind() {
-		Echo("Bind: Allows binding of commands to keypresses.\nUsage: Bind <KeyCode> \"command1 \'[param1\' \'[params...]\'[;][commands...]\"");
+		Echo("Bind: Allows binding of commands to keypresses or axes.\nUsage: Bind <KeyCode> \"command1 \'[param1\' \'[params...]\'[;][commands...]\"");
+		Echo("When binding axes, any instance of %value% will be replaced with the current position of the axis. %nvalue% gives the inverted value.");
+		Echo("Additionally, you may use only half an axis by appending a \"+\" or \"-\" to the end of the axis name.");
 
 	}
 
 	public static void Bind(string name, string cmds) {
 		KeyCode targetKeyCode;
 		try {
-				targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
+			targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), name); // Will throw exception if KeyCode doesn't exist
+			Bind(targetKeyCode, cmds);
 		} catch(System.ArgumentException) {
-			Echo(name + " is not a valid KeyCode!");
-			return;
+			try {
+				if(name[name.Length - 1] == '-' || name[name.Length - 1] == '+') {
+					Input.GetAxisRaw(name.Substring(0, name.Length - 1)); // Will throw exception if axis doesn't exist
+				} else {
+					Input.GetAxisRaw(name); // Will throw exception if axis doesn't exist
+				}
+				if(!axisMappings.ContainsKey(name)) {
+					axisMappings.Add(name, "");
+				} else {
+					axisMappings[name] = "";
+				}
+				List<string> cmdList = cmds.SplitUnlessInContainer(';', '\"');
+				foreach(string cmd in cmdList) {
+					axisMappings[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
+				}
+				axisMappings[name] = axisMappings[name].Substring(1);
+			} catch(UnityException) {
+				Echo(name + " is not a valid KeyCode or axis!");
+				return;
+			}
 		}
-		Bind(targetKeyCode, cmds);
 
 	}
 
 	public static void Bind(KeyCode name, string cmds) {
 		if(!binds.ContainsKey(name)) {
 			binds.Add(name, "");
+		} else {
+			binds[name] = "";
 		}
-		binds[name] = "";
 		List<string> cmdList = cmds.SplitUnlessInContainer(';', '\"');
 		foreach(string cmd in cmdList) {
 			binds[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
@@ -835,8 +885,30 @@ public class Console : MonoBehaviour {
 
 	}
 
+	public static void Poll() {
+		Echo("Poll: Displays the current state of a given KeyCode or axis.\nUsage: Poll <KeyCode>");
+
+	}
+
+	public static void Poll(string surface) {
+		KeyCode pollMe;
+		string name = surface.SplitUnlessInContainer(' ', '\"')[0];
+		try {
+			pollMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
+		} catch(System.ArgumentException) {
+			try {
+				Echo(name + " is " + Input.GetAxisRaw(name));
+			} catch(UnityException) {
+				Echo(name + " is not a valid KeyCode or axis!");
+			}
+			return;
+		}
+		Echo(name + " is " + Input.GetKey(pollMe));
+
+	}
+
 	public static void Unbind() {
-		Echo("Unbind: Unbinds all commands from a key.\nUsage: Unbind <KeyCode>");
+		Echo("Unbind: Unbinds all commands from a key or axis.\nUsage: Unbind <KeyCode>");
 
 	}
 
@@ -846,7 +918,11 @@ public class Console : MonoBehaviour {
 		try {
 			unbindMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
 		} catch(System.ArgumentException) {
-			Echo(name + " is not a valid KeyCode!");
+			if(axisMappings.ContainsKey(name)) {
+				axisMappings.Remove(name);
+			} else {
+				Echo(name + " is not a valid KeyCode or the axis is not bound!");
+			}
 			return;
 		}
 		if(binds.ContainsKey(unbindMe)) {
@@ -891,6 +967,9 @@ public class Console : MonoBehaviour {
 		}
 		foreach(KeyCode bind in binds.Keys) {
 			sw.WriteLine("Bind \"" + bind.ToString() + "\" \"" + binds[bind].Replace('\"', '\'') + "\"");
+		}
+		foreach(string bind in axisMappings.Keys) {
+			sw.WriteLine("Bind \"" + bind.ToString() + "\" \"" + axisMappings[bind].Replace('\"', '\'') + "\"");
 		}
 		sw.Close();
 
