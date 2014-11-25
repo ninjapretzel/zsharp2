@@ -56,6 +56,7 @@ public class Console : MonoBehaviour {
 			aliases.Add("unalias", "Unalias");
 			aliases.Add("unbind", "Unbind");
 			aliases.Add("poll", "Poll");
+			binds.Add(KeyCode.F1, "ToggleConsole");
 			SaveConfigFile();
 		}
 
@@ -97,6 +98,8 @@ public class Console : MonoBehaviour {
 					Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(mapping).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(mapping)).ToString()));
 				}
 			}
+		} else {
+			Screen.lockCursor = false;
 		}
 
 	}
@@ -229,16 +232,23 @@ public class Console : MonoBehaviour {
 			}
 			// Attempt to reference the named member in named class
 			if(targetClass != null) {
-				if(!CallField(targetClass, targetMemberName, parameters)) {
-					if(!CallMethod(targetClass, targetMemberName, parameters)) {
-						if(!CallProperty(targetClass, targetMemberName, parameters)) {
-							if(!aliases.ContainsKey(command)) {
-								Echo("Unknown command: "+command);
-							} else {
-								Execute(aliases[command] + " " + parameters);
+				try {
+					if(!CallField(targetClass, targetMemberName, parameters)) {
+						if(!CallMethod(targetClass, targetMemberName, parameters)) {
+							if(!CallProperty(targetClass, targetMemberName, parameters)) {
+								if(!aliases.ContainsKey(command)) {
+									Echo("Unknown command: "+command);
+								} else {
+									Execute(aliases[command] + " " + parameters);
+								}
 							}
 						}
 					}
+				} catch(TargetInvocationException e) {
+					Console.Echo("Console triggered an exception in the runtime.\n" + e.ToString().Substring(108, e.ToString().IndexOf('\n') - 109));
+#if UNITY_DEBUG || UNITY_EDITOR
+					throw e;
+#endif
 				}
 			} else {
 				Echo("Unknown command: "+command);
