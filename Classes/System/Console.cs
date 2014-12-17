@@ -30,11 +30,11 @@ public class Console : MonoBehaviour {
 	private static Dictionary<KeyCode, string> binds = new Dictionary<KeyCode, string>();
 	private static Dictionary<string, string> axisMappings = new Dictionary<string, string>();
 	public static string configPath { get { return Application.persistentDataPath + "/config.cfg"; } }
+	public static string persistent { get { return Resources.Load<TextAsset>("defaults").text; } }
 	public static string autoexecPath;
 	//private static Message message = new Message();
 
 	public void Awake() {
-		consoleText = initialText.ParseNewlines();
 		autoexecPath = Application.persistentDataPath + "/autoexec.cfg";
 		classBlacklist = blacklistedClasses.ToList<string>();
 		if(!classBlacklist.Contains("InAppPurchases")) { classBlacklist.Add("InAppPurchases"); }
@@ -44,22 +44,34 @@ public class Console : MonoBehaviour {
 
 	public void Start() {
 		if(File.Exists(configPath)) {
+			Execute(persistent.Split('\n'));
+			// If config exists, clear binds after loading persistent file (we want the default aliases but not the keybinds)
+			binds = new Dictionary<KeyCode, string>();
+			// All preexisting keybinds will be reloaded from this file instead
 			Exec(configPath);
 			if(File.Exists(autoexecPath)) {
 				Exec(autoexecPath);
 			}
+			Clear();
 		} else {
-			aliases.Add("quit", "Quit");
-			aliases.Add("alias", "Alias");
-			aliases.Add("bind", "Bind");
-			aliases.Add("ehco", "Echo");
-			aliases.Add("unalias", "Unalias");
-			aliases.Add("unbind", "Unbind");
-			aliases.Add("poll", "Poll");
-			binds.Add(KeyCode.F1, "ToggleConsole");
+			binds = new Dictionary<KeyCode, string>();
+			aliases = new Dictionary<string, string>();
+			axisMappings = new Dictionary<string, string>();
+			Execute(persistent.Split('\n'));
+			Clear();
 			SaveConfigFile();
 		}
+		consoleText = initialText.ParseNewlines();
 
+	}
+
+	public static void Defaults() {
+		binds = new Dictionary<KeyCode, string>();
+		aliases = new Dictionary<string, string>();
+		axisMappings = new Dictionary<string, string>();
+		File.Delete(configPath);
+		Execute(persistent.Split('\n'));
+		SaveConfigFile();
 	}
 
 	public void Update() {
@@ -82,17 +94,49 @@ public class Console : MonoBehaviour {
 			foreach(string mapping in axisMappings.Keys) {
 				if(mapping[mapping.Length - 1] == '-') {
 					string axis = mapping.Substring(0, mapping.Length - 1);
-					if(Input.GetAxisRaw(axis) < 0) {
-						Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
+					if(axisMappings[mapping].Contains("%value%") || axisMappings[mapping].Contains("%nvalue%")) {
+						if(Input.GetAxisRaw(axis) < 0) {
+							Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
+						} else {
+							Execute(axisMappings[mapping].Replace("%value%", "0").Replace("%nvalue%", "0"));
+						}
 					} else {
-						Execute(axisMappings[mapping].Replace("%value%", "0").Replace("%nvalue%", "0"));
+						if(Input.GetAxisRaw(axis) < -0.5f) {
+							Execute(axisMappings[mapping]);
+						}
+						if(axisMappings[mapping][0] == '+') {
+							if(Input.GetAxisRaw(axis) >= -0.5f) {
+								int semicolonindex = axisMappings[mapping].IndexOf(';');
+								if(semicolonindex > 0) {
+									Execute('-' + axisMappings[mapping].Substring(1, semicolonindex - 1));
+								} else {
+									Execute('-' + axisMappings[mapping].Substring(1));
+								}
+							}
+						}
 					}
 				} else if(mapping[mapping.Length - 1] == '+') {
 					string axis = mapping.Substring(0, mapping.Length - 1);
-					if(Input.GetAxisRaw(axis) > 0) {
-						Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
+					if(axisMappings[mapping].Contains("%value%") || axisMappings[mapping].Contains("%nvalue%")) {
+						if(Input.GetAxisRaw(axis) > 0) {
+							Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
+						} else {
+							Execute(axisMappings[mapping].Replace("%value%", "0").Replace("%nvalue%", "0"));
+						}
 					} else {
-						Execute(axisMappings[mapping].Replace("%value%", "0").Replace("%nvalue%", "0"));
+						if(Input.GetAxisRaw(axis) > 0.5f) {
+							Execute(axisMappings[mapping]);
+						}
+						if(axisMappings[mapping][0] == '+') {
+							if(Input.GetAxisRaw(axis) <= 0.5f) {
+								int semicolonindex = axisMappings[mapping].IndexOf(';');
+								if(semicolonindex > 0) {
+									Execute('-' + axisMappings[mapping].Substring(1, semicolonindex - 1));
+								} else {
+									Execute('-' + axisMappings[mapping].Substring(1));
+								}
+							}
+						}
 					}
 				} else {
 					Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(mapping).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(mapping)).ToString()));
@@ -184,6 +228,12 @@ public class Console : MonoBehaviour {
 			//message.Draw(sizeOfLabel);
 		} GUI.EndScrollView();
 
+	}
+
+	public static void Execute(string[] lines) {
+		foreach(string line in lines) {
+			Execute(line);
+		}
 	}
 
 	// Execute takes a line and attempts to turn it into commands which will be executed, through reflection.
@@ -668,9 +718,14 @@ public class Console : MonoBehaviour {
 					return false;
 				} else {
 					try {
-						return System.Boolean.Parse(parameters[0]);
+						float val = System.Single.Parse(parameters[0]);
+						return val >= 0.5f;
 					} catch(System.FormatException) {
-						return null;
+						try {
+							return System.Boolean.Parse(parameters[0]);
+						} catch(System.FormatException) {
+							return null;
+						}
 					}
 				}
 			default:
