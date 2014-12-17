@@ -91,6 +91,11 @@ public static class Input {
 		}
 	}
 	
+	
+	public static Vector3 screenMousePosition { 
+		get { return In.mousePosition; }
+	}
+	
 	public static bool multiTouchEnabled { get { return In.multiTouchEnabled; } set { In.multiTouchEnabled = value; } }
 	public static int touchCount { get { return In.touchCount; } }
 	public static Touch[] touches { get { return In.touches; } }
