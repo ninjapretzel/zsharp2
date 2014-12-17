@@ -7,7 +7,7 @@ using System.Linq;
 using UnityEditor;
 #endif
 
-public class Console : MonoBehaviour {
+public class DevConsole : MonoBehaviour {
 	
 	public string initialText = "";
 	public GUISkin consoleSkin;
@@ -267,7 +267,7 @@ public class Console : MonoBehaviour {
 			if(indexOfDot > 0) {
 				targetClassName = command.Substring(0, indexOfDot);
 				if(classBlacklist.Contains(targetClassName)) {
-#if !DEBUG && !UNITY_EDITOR
+#if !UNITY_DEBUG && !UNITY_EDITOR
 					Echo("Unknown command: "+command);
 					return;
 #else
@@ -277,7 +277,7 @@ public class Console : MonoBehaviour {
 				targetMemberName = command.Substring(indexOfDot+1);
 				targetClass = System.Type.GetType(targetClassName);
 			} else {
-				targetClass = typeof(Console);
+				targetClass = typeof(DevConsole);
 				targetMemberName = command;
 			}
 			// Attempt to reference the named member in named class
@@ -295,7 +295,7 @@ public class Console : MonoBehaviour {
 						}
 					}
 				} catch(TargetInvocationException e) {
-					Console.Echo("Console triggered an exception in the runtime.\n" + e.ToString().Substring(108, e.ToString().IndexOf('\n') - 109));
+					DevConsole.Echo("Console triggered an exception in the runtime.\n" + e.ToString().Substring(108, e.ToString().IndexOf('\n') - 109));
 #if UNITY_DEBUG || UNITY_EDITOR
 					throw e;
 #endif
@@ -749,7 +749,7 @@ public class Console : MonoBehaviour {
 
 	// Returns: boolean, true if member is not marked Inaccessible
 	public static bool IsAccessible(MemberInfo member) {
-#if DEBUG || UNITY_EDITOR
+#if UNITY_DEBUG || UNITY_EDITOR
 		if(System.Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked inaccessible and cannot be accessed normally!");
 		}
@@ -761,7 +761,7 @@ public class Console : MonoBehaviour {
 
 	// Returns: boolean, true if member is marked cheat. Changing any property, field, or calling any method marked cheat through the console must trigger appropriate responses.
 	public static bool IsCheat(MemberInfo member) {
-#if DEBUG || UNITY_EDITOR
+#if UNITY_DEBUG || UNITY_EDITOR
 		if(System.Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked a cheat and cannot be accessed normally without cheats!");
 		}
