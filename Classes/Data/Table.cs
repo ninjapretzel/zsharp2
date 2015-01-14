@@ -245,6 +245,8 @@ public class Table : Dictionary<string, float> {
 		}
 	}
 	
+	//Gets this table with a given 'mask' applied to it
+	//This removes values that do not appear with the mask.
 	public Table Mask(string mask) { return Mask(mask, ','); }
 	public Table Mask(string mask, char delim) { return Mask(mask.Split(delim)); }
 	public Table Mask(string[] fields) {
@@ -356,6 +358,48 @@ public class Table : Dictionary<string, float> {
 		return str.ToString();
 	}
 	
+	public void LoadJson(string json) {
+		JsonObject obj = Json.Parse(json) as JsonObject;
+		if (obj != null) {
+			Dictionary<JsonString, JsonValue> objPairs = obj.GetData();
+			
+			Clear();
+			foreach (var pair in objPairs) {
+				string key = pair.Key.stringVal;
+				JsonValue val = pair.Value;
+				
+				if (val.isNumber) { this[key] = (float)val.numVal; }
+				if (val.isBool) { this[key] = (val.boolVal) ? 1.0f : 0.0f; }
+				
+				if (val.isObject) {
+					if (val.ContainsAnyKeys("x", "y", "z")) {
+						Vector3 v = Vector3.zero;
+						if (val["x"].isNumber) { v.x = (float)val["x"].numVal; }
+						if (val["y"].isNumber) { v.y = (float)val["y"].numVal; }
+						if (val["z"].isNumber) { v.z = (float)val["z"].numVal; }
+						SetVector3(key, v);
+					}
+					
+					
+					
+				}
+			}
+		}
+	}
+	
+	public string ToJson() {
+		JsonObject obj = new JsonObject();
+		foreach (string key in FieldKeys) { 
+			if (ContainsKey(key)) { obj.Add(key, this[key]); }
+			if (ContainsVector3(key)) { 
+				obj.Add(key, Json.Reflect(GetVector2(key)) );
+			} else if (ContainsVector3(key)) {
+				obj.Add(key, Json.Reflect(GetVector3(key)) );
+			}
+		}
+		
+		return obj.PrettyPrint();
+	}
 	
 	public float Sum() {
 		float f = 0;

@@ -47,6 +47,9 @@ public class DevConsole : MonoBehaviour {
 			Execute(persistent.Split('\n'));
 			// If config exists, clear binds after loading persistent file (we want the default aliases but not the keybinds)
 			binds = new Dictionary<KeyCode, string>();
+#if UNITY_EDITOR
+			binds.Add(KeyCode.F1, "ToggleConsole");
+#endif
 			// All preexisting keybinds will be reloaded from this file instead
 			Exec(configPath);
 			if(File.Exists(autoexecPath)) {
@@ -154,10 +157,12 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public void OnGUI() {
-		GUI.skin = consoleSkin;
-		GUI.skin.window.fontSize = 18;
 		if(_consoleUp) {
+			GUI.skin = consoleSkin;
+			GUI.skin.FontSizeFull(12);
+			GUI.skin.window.fontSize = 18;
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_MAC
+			consoleWindowRect = new Rect(Mathf.Min(Mathf.Max(consoleWindowRect.x, -1 * consoleWindowRect.width + 10), Screen.width - 10), Mathf.Min(Mathf.Max(consoleWindowRect.y, -1 * GUI.skin.window.fontSize + 10), Screen.height - 10), consoleWindowRect.width, consoleWindowRect.height);
 			consoleWindowRect = GUI.Window(1, consoleWindowRect, ConsoleWindow, "Developer Console");
 #endif
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
@@ -216,7 +221,8 @@ public class DevConsole : MonoBehaviour {
 
 		GUI.skin.label.alignment = TextAnchor.UpperLeft;
 		GUI.skin.label.wordWrap = true;
-		GUI.skin.FontSizeFull(20.0f);
+		
+		GUI.skin.FontSizeFull(12.0f);
 		heightOfGUIContent = GUI.skin.label.CalcHeight(new GUIContent(consoleText), consoleWindowRect.width - 26.0f);
 		Rect sizeOfLabel = new Rect(0.0f, 0.0f, consoleWindowRect.width - 26.0f, Mathf.Max(heightOfGUIContent, consoleWindowRect.height - heightOfFont - 30.0f));
 		consoleScrollPos = GUI.BeginScrollView(new Rect(5.0f, 20.0f, consoleWindowRect.width - 10.0f, consoleWindowRect.height - heightOfFont - 30.0f), consoleScrollPos, sizeOfLabel, false, true); {

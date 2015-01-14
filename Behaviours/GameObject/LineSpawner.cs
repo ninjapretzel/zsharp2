@@ -40,7 +40,7 @@ public class LineSpawner : MonoBehaviour {
 		if (localOffset) { off = transform.rotation * off; }
 		
 		Vector3 start = transform.position;
-		Vector3 end = start + numInLine * off;
+		//Vector3 end = start + numInLine * off;
 		
 		if (mirror) { 
 			numPoints *= 2; 

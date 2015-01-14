@@ -3,6 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 
 public static class UnityUtils {
+	public static Vector3 GetCenter(this BoxCollider c) {
+		Vector3 pos = c.transform.position;
+		Vector3 offset = Vector3.Scale(c.center, c.transform.lossyScale);
+		return pos + c.transform.rotation * offset;
+	}
+	
 	public static T GetComponentOnOrAbove<T>(this Component c) where T : Component {
 		Transform test = c.transform;
 		Component check;
