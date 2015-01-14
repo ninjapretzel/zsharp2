@@ -14,6 +14,7 @@ public class DevConsole : MonoBehaviour {
 	public static string consoleText = "";
 	public static Color color = Color.white;
 	public static bool cheats = false;
+	public static string echoBuffer = "";
 	[Inaccessible] public string[] blacklistedClasses;
 	[Inaccessible] public static List<string> classBlacklist = new List<string>();
 
@@ -793,7 +794,8 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public static void Echo(string st) {
-		consoleText += "\n"+st.ParseNewlines();
+		echoBuffer += "\n" + st.ParseNewlines();
+		consoleText += "\n" + st.ParseNewlines();
 		consoleScrollPos = new Vector2(0, heightOfGUIContent);
 
 	}
