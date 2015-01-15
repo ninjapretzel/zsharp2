@@ -469,6 +469,48 @@ public static class DataFTable {
 	
 }
 
+public static class DataFiles {
+	
+	public static JsonObject TryConvertCSVToJSON(string file) {
+		string[] lines = File.ReadAllLines(file);
+		string targetFile = file.UpToLast('.') + ".json";
+		JsonObject values = new JsonObject();
+		
+		foreach (string line in lines) {
+			if (line.Length < 3) { continue; }
+			if (line.StartsWith("#")) { continue; }
+			
+			string[] split = line.Split(',');
+			string key = split[0];
+			string val = split[1];
+			double numVal;
+			if (double.TryParse(val, out numVal)) {
+				values[key] = numVal;
+			} 
+			else if (val == "true") { values[key] = true; }
+			else if (val == "false") { values[key] = false; }
+			else {
+				values[key] = val;
+			}
+			
+		}
+		
+		if (values.Count > 0) {
+			try {
+				File.WriteAllText(targetFile, values.PrettyPrint());
+				File.Delete(file);
+				Debug.Log("Converted " + file + " to json successfully");
+			} catch (Exception e) {
+				Debug.Log("Tried to convert " + file + " to json. Unsuccessful: " + e.GetType());
+			}
+			
+			
+			return values;
+		}
+		
+		return null;
+	}
+}
 
 
 
