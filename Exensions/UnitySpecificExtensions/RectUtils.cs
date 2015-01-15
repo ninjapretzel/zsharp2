@@ -132,6 +132,19 @@ public static class RectUtils {
 	public static Rect Left(this Rect r, float p) { return r.UpperLeft(p, 1); }
 	public static Rect Center(this Rect r, float p) { return r.UpperCenter(p, 1); }
 	public static Rect Right(this Rect r, float p) { return r.UpperRight(p, 1); }
+
+	public static Rect Left(this Rect r, float offset, float p) {
+		return new Rect(r.x + r.width * offset, r.y, r.width * p, r.height);
+	}
+	public static Rect Top(this Rect r, float offset, float p) {
+		return new Rect(r.x, r.y + r.height * offset, r.width, r.height * p);
+	}
+	public static Rect Right(this Rect r, float offset, float p) {
+		return new Rect(r.x + r.width - (r.width * offset) - (r.width * p), r.y, (r.width * p), r.height);
+	}
+	public static Rect Bottom(this Rect r, float offset, float p) {
+		return new Rect(r.x, r.y + r.height - (r.height * offset) - (r.height * p), r.width, (r.height * p));
+	}
 	
 	public static Vector2 TopLeft(this Rect r) { return r.UpperLeft(); }
 	public static Rect TopLeft(this Rect r, float f) { return r.UpperLeft(f, f); }

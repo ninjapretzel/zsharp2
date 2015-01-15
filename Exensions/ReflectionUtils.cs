@@ -30,20 +30,27 @@ public static class ReflectionUtils {
 	
 	///Does this object have a property called name?
 	public static bool HasProperty(this System.Object obj, string name) { return obj.GetProperty(name) != null; }
+	public static bool HasStaticProperty(this System.Type type, string name) { return type.GetStaticProperty(name) != null; }
 	///Get this object's property called name, optionally matching a Type or BindingFlags to that property.
 	public static PropertyInfo GetProperty(this System.Object obj, string name) { return obj.GetType().GetProperty(name); }
 	public static PropertyInfo GetProperty(this System.Object obj, string name, Type type) { return obj.GetType().GetProperty(name, type); }
 	public static PropertyInfo GetProperty(this System.Object obj, string name, BindingFlags flags) { return obj.GetType().GetProperty(name, flags); }
 	
+	public static PropertyInfo GetStaticProperty(this System.Type type, string name) { return type.GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty); }
+	
 	///Does this object have a field called name?
 	public static bool HasField(this System.Object obj, string name) { return obj.GetField(name) != null; }
+	public static bool HasStaticField(this System.Type type, string name) { return type.GetStaticField(name) != null; }
 	///Get this object's field called name, optionally matching a Type or BindingFlags to that field.
 	public static FieldInfo GetField(this System.Object obj, string name) { return obj.GetType().GetField(name); }
 	public static FieldInfo GetField(this System.Object obj, string name, Type type) { return obj.GetType().GetField(name, type); }
 	public static FieldInfo GetField(this System.Object obj, string name, BindingFlags flags) { return obj.GetType().GetField(name, flags); }
 	
+	public static FieldInfo GetStaticField(this System.Type type, string name) { return type.GetField(name, BindingFlags.Static); }
+	
 	///Does this object have a method called name?
 	public static bool HasMethod(this System.Object obj, string name) { return obj.GetMethod(name) != null; }
+	public static bool HasStaticMethod(this System.Type type, string name) { return type.GetMethod(name) != null; }
 	///Does this object have a void method called name?
 	public static bool HasAction(this System.Object obj, string name) { return obj.HasMethod<Void>(name); }
 	
@@ -91,6 +98,8 @@ public static class ReflectionUtils {
 	public static MethodInfo GetMethod(this System.Object obj, string name) { return obj.GetType().GetMethod(name); }
 	public static MethodInfo GetMethod(this System.Object obj, string name, Type type) { return obj.GetType().GetMethod(name, type); }
 	public static MethodInfo GetMethod(this System.Object obj, string name, BindingFlags flags) { return obj.GetType().GetMethod(name, flags); }
+	
+	public static MethodInfo GetStaticMethod(this System.Type type, string name) { return type.GetMethod(name, BindingFlags.Static); }
 	
 	///Set an object's Property or Field by the provided name to a value
 	public static bool SetObjectValue(this System.Object obj, string name, System.Object value) {
@@ -167,6 +176,26 @@ public static class ReflectionUtils {
 		
 		Debug.LogWarning("ReflectionF.GetRawPropertyValue: Property " + name + " on instance of " + obj.GetType().ShortName() + " does not exist.");
 		return null;
+	}
+	
+	public static T GetStaticPropertyValue<T>(this System.Type type, string name) {
+		PropertyInfo prop = type.GetStaticProperty(name);
+		if (prop != null) {
+			if (prop.PropertyType.IsAssignableFrom(typeof(T))) {
+				MethodInfo method = prop.GetGetMethod();
+				if (method != null) {
+					return (T) method.Invoke(null, null);
+				}
+				Debug.LogWarning("ReflectionF.GetStaticPropertyValue: Property " + name + " in " + type.ShortName() + " does not have get method.");
+				return default(T);
+			}
+			
+			Debug.LogWarning("ReflectionF.GetStaticPropertyValue: Property " + name + " in " + type.ShortName() + " does not match expected type.");
+			return default(T);
+		}
+		
+		Debug.LogWarning("ReflectionF.GetStaticPropertyValue: Property " + name + " in " + type.ShortName() + " does not exist.");
+		return default(T);
 	}
 	
 	///Set an object's Property value by the provided name and type.

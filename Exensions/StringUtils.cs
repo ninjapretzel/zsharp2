@@ -33,6 +33,13 @@ public static class StringUtils {
 		return str.ToString();
 	}
 	
+	public static bool EndsWith(this string s, string check) {
+		if (s.Length < check.Length) { return false; }
+		if (s.Length == check.Length) { return s == check; }
+		string sub = s.Substring(s.Length - check.Length, check.Length);
+		return sub == check;
+	}
+	
 	///Simple convert string to bytes/from bytes
 	public static byte[] GetBytes(this string s) {
 		byte[] bytes = new byte[s.Length * sizeof(char)];

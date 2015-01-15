@@ -3,6 +3,63 @@ using System.Collections;
 
 using In = UnityEngine.Input;
 
+// Enum definitions with names matching axes as defined in DefaultProjectSettings/InputManager.asset
+public enum AxisCode : int {
+	Joystick1Axis0 = 0,
+	Joystick1Axis1 = 1,
+	Joystick1Axis2 = 2,
+	Joystick1Axis3 = 3,
+	Joystick1Axis4 = 4,
+	Joystick1Axis5 = 5,
+	Joystick1Axis6 = 6,
+	Joystick1Axis7 = 7,
+	Joystick1Axis8 = 8,
+	Joystick1Axis9 = 9,
+	Joystick2Axis0 = 10,
+	Joystick2Axis1 = 11,
+	Joystick2Axis2 = 12,
+	Joystick2Axis3 = 13,
+	Joystick2Axis4 = 14,
+	Joystick2Axis5 = 15,
+	Joystick2Axis6 = 16,
+	Joystick2Axis7 = 17,
+	Joystick2Axis8 = 18,
+	Joystick2Axis9 = 19,
+	Joystick3Axis0 = 20,
+	Joystick3Axis1 = 21,
+	Joystick3Axis2 = 22,
+	Joystick3Axis3 = 23,
+	Joystick3Axis4 = 24,
+	Joystick3Axis5 = 25,
+	Joystick3Axis6 = 26,
+	Joystick3Axis7 = 27,
+	Joystick3Axis8 = 28,
+	Joystick3Axis9 = 29,
+	Joystick4Axis0 = 30,
+	Joystick4Axis1 = 31,
+	Joystick4Axis2 = 32,
+	Joystick4Axis3 = 33,
+	Joystick4Axis4 = 34,
+	Joystick4Axis5 = 35,
+	Joystick4Axis6 = 36,
+	Joystick4Axis7 = 37,
+	Joystick4Axis8 = 38,
+	Joystick4Axis9 = 39,
+	JoystickAxis0 = 40,
+	JoystickAxis1 = 41,
+	JoystickAxis2 = 42,
+	JoystickAxis3 = 43,
+	JoystickAxis4 = 44,
+	JoystickAxis5 = 45,
+	JoystickAxis6 = 46,
+	JoystickAxis7 = 47,
+	JoystickAxis8 = 48,
+	JoystickAxis9 = 49,
+	MouseAxisX = 50,
+	MouseAxisY = 51,
+	MouseWheel = 52
+}
+
 ///This is a static class that wraps all of Unity's internal Input static class'
 ///Then provides some additional extra features
 public static class Input {
@@ -32,6 +89,11 @@ public static class Input {
 			pos.y = Screen.height - pos.y;
 			return pos;
 		}
+	}
+	
+	
+	public static Vector3 screenMousePosition { 
+		get { return In.mousePosition; }
 	}
 	
 	public static bool multiTouchEnabled { get { return In.multiTouchEnabled; } set { In.multiTouchEnabled = value; } }

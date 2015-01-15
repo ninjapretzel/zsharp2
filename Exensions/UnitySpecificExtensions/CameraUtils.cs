@@ -16,7 +16,7 @@ public static class CameraUtils {
 	
 	//Get the ray for the pixel of the mouse from the main Camera object.
 	public static Ray mouseRay {
-		get { return Camera.main.ScreenPointToRay(Input.mousePosition); }
+		get { return Camera.main.ScreenPointToRay(Input.screenMousePosition); }
 	}
 	
 	//Raycasts with default layermask into the world

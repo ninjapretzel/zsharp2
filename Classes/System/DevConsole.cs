@@ -7,13 +7,14 @@ using System.Linq;
 using UnityEditor;
 #endif
 
-public class Console : MonoBehaviour {
+public class DevConsole : MonoBehaviour {
 	
 	public string initialText = "";
 	public GUISkin consoleSkin;
 	public static string consoleText = "";
 	public static Color color = Color.white;
 	public static bool cheats = false;
+	public static string echoBuffer = "";
 	[Inaccessible] public string[] blacklistedClasses;
 	[Inaccessible] public static List<string> classBlacklist = new List<string>();
 
@@ -28,12 +29,13 @@ public class Console : MonoBehaviour {
 	private static List<string> previousCommands = new List<string>();
 	private static Dictionary<string, string> aliases = new Dictionary<string, string>();
 	private static Dictionary<KeyCode, string> binds = new Dictionary<KeyCode, string>();
+	private static Dictionary<string, string> axisMappings = new Dictionary<string, string>();
 	public static string configPath { get { return Application.persistentDataPath + "/config.cfg"; } }
+	public static string persistent { get { return Resources.Load<TextAsset>("defaults").text; } }
 	public static string autoexecPath;
 	//private static Message message = new Message();
 
 	public void Awake() {
-		consoleText = initialText.ParseNewlines();
 		autoexecPath = Application.persistentDataPath + "/autoexec.cfg";
 		classBlacklist = blacklistedClasses.ToList<string>();
 		if(!classBlacklist.Contains("InAppPurchases")) { classBlacklist.Add("InAppPurchases"); }
@@ -43,20 +45,37 @@ public class Console : MonoBehaviour {
 
 	public void Start() {
 		if(File.Exists(configPath)) {
+			Execute(persistent.Split('\n'));
+			// If config exists, clear binds after loading persistent file (we want the default aliases but not the keybinds)
+			binds = new Dictionary<KeyCode, string>();
+#if UNITY_EDITOR
+			binds.Add(KeyCode.F1, "ToggleConsole");
+#endif
+			// All preexisting keybinds will be reloaded from this file instead
 			Exec(configPath);
 			if(File.Exists(autoexecPath)) {
 				Exec(autoexecPath);
 			}
+			Clear();
 		} else {
-			aliases.Add("quit", "Quit");
-			aliases.Add("alias", "Alias");
-			aliases.Add("bind", "Bind");
-			aliases.Add("ehco", "Echo");
-			aliases.Add("unalias", "Unalias");
-			aliases.Add("unbind", "Unbind");
+			binds = new Dictionary<KeyCode, string>();
+			aliases = new Dictionary<string, string>();
+			axisMappings = new Dictionary<string, string>();
+			Execute(persistent.Split('\n'));
+			Clear();
 			SaveConfigFile();
 		}
+		consoleText = initialText.ParseNewlines();
 
+	}
+
+	public static void Defaults() {
+		binds = new Dictionary<KeyCode, string>();
+		aliases = new Dictionary<string, string>();
+		axisMappings = new Dictionary<string, string>();
+		File.Delete(configPath);
+		Execute(persistent.Split('\n'));
+		SaveConfigFile();
 	}
 
 	public void Update() {
@@ -76,6 +95,59 @@ public class Console : MonoBehaviour {
 					}
 				}
 			}
+			foreach(string mapping in axisMappings.Keys) {
+				if(mapping[mapping.Length - 1] == '-') {
+					string axis = mapping.Substring(0, mapping.Length - 1);
+					if(axisMappings[mapping].Contains("%value%") || axisMappings[mapping].Contains("%nvalue%")) {
+						if(Input.GetAxisRaw(axis) < 0) {
+							Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
+						} else {
+							Execute(axisMappings[mapping].Replace("%value%", "0").Replace("%nvalue%", "0"));
+						}
+					} else {
+						if(Input.GetAxisRaw(axis) < -0.5f) {
+							Execute(axisMappings[mapping]);
+						}
+						if(axisMappings[mapping][0] == '+') {
+							if(Input.GetAxisRaw(axis) >= -0.5f) {
+								int semicolonindex = axisMappings[mapping].IndexOf(';');
+								if(semicolonindex > 0) {
+									Execute('-' + axisMappings[mapping].Substring(1, semicolonindex - 1));
+								} else {
+									Execute('-' + axisMappings[mapping].Substring(1));
+								}
+							}
+						}
+					}
+				} else if(mapping[mapping.Length - 1] == '+') {
+					string axis = mapping.Substring(0, mapping.Length - 1);
+					if(axisMappings[mapping].Contains("%value%") || axisMappings[mapping].Contains("%nvalue%")) {
+						if(Input.GetAxisRaw(axis) > 0) {
+							Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
+						} else {
+							Execute(axisMappings[mapping].Replace("%value%", "0").Replace("%nvalue%", "0"));
+						}
+					} else {
+						if(Input.GetAxisRaw(axis) > 0.5f) {
+							Execute(axisMappings[mapping]);
+						}
+						if(axisMappings[mapping][0] == '+') {
+							if(Input.GetAxisRaw(axis) <= 0.5f) {
+								int semicolonindex = axisMappings[mapping].IndexOf(';');
+								if(semicolonindex > 0) {
+									Execute('-' + axisMappings[mapping].Substring(1, semicolonindex - 1));
+								} else {
+									Execute('-' + axisMappings[mapping].Substring(1));
+								}
+							}
+						}
+					}
+				} else {
+					Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(mapping).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(mapping)).ToString()));
+				}
+			}
+		} else {
+			Screen.lockCursor = false;
 		}
 
 	}
@@ -86,10 +158,12 @@ public class Console : MonoBehaviour {
 	}
 
 	public void OnGUI() {
-		GUI.skin = consoleSkin;
-		GUI.skin.window.fontSize = 18;
 		if(_consoleUp) {
+			GUI.skin = consoleSkin;
+			GUI.skin.FontSizeFull(12);
+			GUI.skin.window.fontSize = 18;
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_MAC
+			consoleWindowRect = new Rect(Mathf.Min(Mathf.Max(consoleWindowRect.x, -1 * consoleWindowRect.width + 10), Screen.width - 10), Mathf.Min(Mathf.Max(consoleWindowRect.y, -1 * GUI.skin.window.fontSize + 10), Screen.height - 10), consoleWindowRect.width, consoleWindowRect.height);
 			consoleWindowRect = GUI.Window(1, consoleWindowRect, ConsoleWindow, "Developer Console");
 #endif
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
@@ -148,7 +222,8 @@ public class Console : MonoBehaviour {
 
 		GUI.skin.label.alignment = TextAnchor.UpperLeft;
 		GUI.skin.label.wordWrap = true;
-		GUI.skin.FontSizeFull(20.0f);
+		
+		GUI.skin.FontSizeFull(12.0f);
 		heightOfGUIContent = GUI.skin.label.CalcHeight(new GUIContent(consoleText), consoleWindowRect.width - 26.0f);
 		Rect sizeOfLabel = new Rect(0.0f, 0.0f, consoleWindowRect.width - 26.0f, Mathf.Max(heightOfGUIContent, consoleWindowRect.height - heightOfFont - 30.0f));
 		consoleScrollPos = GUI.BeginScrollView(new Rect(5.0f, 20.0f, consoleWindowRect.width - 10.0f, consoleWindowRect.height - heightOfFont - 30.0f), consoleScrollPos, sizeOfLabel, false, true); {
@@ -160,6 +235,12 @@ public class Console : MonoBehaviour {
 			//message.Draw(sizeOfLabel);
 		} GUI.EndScrollView();
 
+	}
+
+	public static void Execute(string[] lines) {
+		foreach(string line in lines) {
+			Execute(line);
+		}
 	}
 
 	// Execute takes a line and attempts to turn it into commands which will be executed, through reflection.
@@ -193,7 +274,7 @@ public class Console : MonoBehaviour {
 			if(indexOfDot > 0) {
 				targetClassName = command.Substring(0, indexOfDot);
 				if(classBlacklist.Contains(targetClassName)) {
-#if !DEBUG && !UNITY_EDITOR
+#if !UNITY_DEBUG && !UNITY_EDITOR
 					Echo("Unknown command: "+command);
 					return;
 #else
@@ -203,21 +284,28 @@ public class Console : MonoBehaviour {
 				targetMemberName = command.Substring(indexOfDot+1);
 				targetClass = System.Type.GetType(targetClassName);
 			} else {
-				targetClass = typeof(Console);
+				targetClass = typeof(DevConsole);
 				targetMemberName = command;
 			}
 			// Attempt to reference the named member in named class
 			if(targetClass != null) {
-				if(!CallField(targetClass, targetMemberName, parameters)) {
-					if(!CallMethod(targetClass, targetMemberName, parameters)) {
-						if(!CallProperty(targetClass, targetMemberName, parameters)) {
-							if(!aliases.ContainsKey(command)) {
-								Echo("Unknown command: "+command);
-							} else {
-								Execute(aliases[command] + " " + parameters);
+				try {
+					if(!CallField(targetClass, targetMemberName, parameters)) {
+						if(!CallMethod(targetClass, targetMemberName, parameters)) {
+							if(!CallProperty(targetClass, targetMemberName, parameters)) {
+								if(!aliases.ContainsKey(command)) {
+									Echo("Unknown command: "+command);
+								} else {
+									Execute(aliases[command] + " " + parameters);
+								}
 							}
 						}
 					}
+				} catch(TargetInvocationException e) {
+					DevConsole.Echo("Console triggered an exception in the runtime.\n" + e.ToString().Substring(108, e.ToString().IndexOf('\n') - 109));
+#if UNITY_DEBUG || UNITY_EDITOR
+					throw e;
+#endif
 				}
 			} else {
 				Echo("Unknown command: "+command);
@@ -637,9 +725,14 @@ public class Console : MonoBehaviour {
 					return false;
 				} else {
 					try {
-						return System.Boolean.Parse(parameters[0]);
+						float val = System.Single.Parse(parameters[0]);
+						return val >= 0.5f;
 					} catch(System.FormatException) {
-						return null;
+						try {
+							return System.Boolean.Parse(parameters[0]);
+						} catch(System.FormatException) {
+							return null;
+						}
 					}
 				}
 			default:
@@ -654,12 +747,16 @@ public class Console : MonoBehaviour {
 		if(mainField != null && mainField.FieldType == targetClass && IsAccessible(mainField)) {
 			return mainField.GetValue(null);
 		}
+		mainField = targetClass.GetField("instance", BindingFlags.Public | BindingFlags.Static);
+		if(mainField != null && mainField.FieldType == targetClass && IsAccessible(mainField)) {
+			return mainField.GetValue(null);
+		}
 		return null;
 	}
 
 	// Returns: boolean, true if member is not marked Inaccessible
 	public static bool IsAccessible(MemberInfo member) {
-#if DEBUG || UNITY_EDITOR
+#if UNITY_DEBUG || UNITY_EDITOR
 		if(System.Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked inaccessible and cannot be accessed normally!");
 		}
@@ -671,7 +768,7 @@ public class Console : MonoBehaviour {
 
 	// Returns: boolean, true if member is marked cheat. Changing any property, field, or calling any method marked cheat through the console must trigger appropriate responses.
 	public static bool IsCheat(MemberInfo member) {
-#if DEBUG || UNITY_EDITOR
+#if UNITY_DEBUG || UNITY_EDITOR
 		if(System.Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked a cheat and cannot be accessed normally without cheats!");
 		}
@@ -697,7 +794,8 @@ public class Console : MonoBehaviour {
 	}
 
 	public static void Echo(string st) {
-		consoleText += "\n"+st.ParseNewlines();
+		echoBuffer += "\n" + st.ParseNewlines();
+		consoleText += "\n" + st.ParseNewlines();
 		consoleScrollPos = new Vector2(0, heightOfGUIContent);
 
 	}
@@ -780,7 +878,11 @@ public class Console : MonoBehaviour {
 				try {
 					 targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), parameters[0]);
 				} catch(System.ArgumentException) {
-					Echo(parameters[0] + " is not a valid KeyCode");
+					if(axisMappings.ContainsKey(parameters[0])) {
+						Echo(parameters[0] + " is " + axisMappings[parameters[0]]);
+					} else {
+						Echo(parameters[0] + " is not a valid KeyCode or the axis is not bound!");
+					}
 					break;
 				}
 				if(binds.ContainsKey(targetKeyCode)) {
@@ -806,27 +908,48 @@ public class Console : MonoBehaviour {
 	}
 
 	public static void Bind() {
-		Echo("Bind: Allows binding of commands to keypresses.\nUsage: Bind <KeyCode> \"command1 \'[param1\' \'[params...]\'[;][commands...]\"");
+		Echo("Bind: Allows binding of commands to keypresses or axes.\nUsage: Bind <KeyCode> \"command1 \'[param1\' \'[params...]\'[;][commands...]\"");
+		Echo("When binding axes, any instance of %value% will be replaced with the current position of the axis. %nvalue% gives the inverted value.");
+		Echo("Additionally, you may use only half an axis by appending a \"+\" or \"-\" to the end of the axis name.");
 
 	}
 
 	public static void Bind(string name, string cmds) {
 		KeyCode targetKeyCode;
 		try {
-				targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
+			targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), name); // Will throw exception if KeyCode doesn't exist
+			Bind(targetKeyCode, cmds);
 		} catch(System.ArgumentException) {
-			Echo(name + " is not a valid KeyCode!");
-			return;
+			try {
+				if(name[name.Length - 1] == '-' || name[name.Length - 1] == '+') {
+					Input.GetAxisRaw(name.Substring(0, name.Length - 1)); // Will throw exception if axis doesn't exist
+				} else {
+					Input.GetAxisRaw(name); // Will throw exception if axis doesn't exist
+				}
+				if(!axisMappings.ContainsKey(name)) {
+					axisMappings.Add(name, "");
+				} else {
+					axisMappings[name] = "";
+				}
+				List<string> cmdList = cmds.SplitUnlessInContainer(';', '\"');
+				foreach(string cmd in cmdList) {
+					axisMappings[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
+				}
+				axisMappings[name] = axisMappings[name].Substring(1);
+			} catch(UnityException) {
+				Echo(name + " is not a valid KeyCode or axis!");
+				return;
+			}
 		}
-		Bind(targetKeyCode, cmds);
 
 	}
 
 	public static void Bind(KeyCode name, string cmds) {
 		if(!binds.ContainsKey(name)) {
 			binds.Add(name, "");
+		} else {
+			binds[name] = "";
 		}
-		binds[name] = "";
 		List<string> cmdList = cmds.SplitUnlessInContainer(';', '\"');
 		foreach(string cmd in cmdList) {
 			binds[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
@@ -835,8 +958,30 @@ public class Console : MonoBehaviour {
 
 	}
 
+	public static void Poll() {
+		Echo("Poll: Displays the current state of a given KeyCode or axis.\nUsage: Poll <KeyCode>");
+
+	}
+
+	public static void Poll(string surface) {
+		KeyCode pollMe;
+		string name = surface.SplitUnlessInContainer(' ', '\"')[0];
+		try {
+			pollMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
+		} catch(System.ArgumentException) {
+			try {
+				Echo(name + " is " + Input.GetAxisRaw(name));
+			} catch(UnityException) {
+				Echo(name + " is not a valid KeyCode or axis!");
+			}
+			return;
+		}
+		Echo(name + " is " + Input.GetKey(pollMe));
+
+	}
+
 	public static void Unbind() {
-		Echo("Unbind: Unbinds all commands from a key.\nUsage: Unbind <KeyCode>");
+		Echo("Unbind: Unbinds all commands from a key or axis.\nUsage: Unbind <KeyCode>");
 
 	}
 
@@ -846,7 +991,11 @@ public class Console : MonoBehaviour {
 		try {
 			unbindMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
 		} catch(System.ArgumentException) {
-			Echo(name + " is not a valid KeyCode!");
+			if(axisMappings.ContainsKey(name)) {
+				axisMappings.Remove(name);
+			} else {
+				Echo(name + " is not a valid KeyCode or the axis is not bound!");
+			}
 			return;
 		}
 		if(binds.ContainsKey(unbindMe)) {
@@ -891,6 +1040,9 @@ public class Console : MonoBehaviour {
 		}
 		foreach(KeyCode bind in binds.Keys) {
 			sw.WriteLine("Bind \"" + bind.ToString() + "\" \"" + binds[bind].Replace('\"', '\'') + "\"");
+		}
+		foreach(string bind in axisMappings.Keys) {
+			sw.WriteLine("Bind \"" + bind.ToString() + "\" \"" + axisMappings[bind].Replace('\"', '\'') + "\"");
 		}
 		sw.Close();
 
