@@ -6,6 +6,15 @@ using System.Collections.Generic;
 
 public static class Colors {
 	
+	public static string HexString(this Color32 c) {
+		string str = "";
+		str += c.r.ToHex();
+		str += c.g.ToHex();
+		str += c.b.ToHex();
+		str += c.a.ToHex();
+		return str;
+	}
+	
 	#region color making functions
 	///These functions create a color by name with a given intensity.
 	///Optionaly, an alpha value can also be specified.

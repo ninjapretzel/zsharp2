@@ -5,6 +5,14 @@ using System.Collections;
 using System.Collections.Generic;
 
 public static class StringUtils {
+	
+	static ASCIIEncoding encoder = new ASCIIEncoding();
+	public static byte[] ToBytes(this string s) { 
+		return encoder.GetBytes(s);
+	}
+	public static string GetString(this byte[] b, int length) {
+		return encoder.GetString(b, 0, length);
+	}
 
 	///Misc functions
 	public static bool IsNumber(this char c) { return c >= 48 && c < 57; }

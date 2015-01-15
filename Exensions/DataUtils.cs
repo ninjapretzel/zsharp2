@@ -33,7 +33,43 @@ public static class DataUtils {
 			return 0;
 		}
 	}
-	 
+	
+	public static byte[] Chop(this byte[] array, int size, int start = 0) {
+		if (start >= array.Length) { return null; }
+		if (size + start > array.Length) {
+			size = array.Length - start;
+		}
+		byte[] chopped = new byte[size];
+		for (int i = 0; i < size; i++) {
+			chopped[i] = array[i + start];
+		}
+		return chopped;
+	}
+	
+	
+	public static string ToHex(this byte b) {
+		string s = "";
+		
+		byte large = (byte)(b >> 4);
+		byte small = (byte)(b % 16);
+		
+		char a = 'A';
+		char zero = '0';
+		
+		if (large >= 10) { 
+			s += (char)(a + large-10);
+		} else {
+			s += (char)(zero + large);
+		}
+		
+		if (small >= 10) { 
+			s += (char)(a + small-10);
+		} else {
+			s += (char)(zero + small);
+		}
+		
+		return s;
+	}
 	
 	public static List<int> Permutation(int max) { return Permutation(max, max); }
 	public static List<int> Permutation(int max, int length) {
