@@ -160,7 +160,7 @@ public class DevConsole : MonoBehaviour {
 	public void OnGUI() {
 		if(_consoleUp) {
 			GUI.skin = consoleSkin;
-			GUI.skin.FontSizeFull(12);
+			GUI.skin.FontSizeFull(12, 12);
 			GUI.skin.window.fontSize = 18;
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_MAC
 			consoleWindowRect = new Rect(Mathf.Min(Mathf.Max(consoleWindowRect.x, -1 * consoleWindowRect.width + 10), Screen.width - 10), Mathf.Min(Mathf.Max(consoleWindowRect.y, -1 * GUI.skin.window.fontSize + 10), Screen.height - 10), consoleWindowRect.width, consoleWindowRect.height);
@@ -223,7 +223,7 @@ public class DevConsole : MonoBehaviour {
 		GUI.skin.label.alignment = TextAnchor.UpperLeft;
 		GUI.skin.label.wordWrap = true;
 		
-		GUI.skin.FontSizeFull(12.0f);
+		GUI.skin.FontSizeFull(12.0f, 12.0f);
 		heightOfGUIContent = GUI.skin.label.CalcHeight(new GUIContent(consoleText), consoleWindowRect.width - 26.0f);
 		Rect sizeOfLabel = new Rect(0.0f, 0.0f, consoleWindowRect.width - 26.0f, Mathf.Max(heightOfGUIContent, consoleWindowRect.height - heightOfFont - 30.0f));
 		consoleScrollPos = GUI.BeginScrollView(new Rect(5.0f, 20.0f, consoleWindowRect.width - 10.0f, consoleWindowRect.height - heightOfFont - 30.0f), consoleScrollPos, sizeOfLabel, false, true); {

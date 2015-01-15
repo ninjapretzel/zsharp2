@@ -44,14 +44,14 @@ public static class GUIStyleF {
 	}
 	
 	public static void SetFontSize(this GUIStyle style, string s) { style.SetFontSize(GUIFontSize.Get(s)); }
-	public static void SetFontSize(this GUIStyle style, float p) {
-		style.fontSize = (int)(p * (float)Screen.height);
+	public static void SetFontSize(this GUIStyle style, float p, float minFontSize = 8f) {
+		style.fontSize = (int) Mathf.Max(minFontSize, (p * (float)Screen.height));	
 	}
 	
 	public static GUIStyle ScaledFontTo(this GUIStyle style, string s) { return style.ScaledFontTo(GUIFontSize.Get(s)); }
-	public static GUIStyle ScaledFontTo(this GUIStyle style, float p) {
+	public static GUIStyle ScaledFontTo(this GUIStyle style, float p, float minFontSize = 8f) {
 		GUIStyle copy = new GUIStyle(style);
-		copy.fontSize = (int)(p * (float)Screen.height);
+		copy.fontSize = (int) Mathf.Max(minFontSize, (p * (float)Screen.height));
 		return copy;
 	}
 	
@@ -118,38 +118,39 @@ public static class GUISkinF {
 	public static void FontSize(this GUISkin skin, string s) { skin.FontSize(GUIFontSize.Get(s)); }
 	public static void FontSizeFull(this GUISkin skin, string s) { skin.FontSizeFull(GUIFontSize.Get(s)); }
 	
-	public static void FontSize(this GUISkin skin, float size) { skin.SetFontSize(size/720.0f); }
-	public static void FontSizeFull(this GUISkin skin, float size) { skin.SetFontSizeFull(size/720.0f); }
+	public static void FontSize(this GUISkin skin, float size, float minFontSize = 8f) { skin.SetFontSize(size/720.0f, minFontSize); }
+	public static void FontSizeFull(this GUISkin skin, float size, float minFontSize = 8f) { skin.SetFontSizeFull(size/720.0f, minFontSize); }
 	
-	public static void SetFontSize(this GUISkin skin, float size) {
-		skin.label.SetFontSize(size);
-		skin.button.SetFontSize(size);
-		skin.box.SetFontSize(size);
+
+	public static void SetFontSize(this GUISkin skin, float size, float minFontSize = 8f) {
+		skin.label.SetFontSize(size, minFontSize);
+		skin.button.SetFontSize(size, minFontSize);
+		skin.box.SetFontSize(size, minFontSize);
 	}
 	
-	public static void SetFontSizeFull(this GUISkin skin, float size) {
-		skin.label.SetFontSize(size);
-		skin.button.SetFontSize(size);
-		skin.box.SetFontSize(size);
-		skin.textField.SetFontSize(size);
-		skin.textArea.SetFontSize(size);
-		skin.toggle.SetFontSize(size);
-		skin.window.SetFontSize(size);
-		skin.horizontalSlider.SetFontSize(size);
-		skin.horizontalSliderThumb.SetFontSize(size);
-		skin.verticalSlider.SetFontSize(size);
-		skin.verticalSliderThumb.SetFontSize(size);
-		skin.horizontalScrollbar.SetFontSize(size);
-		skin.horizontalScrollbarThumb.SetFontSize(size);
-		skin.horizontalScrollbarLeftButton.SetFontSize(size);
-		skin.horizontalScrollbarRightButton.SetFontSize(size);
-		skin.verticalScrollbar.SetFontSize(size);
-		skin.verticalScrollbarThumb.SetFontSize(size);
-		skin.verticalScrollbarUpButton.SetFontSize(size);
-		skin.verticalScrollbarDownButton.SetFontSize(size);
-		skin.scrollView.SetFontSize(size);
+	public static void SetFontSizeFull(this GUISkin skin, float size, float minFontSize = 8f) {
+		skin.label.SetFontSize(size, minFontSize);
+		skin.button.SetFontSize(size, minFontSize);
+		skin.box.SetFontSize(size, minFontSize);
+		skin.textField.SetFontSize(size, minFontSize);
+		skin.textArea.SetFontSize(size, minFontSize);
+		skin.toggle.SetFontSize(size, minFontSize);
+		skin.window.SetFontSize(size, minFontSize);
+		skin.horizontalSlider.SetFontSize(size, minFontSize);
+		skin.horizontalSliderThumb.SetFontSize(size, minFontSize);
+		skin.verticalSlider.SetFontSize(size, minFontSize);
+		skin.verticalSliderThumb.SetFontSize(size, minFontSize);
+		skin.horizontalScrollbar.SetFontSize(size, minFontSize);
+		skin.horizontalScrollbarThumb.SetFontSize(size, minFontSize);
+		skin.horizontalScrollbarLeftButton.SetFontSize(size, minFontSize);
+		skin.horizontalScrollbarRightButton.SetFontSize(size, minFontSize);
+		skin.verticalScrollbar.SetFontSize(size, minFontSize);
+		skin.verticalScrollbarThumb.SetFontSize(size, minFontSize);
+		skin.verticalScrollbarUpButton.SetFontSize(size, minFontSize);
+		skin.verticalScrollbarDownButton.SetFontSize(size, minFontSize);
+		skin.scrollView.SetFontSize(size, minFontSize);
 		if (skin.customStyles != null) {
-			foreach (GUIStyle s in skin.customStyles) { s.SetFontSize(size); }
+			foreach (GUIStyle s in skin.customStyles) { s.SetFontSize(size, minFontSize); }
 		}
 	}
 	
