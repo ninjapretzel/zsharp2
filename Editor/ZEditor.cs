@@ -77,6 +77,14 @@ public class JsonEditor : ZEditorWindow {
 		
 	}
 	
+	public void PatchModel() {
+		foreach (var pair in defaults) {
+			if (!model.ContainsKey(pair.Key)) {
+				model[pair.Key] = pair.Value;
+			}
+		}
+	}
+	
 	public void ModelEditor() {
 		GUI.color = Color.white;
 		editScroll = BeginScrollView(editScroll, false, true); {

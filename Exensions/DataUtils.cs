@@ -418,6 +418,15 @@ public static class DataFUnity {
 		}
 		return list;
 	}
+
+	/*public static bool Contains<T>(this T[] a, T search) where T : IEquatable<T> {
+		foreach(T item in a) {
+			if(item.Equals(search)) {
+				return true;
+			}
+		}
+		return false;
+	}*/
 }
 
 ///////////////////////////////////////////////////////////////////////////////

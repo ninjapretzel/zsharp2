@@ -18,7 +18,7 @@ public class DevConsole : MonoBehaviour {
 	[Inaccessible] public string[] blacklistedClasses;
 	[Inaccessible] public static List<string> classBlacklist = new List<string>();
 
-	private static Rect consoleWindowRect = new Rect(Screen.width * 0.125f, Screen.height * 0.125f, Screen.width * 0.75f, Screen.height * 0.75f);
+	private static Rect consoleWindowRect = new Rect(Screen.width * 0.025f, Screen.height * 0.025f, Screen.width * 0.75f, Screen.height * 0.75f);
 	private static bool _consoleUp = false;
 	public static bool consoleUp { get { return _consoleUp; } }
 	private static bool focusTheTextField = false;
