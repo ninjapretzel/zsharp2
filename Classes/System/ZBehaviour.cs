@@ -151,10 +151,21 @@ public class ZBehaviour : MonoBehaviour {
 			float value = this.GetObjectValue<float>(valueName);
 			value = FloatField(value, options);
 			this.SetObjectValue(valueName, value);
-		}
+		} EndHorizontal();
+		
 		
 	}
 	
+	public void IntField(string label, string valueName, params GUILayoutOption[] options) {
+		BeginHorizontal(); {
+			Label(label, options);
+			
+			int value = this.GetObjectValue<int>(valueName);
+			value = IntField(value, options);
+			this.SetObjectValue(valueName, value);
+		} EndHorizontal();
+		
+	}
 	#endregion
 	
 }
