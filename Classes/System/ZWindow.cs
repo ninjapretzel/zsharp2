@@ -3,6 +3,28 @@ using System.Collections;
 using System.Collections.Generic;
 
 
+public class DropdownList<T> : List<T> {
+	
+	public bool open = false;
+	public T selected;
+	
+	public DropdownList() : base() {
+		selected = default(T);
+		open = false;
+	}
+	
+	public new void Add(T t) {
+		
+	}
+	
+	public void Draw(Rect baseArea, Rect windowArea) {
+		
+	}
+	
+	
+	
+}
+
 public class ZWindow {
 	public string name;
 	public Rect area;
@@ -233,7 +255,7 @@ public class ZWindow {
 			float value = this.GetObjectValue<float>(valueName);
 			value = FloatField(value, options);
 			this.SetObjectValue(valueName, value);
-		}
+		} EndHorizontal();
 		
 	}
 	
@@ -244,9 +266,10 @@ public class ZWindow {
 			int value = this.GetObjectValue<int>(valueName);
 			value = IntField(value, options);
 			this.SetObjectValue(valueName, value);
-		}
+		} EndHorizontal();
 		
 	}
+	
 	#endregion
 	
 }
