@@ -7,6 +7,8 @@ public class DropdownList<T> : List<T> {
 	
 	public bool open = false;
 	int selectedIndex = 0;
+	
+	public string selectedLabel { get { return LabelOfElementAt(selectedIndex); } }
 	public T selected { 
 		get {
 			if (Count == 0) { return default(T); }
@@ -15,7 +17,6 @@ public class DropdownList<T> : List<T> {
 			return this[selectedIndex];
 		}
 	}
-	
 	
 	const string NULLSTR = "<NULL>";
 	public DropdownList() : base() {
@@ -29,61 +30,42 @@ public class DropdownList<T> : List<T> {
 		
 		T sel = this[index];
 		string str = NULLSTR;
-		if (sel != null) {
-			str = sel.ToString();
-		}
+		if (sel != null) { str = sel.ToString(); }
+		
 		return str;
 	}
 	
 	public void Draw(Rect baseArea) {
-		string label = LabelOfElementAt(selectedIndex);
-		//GUI.color = open ? Color.red : Color.blue;
+		if (GUI.Button(baseArea, selectedLabel)) { open = !open; }
 		
-		if (GUI.Button(baseArea, label)) { open = !open; }
+		if (open) { Selection(baseArea); }
 		
-		if (open) {
-			Rect r = baseArea;
-			for (int i = 0; i < Count; i++) {
-				string str = LabelOfElementAt(i);
-				r = r.MoveDown();
-				if (GUI.Button(r, str)) {
-					selectedIndex = i;
-					open = false;
-				}
-				
-			}
-			
-			GUI.PushSkin(GUI.blankSkin);
-			if (GUI.Button(Screen.all, "")) { open = false; }
-			GUI.PopSkin();
-		}
 	}
 	
 	public void Draw(params GUILayoutOption[] options) {
+		if (GUILayout.Button(selectedLabel, options)) { open = !open; }
 		
-		string label = LabelOfElementAt(selectedIndex);
-		//GUI.color = open ? Color.red : Color.blue;
-		
-		if (GUILayout.Button(label, options)) { open = !open; }
-		
-		if (open) {
-			Rect r = GUILayoutUtility.GetLastRect();
-			for (int i = 0; i < Count; i++) {
-				string str = LabelOfElementAt(i);
-				r = r.MoveDown();
-				if (GUI.Button(r, str)) {
-					selectedIndex = i;
-					open = false;
-				}
-				
-			}
-			
-			GUI.PushSkin(GUI.blankSkin);
-			if (GUI.Button(Screen.all, "")) { open = false; }
-			GUI.PopSkin();
-		}
+		if (open) { Selection(GUILayoutUtility.GetLastRect()); }
 		
 	}
+	
+	public void Selection(Rect r) {
+		for (int i = 0; i < Count; i++) {
+			string str = LabelOfElementAt(i);
+			r = r.MoveDown();
+			if (GUI.Button(r, str)) {
+				selectedIndex = i;
+				open = false;
+			}
+		}
+		
+		GUI.PushSkin(GUI.blankSkin);
+		if (GUI.Button(Screen.all, "")) { open = false; }
+		GUI.PopSkin();	
+		
+	}
+	
+	
 	
 	
 	
