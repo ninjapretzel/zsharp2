@@ -21,7 +21,7 @@ public class ZWindow {
 	private int id;
 	public static int next_id = 10000;
 	public static int lastFocused = 0;
-	public float closeButtonSize = 20;
+	public float closeButtonSize = 18;
 	
 	public float x { get { return area.x; } set { area.x = value; } }
 	public float y { get { return area.y; } set { area.y = value; } }
@@ -37,7 +37,7 @@ public class ZWindow {
 		get {
 			float size = closeButtonSize;
 			if (size < 10) { size = 10; }
-			return new Rect(width - size, 0, size, size); 
+			return new Rect(width - size - 1, 1, size, size); 
 		}
 	}
 	
