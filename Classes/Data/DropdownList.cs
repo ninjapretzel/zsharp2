@@ -68,6 +68,8 @@ public class DropdownList<T> : List<T> {
 			
 			scrollPos = GUI.BeginScrollView(screenArea, scrollPos, totalArea, false, true); 
 			r = new Rect(0, 0, r.width, r.height); 
+		} else {
+			r = r.MoveDown();
 		}
 	
 		for (int i = 0; i < Count; i++) {
