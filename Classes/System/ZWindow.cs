@@ -3,27 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-public class DropdownList<T> : List<T> {
-	
-	public bool open = false;
-	public T selected;
-	
-	public DropdownList() : base() {
-		selected = default(T);
-		open = false;
-	}
-	
-	public new void Add(T t) {
-		
-	}
-	
-	public void Draw(Rect baseArea, Rect windowArea) {
-		
-	}
-	
-	
-	
-}
+
 
 public class ZWindow {
 	public string name;

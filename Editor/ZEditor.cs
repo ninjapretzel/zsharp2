@@ -175,7 +175,7 @@ public class JsonEditor : ZEditorWindow {
 		if (def != null) {
 			if (model.ContainsKey(name)) {
 				JsonValue modelVal = model[name];
-				JsonType type = def.JsonType;
+//				JsonType type = def.JsonType;
 				JsonValue backValue = null;
 				
 				if (def.isBool) {
