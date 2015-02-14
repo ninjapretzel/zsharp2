@@ -7,6 +7,8 @@ public class DropdownList<T> : List<T> {
 	
 	public bool open = false;
 	int selectedIndex = 0;
+	Vector2 scrollPos;
+	public float maxHeight = .25f;
 	
 	public string selectedLabel { get { return LabelOfElementAt(selectedIndex); } }
 	public T selected { 
@@ -35,6 +37,7 @@ public class DropdownList<T> : List<T> {
 		return str;
 	}
 	
+	
 	public void Draw(Rect baseArea) {
 		if (GUI.Button(baseArea, selectedLabel)) { open = !open; }
 		
@@ -50,14 +53,30 @@ public class DropdownList<T> : List<T> {
 	}
 	
 	public void Selection(Rect r) {
+		float totalHeight = r.height * Count;
+		float maxPixelHeight = maxHeight * Screen.height;
+		
+		if (totalHeight > maxPixelHeight) {
+			Rect screenArea = r.MoveDown();
+			screenArea.width += 20;
+			screenArea.height = maxPixelHeight;
+			
+			Rect totalArea = new Rect(0, 0, screenArea.width-20, totalHeight);
+			
+			scrollPos = GUI.BeginScrollView(screenArea, scrollPos, totalArea, false, true); 
+			r = new Rect(0, 0, r.width, r.height); 
+		}
+	
 		for (int i = 0; i < Count; i++) {
 			string str = LabelOfElementAt(i);
-			r = r.MoveDown();
 			if (GUI.Button(r, str)) {
 				selectedIndex = i;
 				open = false;
 			}
+			r = r.MoveDown();
 		}
+		
+		if (totalHeight > maxPixelHeight) { GUI.EndScrollView(); }
 		
 		GUI.PushSkin(GUI.blankSkin);
 		if (GUI.Button(Screen.all, "")) { open = false; }
