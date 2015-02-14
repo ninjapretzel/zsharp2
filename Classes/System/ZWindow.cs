@@ -130,6 +130,9 @@ public class ZWindow {
 	public static void Box(string s, params GUILayoutOption[] options) { GUILayout.Box(s, options); }
 	public static void Box(Texture s, params GUILayoutOption[] options) { GUILayout.Box(s, options); }
 	public static void Box(GUIContent s, params GUILayoutOption[] options) { GUILayout.Box(s, options); }
+	public static void Box(string s, GUIStyle style, params GUILayoutOption[] options) { GUILayout.Box(s, style, options); }
+	public static void Box(Texture s, GUIStyle style, params GUILayoutOption[] options) { GUILayout.Box(s, style, options); }
+	public static void Box(GUIContent s, GUIStyle style, params GUILayoutOption[] options) { GUILayout.Box(s, style, options); }
 	public static void FixedBox(string s) { Box(s, ExpandWidth(false)); }
 	public static void FixedBox(Texture s) { Box(s, ExpandWidth(false)); }
 	public static void FixedBox(GUIContent s) { Box(s, ExpandWidth(false)); }
@@ -141,6 +144,9 @@ public class ZWindow {
 	public static bool Button(string s, params GUILayoutOption[] options) { return GUILayout.Button(s, options); }
 	public static bool Button(Texture s, params GUILayoutOption[] options) { return GUILayout.Button(s, options); }
 	public static bool Button(GUIContent s, params GUILayoutOption[] options) { return GUILayout.Button(s, options); }
+	public static bool Button(string s, GUIStyle style, params GUILayoutOption[] options) { return GUILayout.Button(s, style, options); }
+	public static bool Button(Texture s, GUIStyle style, params GUILayoutOption[] options) { return GUILayout.Button(s, style, options); }
+	public static bool Button(GUIContent s, GUIStyle style, params GUILayoutOption[] options) { return GUILayout.Button(s, style, options); }
 	public static bool FixedButton(string s) { return Button(s, ExpandWidth(false)); }
 	
 	public static bool Button(Rect r, string s) { return GUI.Button(r, s); }

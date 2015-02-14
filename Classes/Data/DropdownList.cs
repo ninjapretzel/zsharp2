@@ -10,6 +10,9 @@ public class DropdownList<T> : List<T> {
 	Vector2 scrollPos;
 	public float maxHeight = .25f;
 	
+	public GUIStyle topStyle { get { return GUI.skin.FindStyle("dropdown_top"); } }
+	public GUIStyle bodyStyle { get { return GUI.skin.FindStyle("dropdown_body"); } }
+	
 	public string selectedLabel { get { return LabelOfElementAt(selectedIndex); } }
 	public T selected { 
 		get {
@@ -39,14 +42,14 @@ public class DropdownList<T> : List<T> {
 	
 	
 	public void Draw(Rect baseArea) {
-		if (GUI.Button(baseArea, selectedLabel)) { open = !open; }
+		if (GUI.Button(baseArea, selectedLabel, topStyle)) { open = !open; }
 		
 		if (open) { Selection(baseArea); }
 		
 	}
 	
 	public void Draw(params GUILayoutOption[] options) {
-		if (GUILayout.Button(selectedLabel, options)) { open = !open; }
+		if (GUILayout.Button(selectedLabel, topStyle, options)) { open = !open; }
 		
 		if (open) { Selection(GUILayoutUtility.GetLastRect()); }
 		
@@ -58,10 +61,10 @@ public class DropdownList<T> : List<T> {
 		
 		if (totalHeight > maxPixelHeight) {
 			Rect screenArea = r.MoveDown();
-			screenArea.width += 20;
+			screenArea.width += 16;
 			screenArea.height = maxPixelHeight;
 			
-			Rect totalArea = new Rect(0, 0, screenArea.width-20, totalHeight);
+			Rect totalArea = new Rect(0, 0, screenArea.width-16, totalHeight);
 			
 			scrollPos = GUI.BeginScrollView(screenArea, scrollPos, totalArea, false, true); 
 			r = new Rect(0, 0, r.width, r.height); 
@@ -69,7 +72,7 @@ public class DropdownList<T> : List<T> {
 	
 		for (int i = 0; i < Count; i++) {
 			string str = LabelOfElementAt(i);
-			if (GUI.Button(r, str)) {
+			if (GUI.Button(r, str, bodyStyle)) {
 				selectedIndex = i;
 				open = false;
 			}
