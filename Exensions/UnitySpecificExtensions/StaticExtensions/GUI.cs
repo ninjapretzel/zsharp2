@@ -24,20 +24,54 @@ public static class GUI {
 		return inColor;
 	}
 	
-	public static Stack<GUISkin> skinStack = new Stack<GUISkin>();
-	public static void PushSkin(GUISkin newSkin) { 
-		skinStack.Push(skin);
-		skin = newSkin;
-	}
+	private static Stack<GUISkin> skinStack = new Stack<GUISkin>();
+	private static Stack<Color> colorStack = new Stack<Color>();
+	private static Stack<Color> bgColorStack = new Stack<Color>();
+	private static Stack<Color> ctColorStack = new Stack<Color>();
+	
+	public static void PushSkin(GUISkin newSkin) { skinStack.Push(skin); skin = newSkin; }
+	public static void PushColor(Color c) { colorStack.Push(c); color = c; }
+	public static void PushBgColor(Color c) { bgColorStack.Push(c); backgroundColor = c; }
+	public static void PushCtColor(Color c) { ctColorStack.Push(c); contentColor = c; }
 	
 	public static GUISkin PopSkin() {
+		GUISkin prev = null;
 		if (skinStack.Count > 0) {
-			GUISkin prev = skin;
+			prev = skin;
 			skin = skinStack.Pop();
-			return prev;
 		}
-		return null;
+		return prev;
 	}
+	
+	public static Color PopColor() {
+		Color prev = Color.clear;
+		if (colorStack.Count > 0) {
+			prev = color;
+			color = colorStack.Pop();
+		}
+		return prev;
+	}
+	
+	public static Color PopBgColor() {
+		Color prev = Color.clear;
+		if (bgColorStack.Count > 0) {
+			prev = backgroundColor;
+			backgroundColor = bgColorStack.Pop();
+		}
+		return prev;
+	}
+	
+	public static Color PopCtColor() {
+		Color prev = Color.clear;
+		if (ctColorStack.Count > 0) {
+			prev = contentColor;
+			contentColor = ctColorStack.Pop();
+		}
+		return prev;
+	}
+	
+	
+	
 	public static GUISkin blankSkin { get { return Resources.Load<GUISkin>("blank"); } }
 	
 	

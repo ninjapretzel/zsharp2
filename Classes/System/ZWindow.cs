@@ -89,18 +89,28 @@ public class ZWindow {
 		
 		Window();
 		
+		GUI.PushColor(Color.red);
 		if (GUI.Button(closeButtonArea, "X")) {
 			open = false;
 		}
+		GUI.PopColor();
+		
 		if (dragable) {
 			GUI.DragWindow(draggableArea);
 		}
-		
+		Bound();
 	}
 	
 	
 	public virtual void Window() { }
 	
+	
+	public void Bound() {
+		if (x < -width+60) { x = -width+60; }
+		if (y < 0) { y = 0; }
+		if (x > Screen.width - 60) { x = Screen.width - 60; }
+		if (y > Screen.height - 20) { y = Screen.height - 20; }
+	}
 	
 	#region GUI Extensions
 	public static void Label(string s, params GUILayoutOption[] options) { GUILayout.Label(s, options); }
