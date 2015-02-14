@@ -4,12 +4,14 @@ using System.Collections.Generic;
 
 
 public class ZWindow {
-	
 	public string name;
 	public Rect area;
 	public int padding = 0;
 	public GUISkin skin;
+	
 	public bool open;
+	public bool invisibleBackground;
+	public bool dragable;
 	
 	public bool hasCloseButton;
 	public bool hasMiniButton;
@@ -23,6 +25,7 @@ public class ZWindow {
 	public float width { get { return area.width; } set { area.width = value; } }
 	public float height { get { return area.height; } set { area.height = value; } } 
 	
+	public GUISkin blank { get { return Resources.Load<GUISkin>("blank"); } }
 	public Rect draggableArea {
 		get { return new Rect(0, 0 ,1000, 20); }
 	}
@@ -38,7 +41,9 @@ public class ZWindow {
 	public ZWindow Named(string n) { name = n; return this; }
 	public ZWindow Titled(string n) { name = n; return this; }
 	public ZWindow Skinned(GUISkin s) { skin = s; return this; }
+	public ZWindow InvisibleBackground() { invisibleBackground = true; return this; }
 	
+	public ZWindow Undragable() { dragable = false; return this; }
 	public ZWindow Unclosable() { hasCloseButton = false; return this; }
 	public ZWindow Minimizable() { hasMiniButton = true; return this; }
 	
@@ -51,6 +56,8 @@ public class ZWindow {
 		name = "New Window";
 		skin = Resources.Load<GUISkin>("Standard");
 		open = true;
+		invisibleBackground = false;
+		dragable = true;
 		
 		hasCloseButton = true;
 		hasMiniButton = false;
@@ -63,7 +70,11 @@ public class ZWindow {
 	
 	public void Draw() {
 		if (open) {
-			GUI.skin = skin;
+			if (invisibleBackground) {
+				GUI.skin = blank;
+			} else {
+				GUI.skin = skin;
+			}
 			area = GUI.Window(id, area, DrawWindow, name);	
 			
 		}
@@ -79,7 +90,9 @@ public class ZWindow {
 		if (GUI.Button(closeButtonArea, "X")) {
 			open = false;
 		}
-		GUI.DragWindow(draggableArea);
+		if (dragable) {
+			GUI.DragWindow(draggableArea);
+		}
 		
 	}
 	
@@ -219,6 +232,17 @@ public class ZWindow {
 			
 			float value = this.GetObjectValue<float>(valueName);
 			value = FloatField(value, options);
+			this.SetObjectValue(valueName, value);
+		}
+		
+	}
+	
+	public void IntField(string label, string valueName, params GUILayoutOption[] options) {
+		BeginHorizontal(); {
+			Label(label, options);
+			
+			int value = this.GetObjectValue<int>(valueName);
+			value = IntField(value, options);
 			this.SetObjectValue(valueName, value);
 		}
 		
