@@ -35,6 +35,30 @@ public class DropdownList<T> : List<T> {
 		return str;
 	}
 	
+	public void Draw(Rect baseArea) {
+		string label = LabelOfElementAt(selectedIndex);
+		//GUI.color = open ? Color.red : Color.blue;
+		
+		if (GUI.Button(baseArea, label)) { open = !open; }
+		
+		if (open) {
+			Rect r = baseArea;
+			for (int i = 0; i < Count; i++) {
+				string str = LabelOfElementAt(i);
+				r = r.MoveDown();
+				if (GUI.Button(r, str)) {
+					selectedIndex = i;
+					open = false;
+				}
+				
+			}
+			
+			GUI.PushSkin(GUI.blankSkin);
+			if (GUI.Button(Screen.all, "")) { open = false; }
+			GUI.PopSkin();
+		}
+	}
+	
 	public void Draw(params GUILayoutOption[] options) {
 		
 		string label = LabelOfElementAt(selectedIndex);
