@@ -28,6 +28,8 @@ public class ZWindow {
 	public float width { get { return area.width; } set { area.width = value; } }
 	public float height { get { return area.height; } set { area.height = value; } } 
 	
+	bool lastOpenedState = false;
+	
 	public GUISkin blank { get { return Resources.Load<GUISkin>("blank"); } }
 	public Rect draggableArea {
 		get { return new Rect(0, 0 ,1000, 20); }
@@ -54,15 +56,16 @@ public class ZWindow {
 	public ZWindow Unclosable() { hasCloseButton = false; return this; }
 	public ZWindow Minimizable() { hasMiniButton = true; return this; }
 	
-	public ZWindow Opened() { open = true; return this; }
-	public ZWindow Closed() { open = false; return this; }
+	public ZWindow Opened() { open = true; lastOpenedState = true; return this; }
+	public ZWindow Closed() { open = false; lastOpenedState = false; return this; }
 	
-	public void Init() {
+	void Init() {
 		id = next_id++;
 		area = Screen.MiddleCenter(.5f, .5f);
 		name = "New Window";
 		skin = Resources.Load<GUISkin>("Standard");
 		open = true;
+		lastOpenedState = true;
 		invisibleBackground = false;
 		dragable = true;
 		
@@ -85,6 +88,10 @@ public class ZWindow {
 			area = GUI.Window(id, area, DrawWindow, name);	
 			
 		}
+		if (open && !lastOpenedState) { OnOpen(); }
+		if (!open && lastOpenedState) { OnClose(); }
+		lastOpenedState = open;
+		
 	}
 	
 	public void DrawWindow(int windowID) {
@@ -106,9 +113,12 @@ public class ZWindow {
 		Bound();
 	}
 	
-	
+	#region Virtual functions
 	public virtual void Window() { }
+	public virtual void OnClose() { }
+	public virtual void OnOpen() { }
 	
+	#endregion
 	
 	public void Bound() {
 		if (x < -width+60) { x = -width+60; }
