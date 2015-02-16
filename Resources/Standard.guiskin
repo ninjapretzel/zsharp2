@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 12001, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: Standard
   m_EditorClassIdentifier: 
-  m_Font: {fileID: 12800000, guid: 7fa152aa4f588be44aa67a6388d91abe, type: 3}
+  m_Font: {fileID: 12800000, guid: cb8d7f481946cf94f95ae3f8da51248c, type: 3}
   m_box:
     m_Name: box
     m_Normal:
@@ -59,7 +59,7 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 0}
-    m_FontSize: 0
+    m_FontSize: 18
     m_FontStyle: 0
     m_Alignment: 1
     m_WordWrap: 0
@@ -118,7 +118,7 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 0}
-    m_FontSize: 0
+    m_FontSize: 18
     m_FontStyle: 0
     m_Alignment: 4
     m_WordWrap: 0
@@ -226,8 +226,8 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     m_Padding:
-      m_Left: 0
-      m_Right: 0
+      m_Left: 2
+      m_Right: 4
       m_Top: 0
       m_Bottom: 0
     m_Overflow:
@@ -236,7 +236,7 @@ MonoBehaviour:
       m_Top: 0
       m_Bottom: 0
     m_Font: {fileID: 0}
-    m_FontSize: 0
+    m_FontSize: 18
     m_FontStyle: 0
     m_Alignment: 0
     m_WordWrap: 1
@@ -412,7 +412,7 @@ MonoBehaviour:
       m_Right: 0
       m_Top: 0
       m_Bottom: 0
-    m_Font: {fileID: 0}
+    m_Font: {fileID: 12800000, guid: cb8d7f481946cf94f95ae3f8da51248c, type: 3}
     m_FontSize: 0
     m_FontStyle: 0
     m_Alignment: 1

@@ -78,15 +78,19 @@ public class ZWindow {
 		area.y = (Screen.height - area.height)/2f;
 	}
 	
+	void SetSkin() {
+		if (invisibleBackground) {
+			GUI.skin = blank;
+		} else {
+			GUI.skin = skin;
+		}
+	}
+	
 	public void Draw() {
 		if (open) {
-			if (invisibleBackground) {
-				GUI.skin = blank;
-			} else {
-				GUI.skin = skin;
-			}
+			SetSkin();
 			area = GUI.Window(id, area, DrawWindow, name);	
-			
+			//SetSkin();
 		}
 		if (open && !lastOpenedState) { OnOpen(); }
 		if (!open && lastOpenedState) { OnClose(); }
@@ -95,6 +99,7 @@ public class ZWindow {
 	}
 	
 	public void DrawWindow(int windowID) {
+		//SetSkin();
 		if ((Event.current.button == 0) && (Event.current.type == EventType.MouseDown)) {
 			lastFocused = id;
 		}
@@ -107,10 +112,9 @@ public class ZWindow {
 		}
 		GUI.PopColor();
 		
-		if (dragable) {
-			GUI.DragWindow(draggableArea);
-		}
+		if (dragable) { GUI.DragWindow(draggableArea); }
 		Bound();
+		//SetSkin();
 	}
 	
 	#region Virtual functions
