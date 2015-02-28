@@ -30,9 +30,9 @@ public static class GUI {
 	private static Stack<Color> ctColorStack = new Stack<Color>();
 	
 	public static void PushSkin(GUISkin newSkin) { skinStack.Push(skin); skin = newSkin; }
-	public static void PushColor(Color c) { colorStack.Push(c); color = c; }
-	public static void PushBgColor(Color c) { bgColorStack.Push(c); backgroundColor = c; }
-	public static void PushCtColor(Color c) { ctColorStack.Push(c); contentColor = c; }
+	public static void PushColor(Color c) { colorStack.Push(color); color = c; }
+	public static void PushBgColor(Color c) { bgColorStack.Push(backgroundColor); backgroundColor = c; }
+	public static void PushCtColor(Color c) { ctColorStack.Push(contentColor); contentColor = c; }
 	
 	public static GUISkin PopSkin() {
 		GUISkin prev = null;
