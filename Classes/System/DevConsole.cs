@@ -42,7 +42,7 @@ public class DevConsole : MonoBehaviour {
 		window = (ConsoleWindow)new ConsoleWindow()
 			.Named("Developer Console")
 			.Closed()
-			.Area(ScreenF.all.MiddleCenter(0.7f, 0.8f).Move(0.1f, 0.0f));
+			.Area(Screen.all.MiddleCenter(0.7f, 0.8f).Move(0.1f, 0.0f));
 		window.textWindow = initialText.ParseNewlines();
 
 		if(File.Exists(configPath)) {
@@ -1072,29 +1072,20 @@ public class DevConsole : MonoBehaviour {
 
 public class ConsoleWindow : ZWindow {
 
-	[DevConsole.Inaccessible]
-	public Vector2 scrollPos = Vector2.zero;
-	[DevConsole.Inaccessible]
-	public string textWindow = "";
-	[DevConsole.Inaccessible]
-	public string textField = "";
+	[DevConsole.Inaccessible] public Vector2 scrollPos = Vector2.zero;
+	[DevConsole.Inaccessible] public string textWindow = "";
+	[DevConsole.Inaccessible] public string textField = "";
 
 	public List<string> previousCommands = new List<string>();
-	[DevConsole.Inaccessible]
-	public int cmdIndex = 0;
-	[DevConsole.Inaccessible]
-	public bool focusTheTextField = false;
+	[DevConsole.Inaccessible] public int cmdIndex = 0;
+	[DevConsole.Inaccessible] public bool focusTheTextField = false;
 
 	public override void Window() {
-		GUILayout.BeginVertical();
-		{
-			GUILayout.BeginScrollView(scrollPos, GUIStyle.none, GUI.skin.verticalScrollbar);
-			{
+		GUILayout.BeginVertical(); {
+			scrollPos = GUILayout.BeginScrollView(scrollPos, GUIStyle.none, GUI.skin.verticalScrollbar); {
 				Label(textWindow);
-			}
-			GUILayout.EndScrollView();
-			GUILayout.BeginHorizontal();
-			{
+			} GUILayout.EndScrollView();
+			GUILayout.BeginHorizontal(); {
 				GUI.SetNextControlName("ConsoleInput");
 				if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return && GUI.GetNameOfFocusedControl() == "ConsoleInput" && textField.Length > 0) {
 					TryExecute(textField);
@@ -1115,10 +1106,8 @@ public class ConsoleWindow : ZWindow {
 					TryExecute(textField);
 					textField = "";
 				}
-			}
-			GUILayout.EndHorizontal();
-		}
-		GUILayout.EndVertical();
+			} GUILayout.EndHorizontal();
+		} GUILayout.EndVertical();
 		if(focusTheTextField && Event.current.type == EventType.Repaint) {
 			GUI.FocusControl("ConsoleInput");
 		}
