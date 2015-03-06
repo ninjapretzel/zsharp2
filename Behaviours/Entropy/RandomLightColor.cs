@@ -10,11 +10,11 @@ public class RandomLightColor : MonoBehaviour {
 	
 	
 	void Start() {
-		Color baseColor = light.color.RGBtoHSV();
+		Color baseColor = GetComponent<Light>().color.RGBtoHSV();
 		baseColor.r += Random.Range(-hueShift, hueShift);
 		baseColor.g += Random.Range(-satShift, satShift);
 		baseColor.b += Random.Range(-valShift, valShift);
-		light.color = baseColor.HSVtoRGB();
+		GetComponent<Light>().color = baseColor.HSVtoRGB();
 		Destroy(this);
 	}
 	

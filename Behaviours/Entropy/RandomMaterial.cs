@@ -54,8 +54,8 @@ public class RandomMaterial : MonoBehaviour {
 			else { index = Random.WeightedChoose(weights); }
 		}
 		
-		if (renderer != null) {
-			renderer.material = materials[index];
+		if (GetComponent<Renderer>() != null) {
+			GetComponent<Renderer>().material = materials[index];
 		}
 		foreach (Renderer r in alsoSetThese) {
 			r.material = materials[index];

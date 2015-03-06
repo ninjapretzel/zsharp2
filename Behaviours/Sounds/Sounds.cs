@@ -49,7 +49,7 @@ public class Sounds : MonoBehaviour {
 			o.AddComponent<AudioSource>();
 			o.AddComponent<SoundVolume>();
 			o.AddComponent<AutodestructSound>();
-			return o.audio;
+			return o.GetComponent<AudioSource>();
 		}
 	}
 	

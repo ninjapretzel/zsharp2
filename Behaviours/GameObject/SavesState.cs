@@ -123,7 +123,7 @@ public class SavesState : MonoBehaviour {
 		int i = 0;
 		foreach(Type type in savedBehaviours.Keys) {
 			// Add back the saved components
-			Behaviour current = gameObject.AddComponent(type.Name) as Behaviour;
+			Behaviour current = UnityEngineInternal.APIUpdaterRuntimeServices.AddComponent(gameObject, "Assets/Standard Assets/ZSharp2/Behaviours/GameObject/SavesState.cs (126,24)", type.Name) as Behaviour;
 			foreach(FieldInfo field in savedBehaviours[type].Keys) {
 				// Even though "current" is a Behaviour above, setting fields of derivative classes works through reflection, fortunately
 				field.SetValue(current, savedBehaviours[type][field]);

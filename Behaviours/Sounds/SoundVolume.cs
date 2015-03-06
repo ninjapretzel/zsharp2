@@ -5,7 +5,7 @@ public class SoundVolume : MonoBehaviour {
 	float baseVolume;
 	
 	void Awake() {
-		baseVolume = audio.volume;
+		baseVolume = GetComponent<AudioSource>().volume;
 	}
 	
 	void Start() {
@@ -18,7 +18,7 @@ public class SoundVolume : MonoBehaviour {
 	}
 	
 	void SetVolume() {
-		audio.volume = baseVolume * Settings.soundVolume;
+		GetComponent<AudioSource>().volume = baseVolume * Settings.soundVolume;
 	}
 	
 }

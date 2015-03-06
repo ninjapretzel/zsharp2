@@ -30,17 +30,17 @@ public class RendererFader : MonoBehaviour {
 		if (wantsToBeVisible) { time = fadeTime; }
 		else { time = 0; }
 		//Support for a few shaders that are known can be added here
-		if (renderer.material.shader.name == "Vertex Lit") {
+		if (GetComponent<Renderer>().material.shader.name == "Vertex Lit") {
 			baseShader = "Vertex Lit";
 			transparentShader = "Transparent/Vertex Lit";
 		}
 		
-		if (renderer.material.shader.name == "GUI/Text Shader") {
+		if (GetComponent<Renderer>().material.shader.name == "GUI/Text Shader") {
 			
 			baseShader = "GUI/Text Shader";
 			transparentShader = "GUI/Text Shader";
 		}
-		alpha = renderer.material.color.a;
+		alpha = GetComponent<Renderer>().material.color.a;
 	}
 	
 	void Start() {
@@ -56,27 +56,27 @@ public class RendererFader : MonoBehaviour {
 			
 		}
 		
-		if (time == 0 && renderer.enabled) { renderer.enabled = false; }
-		else if (time > 0 && !renderer.enabled) { renderer.enabled = true; }
+		if (time == 0 && GetComponent<Renderer>().enabled) { GetComponent<Renderer>().enabled = false; }
+		else if (time > 0 && !GetComponent<Renderer>().enabled) { GetComponent<Renderer>().enabled = true; }
 		
-		if (time == fadeTime && renderer.material.shader.name != baseShader) {
+		if (time == fadeTime && GetComponent<Renderer>().material.shader.name != baseShader) {
 			if (alpha * percentage >= 1) { SetBaseShader(); }
 			
-		} else if (time < fadeTime && renderer.material.shader.name != transparentShader) {
+		} else if (time < fadeTime && GetComponent<Renderer>().material.shader.name != transparentShader) {
 			SetTransparentShader();
 			
 		}
 		
-		if (renderer.materials.Length > 1) {
-			for (int i = 0; i < renderer.materials.Length; i++) {
-				Color c = renderer.materials[i].color;
+		if (GetComponent<Renderer>().materials.Length > 1) {
+			for (int i = 0; i < GetComponent<Renderer>().materials.Length; i++) {
+				Color c = GetComponent<Renderer>().materials[i].color;
 				c.a = percentage * alpha;
-				renderer.materials[i].color = c;
+				GetComponent<Renderer>().materials[i].color = c;
 			}
 		} else {
-			Color c = renderer.material.color;
+			Color c = GetComponent<Renderer>().material.color;
 			c.a = percentage * alpha;
-			renderer.material.color = c;
+			GetComponent<Renderer>().material.color = c;
 		}
 		
 	}
@@ -86,12 +86,12 @@ public class RendererFader : MonoBehaviour {
 	void SetTransparentShader() { SetShader(transparentShader); }
 	
 	void SetShader(string shader) {
-		if (renderer.materials.Length > 1) {
-			foreach (Material m in renderer.materials) {
+		if (GetComponent<Renderer>().materials.Length > 1) {
+			foreach (Material m in GetComponent<Renderer>().materials) {
 				m.shader = Shader.Find(shader);
 			}
 		} else {
-			renderer.material.shader = Shader.Find(shader);
+			GetComponent<Renderer>().material.shader = Shader.Find(shader);
 		}
 	}
 	

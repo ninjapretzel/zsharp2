@@ -21,10 +21,10 @@ public class RandomColor : MonoBehaviour {
 	void SetColor() {
 		if (useSeed) { Random.PushSeed(seed); }
 		
-		if (renderer.material.HasProperty(target)) { 
+		if (GetComponent<Renderer>().material.HasProperty(target)) { 
 			Color c = colors.Lerp(Random.value);
 			c.a = alpha.value;
-			renderer.material.SetColor(target, c); 
+			GetComponent<Renderer>().material.SetColor(target, c); 
 		}
 		
 		

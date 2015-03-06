@@ -26,9 +26,9 @@ public class MassParticles : MonoBehaviour {
 		
 		
 		if (worldSpace) {
-			particleSystem.simulationSpace = ParticleSystemSimulationSpace.World;
+			GetComponent<ParticleSystem>().simulationSpace = ParticleSystemSimulationSpace.World;
 		} else {
-			particleSystem.simulationSpace = ParticleSystemSimulationSpace.Local;
+			GetComponent<ParticleSystem>().simulationSpace = ParticleSystemSimulationSpace.Local;
 		}
 		
 	}
@@ -42,7 +42,7 @@ public class MassParticles : MonoBehaviour {
 				
 			}
 			
-			particleSystem.SetParticles(parts, parts.Length);
+			GetComponent<ParticleSystem>().SetParticles(parts, parts.Length);
 		}
 	}
 

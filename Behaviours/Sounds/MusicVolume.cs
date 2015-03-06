@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class MusicVolume : MonoBehaviour {
 	
 	void Update() {
-		audio.volume = Settings.musicVolume;
+		GetComponent<AudioSource>().volume = Settings.musicVolume;
 	}
 	
 }

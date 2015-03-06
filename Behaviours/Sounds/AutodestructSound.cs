@@ -5,8 +5,8 @@ public class AutodestructSound : MonoBehaviour {
 	void Awake() { DontDestroyOnLoad(gameObject); }
 	void Start() { DontDestroyOnLoad(gameObject); }
 	void Update() {
-		if (audio) {
-			if (!audio.isPlaying) { Destroy(gameObject); }
+		if (GetComponent<AudioSource>()) {
+			if (!GetComponent<AudioSource>().isPlaying) { Destroy(gameObject); }
 		} else { Destroy(gameObject); }
 	}
 }

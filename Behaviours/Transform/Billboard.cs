@@ -9,7 +9,7 @@ public class Billboard : MonoBehaviour {
 	public float dzrotation = 0;
 	
 	void LateUpdate() {
-		if (renderer != null && !renderer.enabled) { return; }
+		if (GetComponent<Renderer>() != null && !GetComponent<Renderer>().enabled) { return; }
 		transform.LookAt(Camera.main.transform);
 		if (flip) { transform.Rotate(0, 180, 0); }
 		zrotation += dzrotation * Time.deltaTime;
