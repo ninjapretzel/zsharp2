@@ -35,15 +35,20 @@ public class Reactor {
 		}
 	}
 	
+	public void AddReaction(object target, string func, params object[] p) {
+		if (target == null) { return; }
+		MethodInfo m = target.GetFunction(func);
+		Add(m, target, p);
+	}
+	
 	public void React() {
 		lock (mutex) {
-			Debug.Log("Reacting");
+			//Debug.Log("Reacting");
 			while (reactions.Count > 0) {
 				reactions.Dequeue().React();
 			}
 		}
 	}
-	
 	
 }
 
@@ -56,16 +61,21 @@ public static class ReactorUtils {
 	public static void AddReaction(this object o, Reactor r, string func, params object[] p) {
 		if (o == null) { return; }
 		if (r == null) { return; }
+		MethodInfo m = o.GetFunction(func);
+		if (m == null) { return; }
+		
+		r.Add(m, o, p);
+	}
+	
+	public static MethodInfo GetFunction(this object o, string func) {
 		MethodInfo m = null;
 		if (o.GetType() == typeof(Type)) {
 			Type t = o as Type;
 			m = t.GetMethod(func, methodsToGrab);
 		} else {
 			m = o.GetMethod(func, methodsToGrab);
-			//
 		}
-		if (m == null) { return; }
-		r.Add(m, o, p);
+		return m;
 	}
 	
 }

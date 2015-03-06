@@ -11,24 +11,29 @@ public class DevConsole : MonoBehaviour {
 	
 	public string initialText = "";
 	public GUISkin consoleSkin;
+	public static string consoleText = "";
 	public static Color color = Color.white;
 	public static bool cheats = false;
 	public static string echoBuffer = "";
 	[Inaccessible] public string[] blacklistedClasses;
 	[Inaccessible] public static List<string> classBlacklist = new List<string>();
 
-#if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
-	private static Rect consoleWindowRect = new Rect(0.0f, 0.0f, Screen.width, Screen.height * 0.5f);
-#endif
-	public static bool consoleUp { get { return window.open; } }
+	private static Rect consoleWindowRect = new Rect(Screen.width * 0.025f, Screen.height * 0.025f, Screen.width * 0.75f, Screen.height * 0.75f);
+	private static bool _consoleUp = false;
+	public static bool consoleUp { get { return _consoleUp; } }
+	private static bool focusTheTextField = false;
+	private static Vector2 consoleScrollPos;
+	private static string consoleInput = "";
+	private static float heightOfGUIContent = 0.0f;
+	private static int cmdIndex = 0;
+	private static List<string> previousCommands = new List<string>();
 	private static Dictionary<string, string> aliases = new Dictionary<string, string>();
 	private static Dictionary<KeyCode, string> binds = new Dictionary<KeyCode, string>();
 	private static Dictionary<string, string> axisMappings = new Dictionary<string, string>();
 	public static string configPath { get { return Application.persistentDataPath + "/config.cfg"; } }
 	public static string persistent { get { return Resources.Load<TextAsset>("defaults").text; } }
 	public static string autoexecPath;
-
-	private static ConsoleWindow window;
+	//private static Message message = new Message();
 
 	public void Awake() {
 		autoexecPath = Application.persistentDataPath + "/autoexec.cfg";
@@ -39,12 +44,6 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public void Start() {
-		window = (ConsoleWindow)new ConsoleWindow()
-			.Named("Developer Console")
-			.Closed()
-			.Area(Screen.all.MiddleCenter(0.7f, 0.8f).Move(0.1f, 0.0f));
-		window.textWindow = initialText.ParseNewlines();
-
 		if(File.Exists(configPath)) {
 			Execute(persistent.Split('\n'));
 			// If config exists, clear binds after loading persistent file (we want the default aliases but not the keybinds)
@@ -57,17 +56,16 @@ public class DevConsole : MonoBehaviour {
 			if(File.Exists(autoexecPath)) {
 				Exec(autoexecPath);
 			}
-			//Clear();
+			Clear();
 		} else {
 			binds = new Dictionary<KeyCode, string>();
 			aliases = new Dictionary<string, string>();
 			axisMappings = new Dictionary<string, string>();
 			Execute(persistent.Split('\n'));
-			//Clear();
+			Clear();
 			SaveConfigFile();
 		}
-
-		//consoleText = initialText.ParseNewlines();
+		consoleText = initialText.ParseNewlines();
 
 	}
 
@@ -81,7 +79,7 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public void Update() {
-		if(!window.open) {
+		if(!_consoleUp) {
 			foreach(KeyCode bind in binds.Keys) {
 				if(Input.GetKeyDown(bind)) {
 					Execute(binds[bind]);
@@ -160,79 +158,84 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public void OnGUI() {
-		if(window.open) {
-			//GUI.skin = consoleSkin;
-			//GUI.skin.FontSizeFull(12, 12);
-			//GUI.skin.window.fontSize = 18;
+		if(_consoleUp) {
+			GUI.skin = consoleSkin;
+			GUI.skin.FontSizeFull(12, 12);
+			GUI.skin.window.fontSize = 18;
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_MAC
-			//consoleWindowRect = new Rect(Mathf.Min(Mathf.Max(consoleWindowRect.x, -1 * consoleWindowRect.width + 10), Screen.width - 10), Mathf.Min(Mathf.Max(consoleWindowRect.y, -1 * GUI.skin.window.fontSize + 10), Screen.height - 10), consoleWindowRect.width, consoleWindowRect.height);
-			//consoleWindowRect = GUI.Window(1, consoleWindowRect, ConsoleWindow, "Developer Console");
-			window.Draw();
+			consoleWindowRect = new Rect(Mathf.Min(Mathf.Max(consoleWindowRect.x, -1 * consoleWindowRect.width + 10), Screen.width - 10), Mathf.Min(Mathf.Max(consoleWindowRect.y, -1 * GUI.skin.window.fontSize + 10), Screen.height - 10), consoleWindowRect.width, consoleWindowRect.height);
+			consoleWindowRect = GUI.Window(1, consoleWindowRect, ConsoleWindow, "Developer Console");
 #endif
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
+			consoleWindowRect = new Rect(0.0f, 0.0f, Screen.width, Screen.height * 0.5f);
 			GUI.color = new Color(0.0f, 0.0f, 0.0f, 0.6667f);
 			GUI.DrawTexture(consoleWindowRect, GUIUtils.pixel);
-			DrawConsole(-1);
+			ConsoleWindow(-1);
 #endif
 		} else {
-			//ConsoleWindow.focusTheTextField = true;
+			focusTheTextField = true;
 		}
 
 	}
 	
-#if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
 	// The GUIWindow containing the console (simply occupies the top half of the screen on mobile)
-	private static void DrawConsole(int id) {
+	private static void ConsoleWindow(int id) {
 		GUI.color = Color.white;
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_MAC
+		GUI.DragWindow(new Rect(4, 4, consoleWindowRect.width - 36, 16));
+#endif
 		float heightOfFont = GUI.skin.button.LineSize();
+		if(GUI.Button(new Rect(consoleWindowRect.width - 34, 2, 32, 16), "X")) {
+			_consoleUp = false;
+			consoleInput = "";
+		}
 
 		// Handle some inputs
-		if(((Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return) || (GUI.Button(new Rect(consoleWindowRect.width * 0.9f + 5.0f, consoleWindowRect.height - heightOfFont - 5.0f, consoleWindowRect.width * 0.1f - 10.0f, heightOfFont), "Send"))) && window.textField.Length > 0) {
-			Echo("> " + window.textField);
+		if(((Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return) || (GUI.Button(new Rect(consoleWindowRect.width * 0.9f + 5.0f, consoleWindowRect.height - heightOfFont - 5.0f, consoleWindowRect.width * 0.1f - 10.0f, heightOfFont), "Send"))) && consoleInput.Length > 0) {
+			Echo("> "+consoleInput);
 			try {
 				// Execute the current line
-				Execute(window.textField);
+				Execute(consoleInput);
 			} catch(System.Exception e) {
 				Debug.LogError("Internal error executing console command:\n"+e);
 			}
-			window.previousCommands.Add(window.textField);
-			window.cmdIndex = window.previousCommands.Count;
-			window.textField = "";
-			window.focusTheTextField = true;
-		} else if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.UpArrow && window.cmdIndex > 0) {
-			window.cmdIndex--;
-			window.textField = window.previousCommands[window.cmdIndex];
-		} else if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.DownArrow && window.cmdIndex < window.previousCommands.Count - 1) {
-			window.cmdIndex++;
-			window.textField = window.previousCommands[window.cmdIndex];
+			previousCommands.Add(consoleInput);
+			cmdIndex = previousCommands.Count;
+			consoleInput = "";
+			focusTheTextField = true;
+		} else if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.UpArrow && cmdIndex > 0) {
+			cmdIndex--;
+			consoleInput = previousCommands[cmdIndex];
+		} else if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.DownArrow && cmdIndex < previousCommands.Count - 1) {
+			cmdIndex++;
+			consoleInput = previousCommands[cmdIndex];
 		} else if(Event.current.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.Escape || (Event.current.keyCode == KeyCode.Menu && Application.platform == RuntimePlatform.Android))) {
-			window.open = false;
-			window.textField = "";
+			_consoleUp = false;
+			consoleInput = "";
 		}
 		GUI.SetNextControlName("ConsoleInput");
-		window.textField = GUI.TextField(new Rect(5.0f, consoleWindowRect.height - heightOfFont - 5.0f, consoleWindowRect.width * 0.9f - 10.0f, heightOfFont), window.textField);
-		if(window.focusTheTextField) {
+		consoleInput = GUI.TextField(new Rect(5.0f, consoleWindowRect.height - heightOfFont - 5.0f, consoleWindowRect.width * 0.9f - 10.0f, heightOfFont), consoleInput);
+		if(focusTheTextField) {
 			GUI.FocusControl("ConsoleInput");
-			window.focusTheTextField = false;
+			focusTheTextField = false;
 		}
 
 		GUI.skin.label.alignment = TextAnchor.UpperLeft;
 		GUI.skin.label.wordWrap = true;
 		
 		GUI.skin.FontSizeFull(12.0f, 12.0f);
-		float heightOfGUIContent = GUI.skin.label.CalcHeight(new GUIContent(window.textWindow), consoleWindowRect.width - 26.0f);
+		heightOfGUIContent = GUI.skin.label.CalcHeight(new GUIContent(consoleText), consoleWindowRect.width - 26.0f);
 		Rect sizeOfLabel = new Rect(0.0f, 0.0f, consoleWindowRect.width - 26.0f, Mathf.Max(heightOfGUIContent, consoleWindowRect.height - heightOfFont - 30.0f));
-		window.scrollPos = GUI.BeginScrollView(new Rect(5.0f, 20.0f, consoleWindowRect.width - 10.0f, consoleWindowRect.height - heightOfFont - 30.0f), window.scrollPos, sizeOfLabel, false, true); {
+		consoleScrollPos = GUI.BeginScrollView(new Rect(5.0f, 20.0f, consoleWindowRect.width - 10.0f, consoleWindowRect.height - heightOfFont - 30.0f), consoleScrollPos, sizeOfLabel, false, true); {
 			GUI.color = new Color(0.0f, 0.0f, 0.0f, 0.6667f);
 			GUI.DrawTexture(sizeOfLabel, GUIUtils.pixel);
 			GUI.color = color;
-			GUI.Label(sizeOfLabel, window.textWindow);
+			GUI.Label(sizeOfLabel, consoleText);
 			//message.str = consoleText;
 			//message.Draw(sizeOfLabel);
 		} GUI.EndScrollView();
 
 	}
-#endif
 
 	public static void Execute(string[] lines) {
 		foreach(string line in lines) {
@@ -780,8 +783,8 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public static void ToggleConsole() {
-		window.open = !window.open;
-		window.textField = "";
+		_consoleUp = !_consoleUp;
+		consoleInput = "";
 
 	}
 
@@ -792,17 +795,15 @@ public class DevConsole : MonoBehaviour {
 
 	public static void Echo(string st) {
 		echoBuffer += "\n" + st.ParseNewlines();
-		/*consoleText += "\n" + st.ParseNewlines();
-		consoleScrollPos = new Vector2(0, heightOfGUIContent);*/
-		window.textWindow += "\n" + st.ParseNewlines();
+		consoleText += "\n" + st.ParseNewlines();
+		consoleScrollPos = new Vector2(0, heightOfGUIContent);
 
 	}
 
 	public static void Clear() {
-		window.textWindow = "";
-		/*consoleText = "";
+		consoleText = "";
 		heightOfGUIContent = 0.0f;
-		consoleScrollPos = Vector2.zero;*/
+		consoleScrollPos = Vector2.zero;
 
 	}
 
@@ -1068,62 +1069,4 @@ public class DevConsole : MonoBehaviour {
 		public InaccessibleAttribute() { }
 
 	}
-}
-
-public class ConsoleWindow : ZWindow {
-
-	[DevConsole.Inaccessible] public Vector2 scrollPos = Vector2.zero;
-	[DevConsole.Inaccessible] public string textWindow = "";
-	[DevConsole.Inaccessible] public string textField = "";
-
-	public List<string> previousCommands = new List<string>();
-	[DevConsole.Inaccessible] public int cmdIndex = 0;
-	[DevConsole.Inaccessible] public bool focusTheTextField = false;
-
-	public override void Window() {
-		GUILayout.BeginVertical(); {
-			scrollPos = GUILayout.BeginScrollView(scrollPos, GUIStyle.none, GUI.skin.verticalScrollbar); {
-				Label(textWindow);
-			} GUILayout.EndScrollView();
-			GUILayout.BeginHorizontal(); {
-				GUI.SetNextControlName("ConsoleInput");
-				if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return && GUI.GetNameOfFocusedControl() == "ConsoleInput" && textField.Length > 0) {
-					TryExecute(textField);
-					textField = "";
-					Event.current.Use();
-				} else if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.UpArrow && cmdIndex > 0) {
-					cmdIndex--;
-					textField = previousCommands[cmdIndex];
-				} else if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.DownArrow && cmdIndex < previousCommands.Count - 1) {
-					cmdIndex++;
-					textField = previousCommands[cmdIndex];
-				} else if(Event.current.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.Escape || (Event.current.keyCode == KeyCode.Menu && Application.platform == RuntimePlatform.Android))) {
-					open = false;
-					textField = "";
-				}
-				textField = GUILayout.TextField(textField);
-				if(GUILayout.Button("Send", GUILayout.ExpandWidth(false)) && textField.Length > 0) {
-					TryExecute(textField);
-					textField = "";
-				}
-			} GUILayout.EndHorizontal();
-		} GUILayout.EndVertical();
-		if(focusTheTextField && Event.current.type == EventType.Repaint) {
-			GUI.FocusControl("ConsoleInput");
-		}
-	}
-
-	public void TryExecute(string cmd) {
-		DevConsole.Echo("> " + cmd);
-		try {
-			// Execute the current line
-			DevConsole.Execute(cmd);
-		} catch(System.Exception e) {
-			Debug.LogError("Internal error executing console command:\n" + e);
-		}
-		previousCommands.Add(cmd);
-		cmdIndex = previousCommands.Count;
-		focusTheTextField = true;
-	}
-
 }
