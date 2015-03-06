@@ -16,7 +16,7 @@ public class MaterialFlicker : MonoBehaviour {
 	public float time = 0.0f;
 	
 	void Start() {
-		baseColor = renderer.material.GetColor(targetChannel);
+		baseColor = GetComponent<Renderer>().material.GetColor(targetChannel);
 		
 	}
 	
@@ -35,11 +35,11 @@ public class MaterialFlicker : MonoBehaviour {
 		Color c = baseColor;
 		c *= rnd;
 		c.a = baseColor.a;
-		renderer.material.SetColor(targetChannel, c);
+		GetComponent<Renderer>().material.SetColor(targetChannel, c);
 	}
 	
 	public void ResetColor() {
-		renderer.material.SetColor(targetChannel, baseColor);
+		GetComponent<Renderer>().material.SetColor(targetChannel, baseColor);
 	}
 	
 }

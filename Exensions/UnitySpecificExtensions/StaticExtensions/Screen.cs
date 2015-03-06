@@ -24,8 +24,15 @@ public static class Screen {
 	public static bool autorotateToPortrait { get { return Scrn.autorotateToPortrait; } set { Scrn.autorotateToPortrait = value; } }
 	public static bool autorotateToPortraitUpsideDown { get { return Scrn.autorotateToPortraitUpsideDown; } set { Scrn.autorotateToPortraitUpsideDown = value; } }
 	public static bool fullScreen { get { return Scrn.fullScreen; } set { Scrn.fullScreen = value; } }
-	public static bool lockCursor { get { return Scrn.lockCursor; } set { Scrn.lockCursor = value; } }
-	public static bool showCursor { get { return Scrn.showCursor; } set { Scrn.showCursor = value; } }
+	
+	public static bool lockCursor {
+		get { return Cursor.lockState == CursorLockMode.Locked; } 
+		set {
+			Cursor.lockState = value ? CursorLockMode.Locked : CursorLockMode.None;
+			Cursor.visible = !value;
+		} 
+	}
+	public static bool showCursor { get { return Cursor.visible; } set { Cursor.visible = value; } }
 	public static float dpi { get { return Scrn.dpi; } }
 	
 	public static Vector2 size { get { return new Vector2(width, height); } }

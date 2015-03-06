@@ -11,8 +11,8 @@ public class MaterialPulse : MonoBehaviour {
 	public bool pulseAlpha = false;
 	
 	void Start() {
-		if (!renderer) { Destroy(this);	return; }
-		baseColor = renderer.materials[targetMaterial].GetColor(targetChannel);
+		if (!GetComponent<Renderer>()) { Destroy(this);	return; }
+		baseColor = GetComponent<Renderer>().materials[targetMaterial].GetColor(targetChannel);
 	}
 	
 	void Update() {
@@ -21,7 +21,7 @@ public class MaterialPulse : MonoBehaviour {
 		if (!pulseAlpha) {
 			c.a = baseColor.a;
 		}
-		renderer.materials[targetMaterial].SetColor(targetChannel, c);
+		GetComponent<Renderer>().materials[targetMaterial].SetColor(targetChannel, c);
 	}
 	
 	

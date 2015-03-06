@@ -68,7 +68,7 @@ public class MusicPlayer : MonoBehaviour {
 		
 		
 		
-		if (!audio.isPlaying) { 
+		if (!GetComponent<AudioSource>().isPlaying) { 
 			if (shuffle) {
 				PlayRandom(false);
 			} else {
@@ -103,7 +103,7 @@ public class MusicPlayer : MonoBehaviour {
 			}
 		}
 		
-		audio.volume = time / fadeTime * Settings.musicVolume * volume;
+		GetComponent<AudioSource>().volume = time / fadeTime * Settings.musicVolume * volume;
 	}
 	
 	public static void FadeIn() {
@@ -149,8 +149,8 @@ public class MusicPlayer : MonoBehaviour {
 	
 	public void Play(int index) {
 		curIndex = index;
-		audio.clip = songs[index];
-		audio.Play();
+		GetComponent<AudioSource>().clip = songs[index];
+		GetComponent<AudioSource>().Play();
 	}
 	
 	public void PlayRandom(bool avoidSame) {

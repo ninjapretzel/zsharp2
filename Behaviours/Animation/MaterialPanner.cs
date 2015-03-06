@@ -16,14 +16,14 @@ public class MaterialPanner : MonoBehaviour {
 	public string[] targets;
 	
 	public Material material {
-		get { return renderer.materials[targetMaterial]; }
-		set { renderer.materials[targetMaterial] = value; }
+		get { return GetComponent<Renderer>().materials[targetMaterial]; }
+		set { GetComponent<Renderer>().materials[targetMaterial] = value; }
 	}
 	
 	void Awake() {
 		if (targets == null) { targets = new string[0]; }
-		if (renderer == null) { Destroy(this); return; }
-		material = new Material(renderer.material);
+		if (GetComponent<Renderer>() == null) { Destroy(this); return; }
+		material = new Material(GetComponent<Renderer>().material);
 	}
 	
 	void Start() {

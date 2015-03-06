@@ -14,7 +14,7 @@ public static class Random {
 	//value is adjusted to return approx [0, 1)
 	public static float value { get { return Rand.value * .9999f; } }
 	
-	//unit has range [-1, 1]
+	//unit has range [-1, 1) and even distribution
 	public static float unit { get { return -1 + (2 * Rand.value); } }
 	
 	//normal is normally distributed from [0, 1)

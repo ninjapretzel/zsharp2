@@ -11,7 +11,7 @@ public static class ZEditorExtensions {
 	public static void LegacyParticle() {
 		
 		GameObject gob = new GameObject("Legacy Particle System");
-		gob.AddComponent("EllipsoidParticleEmitter");
+		gob.AddComponent<EllipsoidParticleEmitter>();
 		gob.AddComponent<ParticleAnimator>();
 		gob.AddComponent<ParticleRenderer>();
 		

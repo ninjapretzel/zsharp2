@@ -14,8 +14,8 @@ public class LightFader : MonoBehaviour {
 	float timeout;
 	
 	void Start() {
-		startIntensity = light.intensity;
-		startRange = light.range;
+		startIntensity = GetComponent<Light>().intensity;
+		startRange = GetComponent<Light>().range;
 		timeout = 0;
 		
 	}
@@ -25,8 +25,8 @@ public class LightFader : MonoBehaviour {
 		
 		float percent = timeout / fadeTime;
 		
-		light.intensity = startIntensity.Lerp(endIntensity, percent);
-		light.range = startRange.Lerp(endRange, percent);
+		GetComponent<Light>().intensity = startIntensity.Lerp(endIntensity, percent);
+		GetComponent<Light>().range = startRange.Lerp(endRange, percent);
 		
 		
 	}
