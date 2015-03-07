@@ -6,6 +6,8 @@ public class DrawsGizmo : MonoBehaviour {
 	public bool wireframe = false;
 	public bool sphere = false;
 	public Vector3 size = Vector3.one;
+	public Vector3 offset = Vector3.zero;
+	
 	public float sizeScale = 1;
 	public Color color = new Color(1, 0, 0, .5f);
 	public float alphaScale = .5f;
@@ -24,7 +26,7 @@ public class DrawsGizmo : MonoBehaviour {
 	}
 	
 	void DrawGizmo() {
-		Vector3 center = transform.position;
+		Vector3 center = transform.position + offset;
 		Vector3 size = this.size * sizeScale;
 		if (wireframe) {
 			if (sphere) {
