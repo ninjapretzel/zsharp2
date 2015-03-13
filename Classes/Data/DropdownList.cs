@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -23,8 +24,15 @@ public class DropdownList<T> : List<T> {
 		}
 	}
 	
+	public Action<List<T>> onSelected = null;
+	
 	const string NULLSTR = "<NULL>";
-	public DropdownList() : base() {
+
+	public DropdownList() : base() { Init(); }
+	public DropdownList(int cap) : base(cap) { Init(); }
+	public DropdownList(IEnumerable<T> collection) : base(collection) { Init(); }
+	
+	void Init() { 
 		open = false;
 		selectedIndex = 0;
 	}
@@ -76,6 +84,9 @@ public class DropdownList<T> : List<T> {
 			string str = LabelOfElementAt(i);
 			if (GUI.Button(r, str, bodyStyle)) {
 				selectedIndex = i;
+				if (onSelected != null) { 
+					onSelected(this);
+				}
 				open = false;
 			}
 			r = r.MoveDown();
