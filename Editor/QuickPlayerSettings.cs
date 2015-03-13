@@ -281,9 +281,15 @@ public class QuickPlayerSettings : EditorWindow {
 				break;
 			#endregion
 			#region android
+#if UNITY_4_6
 			case "Android.use24BitDepthBuffer":
 				PlayerSettings.Android.use24BitDepthBuffer = Boolean.Parse(val);
 				break;
+#else
+			case "Android.disableDepthAndStencilBuffers":
+				PlayerSettings.Android.disableDepthAndStencilBuffers = Boolean.Parse(val);
+				break;
+#endif
 			case "Android.bundleVersionCode":
 				PlayerSettings.Android.bundleVersionCode = Int32.Parse(val);
 				break;
@@ -374,9 +380,17 @@ public class QuickPlayerSettings : EditorWindow {
 				EnumUtils.TryParse<iOSStatusBarStyle>(val, out tempstatusBarStyle);
 				PlayerSettings.iOS.statusBarStyle = tempstatusBarStyle;
 				break;
+#if UNITY_4_6
 			case "iOS.exitOnSuspend":
 				PlayerSettings.iOS.exitOnSuspend = Boolean.Parse(val);
 				break;
+#else
+			case "iOS.appInBackgroundBehavior":
+				iOSAppInBackgroundBehavior tempiosappInBackgroundBehavior;
+				EnumUtils.TryParse<iOSAppInBackgroundBehavior>(val, out tempiosappInBackgroundBehavior);
+				PlayerSettings.iOS.appInBackgroundBehavior = tempiosappInBackgroundBehavior;
+				break;
+#endif
 			case "iOS.showActivityIndicatorOnLoading":
 				iOSShowActivityIndicatorOnLoading tempiosshowActivityIndicatorOnLoading;
 				EnumUtils.TryParse<iOSShowActivityIndicatorOnLoading>(val, out tempiosshowActivityIndicatorOnLoading);
@@ -437,7 +451,11 @@ public class QuickPlayerSettings : EditorWindow {
 		#endregion
 		if(currentPlatform == BuildTargetGroup.Android) {
 			#region android
+#if UNITY_4_6
 			output += "Android.use24BitDepthBuffer," + PlayerSettings.Android.use24BitDepthBuffer + "\n";
+#else
+			output += "Android.disableDepthAndStencilBuffers," + PlayerSettings.Android.disableDepthAndStencilBuffers + "\n";
+#endif
 			output += "Android.bundleVersionCode," + PlayerSettings.Android.bundleVersionCode + "\n";
 			output += "Android.minSdkVersion," + PlayerSettings.Android.minSdkVersion + "\n";
 			output += "Android.preferredInstallLocation," + PlayerSettings.Android.preferredInstallLocation + "\n";
@@ -463,7 +481,11 @@ public class QuickPlayerSettings : EditorWindow {
 			output += "iOS.prerenderedIcon," + PlayerSettings.iOS.prerenderedIcon + "\n";
 			output += "iOS.requiresPersistentWiFi," + PlayerSettings.iOS.requiresPersistentWiFi + "\n";
 			output += "iOS.statusBarStyle," + PlayerSettings.iOS.statusBarStyle + "\n";
+#if UNITY_4_6
 			output += "iOS.exitOnSuspend," + PlayerSettings.iOS.exitOnSuspend + "\n";
+#else
+			output += "iOS.appInBackgroundBehavior," + PlayerSettings.iOS.appInBackgroundBehavior + "\n";
+#endif
 			output += "iOS.showActivityIndicatorOnLoading," + PlayerSettings.iOS.showActivityIndicatorOnLoading;
 			#endregion
 		}
