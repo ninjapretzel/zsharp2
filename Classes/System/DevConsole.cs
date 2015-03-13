@@ -280,6 +280,15 @@ public class DevConsole : MonoBehaviour {
 				}
 				targetMemberName = command.Substring(indexOfDot+1);
 				targetClass = System.Type.GetType(targetClassName);
+				if(targetClass == null) {
+					targetClass = System.Type.GetType(targetClassName + ", Assembly-UnityScript-firstpass");
+					if(targetClass == null) {
+						targetClass = System.Type.GetType(targetClassName + ", Assembly-CSharp");
+						if(targetClass == null) {
+							targetClass = System.Type.GetType(targetClassName + ", Assembly-UnityScript");
+						}
+					}
+				}
 			} else {
 				targetClass = typeof(DevConsole);
 				targetMemberName = command;
