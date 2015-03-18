@@ -17,16 +17,28 @@ public class ZWindow {
 	
 	public bool hasCloseButton;
 	public bool hasMiniButton;
+	public bool resizable;
+	
+	public Vector2 minSize;
+	public Vector2 maxSize;
 	
 	private int id;
 	public static int next_id = 10000;
 	public static int lastFocused = 0;
 	public float closeButtonSize = 18;
+	public float resizeAreaSize = 18;
+	
+	
 	
 	public float x { get { return area.x; } set { area.x = value; } }
 	public float y { get { return area.y; } set { area.y = value; } }
 	public float width { get { return area.width; } set { area.width = value; } }
 	public float height { get { return area.height; } set { area.height = value; } } 
+	
+	static Vector3 resizeClickPoint;
+	static Vector3 resizeBaseSize;
+	static ZWindow resizing = null;
+	static GUIStyle resizeStyle;
 	
 	bool lastOpenedState = false;
 	
@@ -43,6 +55,23 @@ public class ZWindow {
 		}
 	}
 	
+	public Rect resizeArea {
+		get {
+			float size = resizeAreaSize;
+			if (size < 10) { size = 10; }
+			return new Rect(width - size - 1,height - size - 1, size, size);
+		}
+	}
+	
+	public Rect screenResizeArea {
+		get {
+			Rect r = resizeArea;
+			r.x += x;
+			r.y += y;
+			return r;
+		}
+	}
+	
 	
 	public ZWindow() { Init(); }
 	
@@ -50,27 +79,46 @@ public class ZWindow {
 	public ZWindow Named(string n) { name = n; return this; }
 	public ZWindow Titled(string n) { name = n; return this; }
 	public ZWindow Skinned(GUISkin s) { skin = s; return this; }
+	
+	public ZWindow VisibleBackground() { invisibleBackground = false; return this; }
 	public ZWindow InvisibleBackground() { invisibleBackground = true; return this; }
 	
+	public ZWindow Dragable() { dragable = true; return this; }
 	public ZWindow Undragable() { dragable = false; return this; }
+	
+	public ZWindow Resizable() { resizable = true; return this; }
+	public ZWindow Unresizable() { resizable = false; return this; }
+	
+	public ZWindow Closable() { hasCloseButton = true; return this; }
 	public ZWindow Unclosable() { hasCloseButton = false; return this; }
+	
 	public ZWindow Minimizable() { hasMiniButton = true; return this; }
+	public ZWindow Unminimizable() { hasMiniButton = false; return this; }
 	
 	public ZWindow Opened() { open = true; lastOpenedState = true; return this; }
 	public ZWindow Closed() { open = false; lastOpenedState = false; return this; }
 	
+	
+	
 	void Init() {
 		id = next_id++;
 		area = Screen.MiddleCenter(.5f, .5f);
+		
+		
 		name = "New Window";
 		skin = Resources.Load<GUISkin>("Standard");
 		open = true;
 		lastOpenedState = true;
 		invisibleBackground = false;
 		dragable = true;
+		resizable = true;
 		
 		hasCloseButton = true;
 		hasMiniButton = false;
+		
+		minSize = new Vector2(100, 60);
+		maxSize = new Vector2(Screen.width, Screen.height);
+		
 	}
 	
 	public void Center() {
@@ -84,13 +132,15 @@ public class ZWindow {
 		} else {
 			GUI.skin = skin;
 		}
+		resizeStyle = GUI.skin.FindStyle("resize");
 	}
 	
 	public void Draw() {
 		if (open) {
 			SetSkin();
+			Resize();
 			area = GUI.Window(id, area, DrawWindow, name);	
-			//SetSkin();
+			
 		}
 		if (open && !lastOpenedState) { OnOpen(); }
 		if (!open && lastOpenedState) { OnClose(); }
@@ -104,6 +154,7 @@ public class ZWindow {
 			lastFocused = id;
 		}
 		
+
 		Window();
 		
 		GUI.PushColor(Color.red);
@@ -113,8 +164,47 @@ public class ZWindow {
 		GUI.PopColor();
 		
 		if (dragable) { GUI.DragWindow(draggableArea); }
+		
+		
 		Bound();
 		//SetSkin();
+	}
+	
+	public void Resize() {
+		if (!open) { return; }
+		if (resizing == null || resizing == this) {
+			
+			if (resizable) {
+				GUI.DrawTexture(screenResizeArea, resizeStyle.normal.background);
+				if (Event.current.type == EventType.MouseDown) {
+					if (screenResizeArea.Contains(Input.mousePosition)) {
+						resizing = this;
+						Event.current.Use();
+						resizeBaseSize = new Vector3(width, height, 0);
+						resizeClickPoint = Input.mousePosition;
+					}
+				} else if (resizing == this && Event.current.type == EventType.MouseUp) {
+					resizing = null;
+					Event.current.Use();
+				} else if (Event.current.type == EventType.MouseDrag) {
+					if (resizing == this) {
+						Vector3 diff = Input.mousePosition - resizeClickPoint;
+						width = resizeBaseSize.x + diff.x;
+						height = resizeBaseSize.y + diff.y;
+						
+						Event.current.Use();
+					}
+				}
+				
+				if (width < minSize.x) { width = minSize.x; }
+				if (height < minSize.y) { height = minSize.y; }
+				if (width > maxSize.x) { width = maxSize.x; }
+				if (height > maxSize.y) { height = maxSize.y; }
+				
+			}
+			
+		}
+		
 	}
 	
 	#region Virtual functions
