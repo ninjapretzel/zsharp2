@@ -1,8 +1,12 @@
 using UnityEngine;
 using System.Collections;
 
+
+
 public class CreateObjectOnStart : MonoBehaviour {
 	public Transform target;
+	public Transform[] otherObjects;
+	
 	public Vector3 offset;
 	public bool parentIt = false;
 	public bool waitForFixedUpdate = false;
@@ -20,8 +24,15 @@ public class CreateObjectOnStart : MonoBehaviour {
 	
 	
 	void Make() {
+		
 		Transform obj = Instantiate(target, transform.position + offset, transform.rotation) as Transform;
 		if (parentIt) { obj.parent = transform; }
+		
+		foreach (Transform o in otherObjects) {
+			obj = Instantiate(o, transform.position + offset, transform.rotation) as Transform;
+			if (parentIt) { obj.parent = transform; }
+		}
+		
 		Destroy(this);
 	}
 }

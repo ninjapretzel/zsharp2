@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 //Translates back and forth between A and B
 //A and B shouldn't  be the same type, since that will cause ambiguity.
-public class Translator<A, B> {
+public class Translator<A, B>  : IEnumerable<KeyValuePair<A,B>> {
 	
-	Dictionary<A, B> atb;
-	Dictionary<B, A> bta;
+	protected Dictionary<A, B> atb;
+	protected Dictionary<B, A> bta;
 	
 	public Translator() {
 		atb = new Dictionary<A, B>();
@@ -16,6 +16,17 @@ public class Translator<A, B> {
 	}
 	
 	public Dictionary<A, B> pairs { get { return atb; } }
+	
+	public B this[A a] { get { return atb[a]; } set { Put(a, value); } }
+	public A this[B b] { get { return bta[b]; } set { Put(value, b); } }
+	
+	IEnumerator IEnumerable.GetEnumerator() {
+		return atb.GetEnumerator();
+	}
+	
+	public IEnumerator<KeyValuePair<A,B>> GetEnumerator() {
+		return atb.GetEnumerator();
+	}
 	
 	
 	//Accessors
@@ -42,11 +53,11 @@ public class Translator<A, B> {
 	//Tries to add or replace a pair of values
 	public void Put(A a, B b) {
 		if (Contains(a) || Contains(b)) {
-			atb[a] = b;
-			bta[b] = a;
-		} else {
-			Add(a, b);
+			Remove(a);
+			Remove(b);
 		}
+		
+		Add(a, b);
 		
 	}
 	

@@ -48,6 +48,15 @@ public class DropdownList<T> : List<T> {
 		return str;
 	}
 	
+	public void SetIndexTo(object o) {
+		for (int i = 0; i < Count; i++) {
+			if (this[i].Equals(o)) {
+				selectedIndex = i;
+				return;
+			}
+		}
+		selectedIndex = 0;
+	}
 	
 	public void Draw(Rect baseArea) {
 		if (GUI.Button(baseArea, selectedLabel, topStyle)) { open = !open; }
