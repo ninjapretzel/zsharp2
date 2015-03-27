@@ -114,6 +114,9 @@ public static class GUIStyleF {
 
 public static class GUISkinF {
 	
+	public static GUISkin Clone(this GUISkin source) {
+		return Object.Instantiate(source) as GUISkin;
+	}
 	
 	public static void FontSize(this GUISkin skin, string s) { skin.FontSize(GUIFontSize.Get(s)); }
 	public static void FontSizeFull(this GUISkin skin, string s) { skin.FontSizeFull(GUIFontSize.Get(s)); }

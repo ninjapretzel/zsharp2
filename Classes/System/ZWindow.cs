@@ -9,7 +9,24 @@ public class ZWindow {
 	public string name;
 	public Rect area;
 	public int padding = 0;
-	public GUISkin skin;
+	public GUISkin skin { get { return _skin; } 
+		set {
+			_skin = value;
+			resizeStyle = _skin.FindStyle("resize");
+			if (skinCache.ContainsKey(_skin)) {
+				_invisibleSkin = skinCache[_skin];	
+			} else {
+				_invisibleSkin = _skin.Clone();
+				_invisibleSkin.window.normal.background = null;
+				_invisibleSkin.window.onNormal.background = null;
+				skinCache[_skin] = _invisibleSkin;
+			}
+		}
+	}
+		
+	GUISkin _skin;
+	GUISkin _invisibleSkin;
+	static Dictionary<GUISkin, GUISkin> skinCache = new Dictionary<GUISkin, GUISkin>();
 	
 	public bool open;
 	public bool invisibleBackground;
@@ -143,12 +160,12 @@ public class ZWindow {
 	}
 	
 	void SetSkin() {
+		GUI.skin = skin;
+		
 		if (invisibleBackground) {
-			GUI.skin = blank;
-		} else {
-			GUI.skin = skin;
+			GUI.skin = _invisibleSkin;
 		}
-		resizeStyle = GUI.skin.FindStyle("resize");
+		
 	}
 	
 	public void Draw() {
@@ -173,11 +190,17 @@ public class ZWindow {
 
 		Window();
 		
-		GUI.PushColor(Color.red);
-		if (GUI.Button(closeButtonArea, "X")) {
-			open = false;
+		if (hasCloseButton) {
+			GUI.PushColor(Color.red);
+			if (GUI.Button(closeButtonArea, "X")) {
+				open = false;
+			}
+			GUI.PopColor();
 		}
-		GUI.PopColor();
+		
+		if (hasMiniButton) {
+			
+		}
 		
 		if (dragable) { GUI.DragWindow(draggableArea); }
 		
