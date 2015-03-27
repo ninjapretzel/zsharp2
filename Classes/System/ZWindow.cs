@@ -83,6 +83,22 @@ public class ZWindow {
 	public ZWindow VisibleBackground() { invisibleBackground = false; return this; }
 	public ZWindow InvisibleBackground() { invisibleBackground = true; return this; }
 	
+	public ZWindow Locked() {
+		dragable = false;
+		resizable = false;
+		hasCloseButton = false;
+		hasMiniButton = false;
+		return this;
+	}
+	
+	public ZWindow Unlocked() {
+		dragable = true;
+		resizable = true;
+		hasCloseButton = true;
+		hasMiniButton = true;
+		return this;
+	}
+	
 	public ZWindow Dragable() { dragable = true; return this; }
 	public ZWindow Undragable() { dragable = false; return this; }
 	

@@ -25,6 +25,24 @@ public class GUIRoot : MonoBehaviour {
 		
 	}
 	
+	public static void HideAllWindows() {
+		foreach (ZWindow window in windows) {
+			window.open = false;
+		}
+	}
+	
+	public static void HideAllWindows(IEnumerable<ZWindow> windowsToHide) {
+		foreach (ZWindow window in windowsToHide) {
+			window.open = false;
+		}
+	}
+	
+	public static void ShowAllWindows(IEnumerable<ZWindow> windowsToShow) {
+		foreach (ZWindow window in windowsToShow) {
+			window.open = true;
+		}
+	}
+	
 	void OnGUI() {
 		GUI.depth = 0;
 		
