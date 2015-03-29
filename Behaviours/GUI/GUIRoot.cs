@@ -8,6 +8,8 @@ public class GUIRoot : MonoBehaviour {
 	
 	public static List<ZWindow> windows = new List<ZWindow>();
 	
+	public static Dictionary<string, ZWindow> binds = new Dictionary<string, ZWindow>();
+	
 	public static void AddWindow(ZWindow window) {
 		windows.Add(window);
 	}
@@ -23,6 +25,22 @@ public class GUIRoot : MonoBehaviour {
 	
 	void Update() {
 		
+		foreach (var pair in binds) {
+			if (Input.GetKeyDown(pair.Key)) {
+				pair.Value.open = !pair.Value.open;
+			}
+		}
+		
+	}
+	
+	public static void BindKey(string key, ZWindow window) {
+		binds[key] = window;
+	}
+	
+	public static void Unbind(string key) {
+		if (binds.ContainsKey(key)) {
+			binds.Remove(key);
+		}
 	}
 	
 	public static void HideAllWindows() {
