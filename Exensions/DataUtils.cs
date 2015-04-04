@@ -6,6 +6,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
 
 public static class DataUtils {
 	
@@ -349,6 +350,155 @@ public static class DataUtils {
 		string text = Load(filename).ConvertNewlines().Replace(",\n","\n").Replace("\n", ",");
 		return text.Split(',').ToList();
 		
+	}
+
+	/// <summary>
+	///  Attempts to parse the provided parameters into the specified type.
+	/// This is VERY strict. Exactly the right number of parameters must be passed and they must all parse properly.
+	/// The only thing that cannot possibly fail is String.
+	/// Returns: object reference of the result. Null if improper parameters.
+	/// </summary>
+	/// <param name="typeName">The type of the returned object</param>
+	/// <returns></returns>
+	public static object ParseParameterListIntoType(this List<string> parameters, string typeName) {
+		switch(typeName) {
+			case "Vector2":
+				Vector2 targetV2;
+				PropertyInfo vector2ByName = typeof(Vector2).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
+				if(vector2ByName != null) {
+					if(parameters.Count != 1) { return null; }
+					targetV2 = (Vector2)vector2ByName.GetValue(null, null);
+				} else {
+					if(parameters.Count != 2) { return null; }
+					float x = 0.0f;
+					try {
+						x = System.Single.Parse(parameters[0]);
+					} catch(System.FormatException) { return null; }
+					float y = 0.0f;
+					try {
+						y = System.Single.Parse(parameters[1]);
+					} catch(System.FormatException) { return null; }
+					targetV2 = new Vector2(x, y);
+				}
+				return targetV2;
+			case "Vector3":
+				Vector3 targetV3;
+				PropertyInfo vector3ByName = typeof(Vector3).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
+				if(vector3ByName != null) {
+					if(parameters.Count != 1) { return null; }
+					targetV3 = (Vector3)vector3ByName.GetValue(null, null);
+				} else {
+					if(parameters.Count != 3) { return null; }
+					float x = 0.0f;
+					try {
+						x = System.Single.Parse(parameters[0]);
+					} catch(System.FormatException) { return null; }
+					float y = 0.0f;
+					try {
+						y = System.Single.Parse(parameters[1]);
+					} catch(System.FormatException) { return null; }
+					float z = 0.0f;
+					try {
+						z = System.Single.Parse(parameters[2]);
+					} catch(System.FormatException) { return null; }
+					targetV3 = new Vector3(x, y, z);
+				}
+				return targetV3;
+			case "Color":
+				Color targetColor;
+				PropertyInfo colorByName = typeof(Color).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
+				if(colorByName != null) {
+					if(parameters.Count != 1) { return null; }
+					targetColor = (Color)colorByName.GetValue(null, null);
+				} else {
+					if(parameters.Count != 4) { return null; }
+					float r = 0.0f;
+					try {
+						r = System.Single.Parse(parameters[0]);
+					} catch(System.FormatException) { return null; }
+					float g = 0.0f;
+					try {
+						g = System.Single.Parse(parameters[1]);
+					} catch(System.FormatException) { return null; }
+					float b = 0.0f;
+					try {
+						b = System.Single.Parse(parameters[2]);
+					} catch(System.FormatException) { return null; }
+					float a = 1.0f;
+					try {
+						a = System.Single.Parse(parameters[3]);
+					} catch(System.FormatException) { return null; }
+					targetColor = new Color(r, g, b, a);
+				}
+				return targetColor;
+			case "Rect":
+				if(parameters.Count != 4) { return null; }
+				Rect targetRect;
+				float l = 0.0f;
+				try {
+					l = System.Single.Parse(parameters[0]);
+				} catch(System.FormatException) { return null; }
+				float t = 0.0f;
+				try {
+					t = System.Single.Parse(parameters[1]);
+				} catch(System.FormatException) { return null; }
+				float w = 0.0f;
+				try {
+					w = System.Single.Parse(parameters[2]);
+				} catch(System.FormatException) { return null; }
+				float h = 1.0f;
+				try {
+					h = System.Single.Parse(parameters[3]);
+				} catch(System.FormatException) { return null; }
+				targetRect = new Rect(l, t, w, h);
+				return targetRect;
+			case "String":
+				System.Text.StringBuilder bob = new System.Text.StringBuilder();
+				foreach(string st in parameters) {
+					bob.Append(st + " ");
+				}
+				string allparams = bob.ToString();
+				return allparams.Substring(0, allparams.Length - 1);
+			case "Char":
+			case "SByte":
+			case "Int16":
+			case "Int32":
+			case "Int64":
+			case "Byte":
+			case "UInt16":
+			case "UInt32":
+			case "UInt64":
+			case "Single":
+			case "Double":
+				if(parameters.Count != 1) { return null; }
+				try {
+					// Use reflection to call the proper Parse method. Because I can.
+					return System.Type.GetType("System."+typeName).GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new System.Type[] { typeof(string) }, null).Invoke(null, new string[] { parameters[0] });
+				} catch(System.Reflection.TargetInvocationException) { // Is thrown in place of the Parse method's exceptions
+					return null;
+				}
+			case "Boolean":
+				if(parameters.Count != 1) { return null; }
+				if(parameters[0] == "1" || parameters[0].Equals("on", System.StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("yes", System.StringComparison.InvariantCultureIgnoreCase)) {
+					return true;
+				} else if(parameters[0] == "0" || parameters[0].Equals("off", System.StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("no", System.StringComparison.InvariantCultureIgnoreCase)) {
+					return false;
+				} else {
+					try {
+						float val = System.Single.Parse(parameters[0]);
+						return val >= 0.5f;
+					} catch(System.FormatException) {
+						try {
+							return System.Boolean.Parse(parameters[0]);
+						} catch(System.FormatException) {
+							return null;
+						}
+					}
+				}
+			default:
+				return null;
+		}
+
 	}
 	
 	#if !UNITY_WEBPLAYER

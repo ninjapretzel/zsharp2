@@ -24,9 +24,11 @@ public class CreateObjectOnStart : MonoBehaviour {
 	
 	
 	void Make() {
-		
-		Transform obj = Instantiate(target, transform.position + offset, transform.rotation) as Transform;
-		if (parentIt) { obj.parent = transform; }
+		Transform obj;
+		if (target != null) {
+			obj = Instantiate(target, transform.position + offset, transform.rotation) as Transform;
+			if (parentIt) { obj.parent = transform; }
+		}
 		
 		foreach (Transform o in otherObjects) {
 			obj = Instantiate(o, transform.position + offset, transform.rotation) as Transform;
