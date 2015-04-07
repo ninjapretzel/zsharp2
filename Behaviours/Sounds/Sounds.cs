@@ -97,9 +97,7 @@ public class Sounds : MonoBehaviour {
 	public static AudioClip GetSound(string sc) {
 		if (audioSettings == null) { return null; }
 		if (!sounds.ContainsKey(sc)) {
-			Debug.Log("first time playing " + sc);
 			sounds[sc] = Load(sc);
-			Debug.Log(sounds[sc].Count + " sounds loaded");
 		}
 		return sounds[sc].GetSound();
 	}
