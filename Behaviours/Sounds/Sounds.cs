@@ -4,27 +4,25 @@ using System.Collections.Generic;
 
 [System.Serializable]
 public class Sound {
-	public string name;
+	public string name = "un-initialized Sound";
 	public AudioSource overrideSource;
-	public List<AudioClip> clips;
+	private List<AudioClip> clips;
+	
+	public int Count { get { return clips.Count; } }
+	public AudioClip nextSound { get { return GetSound(); } }
 	
 	public Sound() { clips = new List<AudioClip>(); }
-	
-	public Sound(string n, AudioClip c) {
-		name = n;
-		clips = new List<AudioClip>();
-		clips.Add(c);
-	}
+	public Sound(string n) : this() { name = n; }
+	public Sound(string n, AudioClip c) : this(n) { clips.Add(c); }
 	
 	public AudioClip GetSound() {
 		if (clips.Count == 1) { return clips[0]; }
-		else if (clips.Count == 0) { return null; }
+		if (clips.Count == 0) { return null; }
 		return clips.Choose();
 	}
 	
-	public void AddClips(List<AudioClip> list) {
-		foreach (AudioClip clip in list) { clips.Add(clip); }
-	}
+	public void AddClips(List<AudioClip> list) { foreach (AudioClip clip in list) { clips.Add(clip); } }
+	public void AddClips(Sound snd) { foreach (AudioClip clip in snd.clips) { clips.Add(clip); } }
 	
 }
 
@@ -33,12 +31,15 @@ public class Sounds : MonoBehaviour {
 	public AudioSource audioSet;
 	public List<Sound> soundSet;
 	
-	public static Dictionary<string, Sound> sounds = new Dictionary<string, Sound>();
+	static Dictionary<string, Sound> sounds = new Dictionary<string, Sound>();
 	
-	private static AudioSource audioSetStatic;
+	private static AudioSource _audioSettings;
 	public static AudioSource audioSettings {
-		get { return audioSetStatic != null ? audioSetStatic : audioSettingsFactory; }
-		set { audioSetStatic = value; }
+		get { 
+			if (_audioSettings == null) { _audioSettings = audioSettingsFactory; }
+			return _audioSettings;
+		}
+		set { _audioSettings = value; }
 	}
 	
 	public static bool started = false;
@@ -57,6 +58,7 @@ public class Sounds : MonoBehaviour {
 	void Awake() {
 		if (started) { return; }
 		audioSettings = audioSet;
+		
 		foreach (Sound s in soundSet) { Add(s); }
 		
 		started = true;
@@ -95,8 +97,9 @@ public class Sounds : MonoBehaviour {
 	public static AudioClip GetSound(string sc) {
 		if (audioSettings == null) { return null; }
 		if (!sounds.ContainsKey(sc)) {
-			AudioClip loaded = Resources.Load<AudioClip>(sc);
-			return loaded;
+			Debug.Log("first time playing " + sc);
+			sounds[sc] = Load(sc);
+			Debug.Log(sounds[sc].Count + " sounds loaded");
 		}
 		return sounds[sc].GetSound();
 	}
@@ -112,21 +115,55 @@ public class Sounds : MonoBehaviour {
 	
 	public static bool Has(string sc) { return sounds.ContainsKey(sc); }
 	
-	public static bool Load(string sc) { 
-		AudioClip ac = Resources.Load(sc, typeof(AudioClip)) as AudioClip;
-		return (ac != null);
+	// public static bool Load(string sc) { 
+		// AudioClip ac = Resources.Load<AudioClip>(sc);
+		// return (ac != null);
+	// }
+	
+	public static Sound Load(string sc) {
+		List<AudioClip> clips = new List<AudioClip>();
+		AudioSource overrideSource = Resources.Load<AudioSource>(sc);
+		
+		Sound sound = new Sound(sc);
+		sound.overrideSource = overrideSource;
+		
+		AudioClip single = Resources.Load<AudioClip>(sc);
+		if (single != null) { 
+			clips.Add(single);
+		} else {
+			AudioClip clip0 = Resources.Load<AudioClip>(sc+"0");
+			if (clip0 != null) { clips.Add(clip0); }
+			AudioClip clip1 = Resources.Load<AudioClip>(sc+"1");
+			if (clip1 != null) { clips.Add(clip1); }
+			
+			
+			if (clips.Count > 0) {
+				int i = 2;
+				AudioClip clip = Resources.Load<AudioClip>(sc+i);
+				while (clip != null) {
+					clips.Add(clip);
+					i++;
+					clip = Resources.Load<AudioClip>(sc+i);
+				}
+			}
+			
+			
+		}
+		
+		sound.AddClips(clips);
+		
+		return sound;
 	}
 	
 	public static bool Add(string sc) {
 		if (Has(sc)) { return true; }
-		AudioClip ac = Resources.Load(sc, typeof(AudioClip)) as AudioClip;
+		AudioClip ac = Resources.Load<AudioClip>(sc);
 		if (ac != null) { return Add(new Sound(sc, ac)); }
 		return false;
-		
 	}
 	
 	public static bool Add(Sound sc) {
-		if (sounds.ContainsKey(sc.name)) { sounds[sc.name].AddClips(sc.clips); }
+		if (sounds.ContainsKey(sc.name)) { sounds[sc.name].AddClips(sc); }
 		else { sounds.Add(sc.name, sc); }
 		return true;
 	}
