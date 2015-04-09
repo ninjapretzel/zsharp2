@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class Sound {
 	public string name = "un-initialized Sound";
 	public AudioSource overrideSource;
-	private List<AudioClip> clips;
+	public List<AudioClip> clips;
 	
 	public int Count { get { return clips.Count; } }
 	public AudioClip nextSound { get { return GetSound(); } }
@@ -68,7 +68,7 @@ public class Sounds : MonoBehaviour {
 		if (audioSettings == null) { return null; }
 		if (sc == null) { return null; }
 		Vector3 pos = Vector3.zero;
-		if (Camera.main) { pos = Camera.main.transform.position; }
+		if (Camera.main != null) { pos = Camera.main.transform.position; }
 		return Play(sc, settings, pos);
 	}
 	
@@ -95,23 +95,25 @@ public class Sounds : MonoBehaviour {
 	
 	public static AudioClip Get(string sc) { return GetSound(sc); }
 	public static AudioClip GetSound(string sc) {
-		if (audioSettings == null) { return null; }
-		if (!sounds.ContainsKey(sc)) {
-			sounds[sc] = Load(sc);
-		}
-		return sounds[sc].GetSound();
+		if (!sounds.ContainsKey(sc)) { sounds[sc] = Load(sc); }
+		
+		if (sounds[sc] != null) { return sounds[sc].GetSound(); }
+		return null;
 	}
 	
 	public static AudioSource GetSettings(string sc) { 
-		if (!sounds.ContainsKey(sc)) { return audioSettings; }
-		Sound sound = sounds[sc];
+		if (!sounds.ContainsKey(sc) || sounds[sc] == null) { return audioSettings; }
+		Sound sound = sounds[sc];	
+		
 		if (sound.overrideSource != null) {
 			return sound.overrideSource;
 		}
 		return audioSettings;
 	}
 	
-	public static bool Has(string sc) { return sounds.ContainsKey(sc); }
+	public static bool Has(string sc) { 
+		return sounds.ContainsKey(sc) ? sounds[sc].Count > 0 : false; 
+	}
 	
 	// public static bool Load(string sc) { 
 		// AudioClip ac = Resources.Load<AudioClip>(sc);
@@ -148,9 +150,11 @@ public class Sounds : MonoBehaviour {
 			
 		}
 		
-		sound.AddClips(clips);
-		
-		return sound;
+		if (clips.Count > 0) { 
+			sound.AddClips(clips);
+			return sound;
+		}
+		return null;
 	}
 	
 	public static bool Add(string sc) {
