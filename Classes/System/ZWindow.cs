@@ -168,18 +168,25 @@ public class ZWindow {
 		
 	}
 	
-	public void Draw() {
+	public void Predraw() {
+		if (open && !lastOpenedState) { OnOpen(); }
+		if (!open && lastOpenedState) { OnClose(); }
+		
+		lastOpenedState = open;
+	}
+	
+	public virtual void Draw() {
+		Predraw();
+		
 		if (open) {
 			SetSkin();
 			Resize();
 			area = GUI.Window(id, area, DrawWindow, name);	
-			
 		}
-		if (open && !lastOpenedState) { OnOpen(); }
-		if (!open && lastOpenedState) { OnClose(); }
-		lastOpenedState = open;
+			
 		
 	}
+	
 	
 	public void DrawWindow(int windowID) {
 		//SetSkin();
@@ -199,7 +206,11 @@ public class ZWindow {
 		}
 		
 		if (hasMiniButton) {
+			//GUI.PushColor(Color.gray);
 			
+			//TBD: Draw/handle minimizeButton
+			
+			//GUI.PopColor();
 		}
 		
 		if (dragable) { GUI.DragWindow(draggableArea); }

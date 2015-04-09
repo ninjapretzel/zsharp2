@@ -149,7 +149,27 @@ public static class GUI {
 	public static void Label(Rect position, string text, GUIStyle style) { UnityGUI.Label(position, text, style); }
 	public static void Label(Rect position, Texture image, GUIStyle style) { UnityGUI.Label(position, image, style); }
 	public static void Label(Rect position, GUIContent content, GUIStyle style) { UnityGUI.Label(position, content, style); }
-
+	
+	public static void OutlinedLabel(Rect area, string content, int outlineSize = 1) { OutlinedLabel(area, new GUIContent(content), outlineSize); }
+	public static void OutlinedLabel(Rect area, Texture2D content, int outlineSize = 1) { OutlinedLabel(area, new GUIContent(content), outlineSize); }
+	public static void OutlinedLabel(Rect area, GUIContent c, int outlineSize = 1) { 
+		Rect brush;
+		GUI.PushColor(Color.black);
+		
+		GUI.Label(area.Shift(0, -outlineSize), c);
+		GUI.Label(area.Shift(0, outlineSize), c);
+		GUI.Label(area.Shift(-outlineSize, 0), c);
+		GUI.Label(area.Shift(outlineSize, 0), c);
+		
+		GUI.Label(area.Shift(-outlineSize, -outlineSize), c);
+		GUI.Label(area.Shift(outlineSize, -outlineSize), c);
+		GUI.Label(area.Shift(-outlineSize, outlineSize), c);
+		GUI.Label(area.Shift(outlineSize, outlineSize), c);
+		
+		GUI.PopColor();
+		GUI.Label(area, c);
+	}
+	
 	public static Rect ModalWindow(int id, Rect clientRect, UnityGUI.WindowFunction func, string text) { return UnityGUI.ModalWindow(id, clientRect, func, text); }
 	public static Rect ModalWindow(int id, Rect clientRect, UnityGUI.WindowFunction func, Texture image) { return UnityGUI.ModalWindow(id, clientRect, func, image); }
 	public static Rect ModalWindow(int id, Rect clientRect, UnityGUI.WindowFunction func, GUIContent content) { return UnityGUI.ModalWindow(id, clientRect, func, content); }
