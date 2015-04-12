@@ -281,11 +281,14 @@ public class DevConsole : MonoBehaviour {
 				targetMemberName = command.Substring(indexOfDot+1);
 				targetClass = System.Type.GetType(targetClassName);
 				if(targetClass == null) {
-					targetClass = System.Type.GetType(targetClassName + ", Assembly-UnityScript-firstpass");
+					targetClass = System.Type.GetType(targetClassName + ",Assembly-UnityScript-firstpass");
 					if(targetClass == null) {
-						targetClass = System.Type.GetType(targetClassName + ", Assembly-CSharp");
+						targetClass = System.Type.GetType(targetClassName + ",Assembly-CSharp");
 						if(targetClass == null) {
-							targetClass = System.Type.GetType(targetClassName + ", Assembly-UnityScript");
+							targetClass = System.Type.GetType(targetClassName + ",Assembly-UnityScript");
+							if(targetClass == null) {
+								targetClass = System.Type.GetType(targetClassName + ",UnityEngine");
+							}
 						}
 					}
 				}
@@ -629,7 +632,7 @@ public class DevConsole : MonoBehaviour {
 
 	// Returns: boolean, true if member is marked cheat. Changing any property, field, or calling any method marked cheat through the console must trigger appropriate responses.
 	public static bool IsCheat(MemberInfo member) {
-#if UNITY_DEBUG || UNITY_EDITOR
+#if UNITY_DEBUG
 		if(System.Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked a cheat and cannot be accessed normally without cheats!");
 		}
