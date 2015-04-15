@@ -9,6 +9,7 @@ public class CreateObjectOnStart : MonoBehaviour {
 	
 	public Vector3 offset;
 	public bool parentIt = false;
+	public bool parentItToParent = false;
 	public bool waitForFixedUpdate = false;
 	
 	void Start() {
@@ -27,12 +28,16 @@ public class CreateObjectOnStart : MonoBehaviour {
 		Transform obj;
 		if (target != null) {
 			obj = Instantiate(target, transform.position + offset, transform.rotation) as Transform;
-			if (parentIt) { obj.parent = transform; }
+			if (parentIt) { 
+				obj.parent = parentItToParent ? transform.parent : transform;
+			}
 		}
 		
 		foreach (Transform o in otherObjects) {
 			obj = Instantiate(o, transform.position + offset, transform.rotation) as Transform;
-			if (parentIt) { obj.parent = transform; }
+			if (parentIt) { 
+				obj.parent = parentItToParent ? transform.parent : transform;
+			}
 		}
 		
 		Destroy(this);

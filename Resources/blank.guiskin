@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 12001, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: blank
   m_EditorClassIdentifier: 
-  m_Font: {fileID: 12800000, guid: 926e3ff35ecbaca45955a4d6b00d6103, type: 3}
+  m_Font: {fileID: 12800000, guid: f95937d4c82f2b24cb0d5be76d629f57, type: 3}
   m_box:
     m_Name: box
     m_Normal:

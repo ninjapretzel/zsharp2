@@ -96,6 +96,7 @@ public class ZWindow {
 	public ZWindow Named(string n) { name = n; return this; }
 	public ZWindow Titled(string n) { name = n; return this; }
 	public ZWindow Skinned(GUISkin s) { skin = s; return this; }
+	public ZWindow Skinned(string s) { skin = Resources.Load<GUISkin>(s); return this; }
 	
 	public ZWindow VisibleBackground() { invisibleBackground = false; return this; }
 	public ZWindow InvisibleBackground() { invisibleBackground = true; return this; }

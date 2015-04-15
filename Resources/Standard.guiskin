@@ -370,7 +370,7 @@ MonoBehaviour:
     m_Name: window
     m_Normal:
       m_Background: {fileID: 2800000, guid: 46d3cfc78f9df404b9b3596866b61076, type: 3}
-      m_TextColor: {r: 1, g: 1, b: 1, a: 1}
+      m_TextColor: {r: 1, g: .963235319, b: .963235319, a: 1}
     m_Hover:
       m_Background: {fileID: 0}
       m_TextColor: {r: 0, g: 0, b: 0, a: 1}

@@ -8,8 +8,8 @@ public static class Screen {
 	
 	
 	#region basic features
-	public static float width { get { return Scrn.width; } }
-	public static float height { get { return Scrn.height; } }
+	public static int width { get { return Scrn.width; } }
+	public static int height { get { return Scrn.height; } }
 	public static int sleepTimeout { get { return Scrn.sleepTimeout; } set { Scrn.sleepTimeout = value; } }
 	
 	public static Resolution currentResolution { get { return Scrn.currentResolution; } }

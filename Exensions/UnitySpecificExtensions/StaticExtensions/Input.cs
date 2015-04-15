@@ -69,6 +69,7 @@ public static class Input {
 	public static int accelerationEventCount { get { return In.accelerationEventCount; } }
 	public static AccelerationEvent[] accelerationEvents { get { return In.accelerationEvents; } }
 	
+	public static string inputString { get { return In.inputString; } } 
 	public static bool anyKey { get { return In.anyKey; } }
 	public static bool anyKeyDown { get { return In.anyKeyDown; } }
 	public static Compass compass { get { return In.compass; } } 
