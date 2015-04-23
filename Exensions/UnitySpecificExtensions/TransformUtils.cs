@@ -61,12 +61,14 @@ public static class TransformUtils {
 		t.localScale = localScale;
 	}
 	
-	//Snaps the position/rotation of the parent of the first component 
-	//to line the first component up to the second component
-	//Makes t face along the same vector as o.
-	//with the flip option, they will face in opposite directions.
-	public static void SnapParent(this Component c, Component other, bool flip = false) { c.transform.SnapParent(other.transform, flip); }
-	public static void SnapParent(this Transform t, Transform o, bool flip = false) {
+	///<summary>Snaps the position/rotation of the parent of the first component 
+	///to line the first component up to the second component
+	///Makes t face along the same vector as o.
+	///with the flip option, they will face in opposite directions.
+	public static void SnapParent(this Component c, Component other, bool flip = false) {
+		Transform t = c.transform;
+		Transform o = other.transform;
+		
 		Transform p = t.parent;
 		Quaternion q = t.rotation.To(o.rotation);
 		

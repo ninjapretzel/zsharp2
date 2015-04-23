@@ -67,12 +67,16 @@ public class Sounds : MonoBehaviour {
 	public static AudioSource Play(AudioClip sc, AudioSource settings) {
 		if (audioSettings == null) { return null; }
 		if (sc == null) { return null; }
-		Vector3 pos = Vector3.zero;
-		if (Camera.main != null) { pos = Camera.main.transform.position; }
-		return Play(sc, settings, pos);
+		if (Camera.main != null) { return Play(sc, settings, Camera.main.transform); }
+		return Play(sc, settings, Vector3.zero);
 	}
 	
-	public static AudioSource Play(AudioClip sc, AudioSource settings, Transform t) { return Play(sc, settings, t.position); } 
+	public static AudioSource Play(AudioClip sc, AudioSource settings, Transform t) {
+		AudioSource snd = Play(sc, settings, t.position); 
+		if (snd != null) { snd.transform.parent = t; }
+		return snd;
+	} 
+		
 	public static AudioSource Play(AudioClip sc, AudioSource settings, Vector3 pos) {
 		if (audioSettings == null && settings == null) { return null; }
 		if (sc == null) { return null; }
@@ -86,12 +90,12 @@ public class Sounds : MonoBehaviour {
 	}
 	
 	public static AudioSource Play(string sc) { return Play(GetSound(sc), GetSettings(sc)); }
-	public static AudioSource Play(string sc, Transform t) { return Play(GetSound(sc), GetSettings(sc), t.position); }
 	public static AudioSource Play(string sc, Vector3 pos) { return Play(GetSound(sc), GetSettings(sc), pos); }
+	public static AudioSource Play(string sc, Transform t) { return Play(GetSound(sc), GetSettings(sc), t); }
 	
 	public static AudioSource Play(string sc, string settings) { return Play(GetSound(sc), GetSettings(settings)); }
-	public static AudioSource Play(string sc, string settings, Transform t) { return Play(GetSound(sc), GetSettings(settings), t.position); }
 	public static AudioSource Play(string sc, string settings, Vector3 pos) { return Play(GetSound(sc), GetSettings(settings), pos); }
+	public static AudioSource Play(string sc, string settings, Transform t) { return Play(GetSound(sc), GetSettings(settings), t); }
 	
 	public static AudioClip Get(string sc) { return GetSound(sc); }
 	public static AudioClip GetSound(string sc) {
