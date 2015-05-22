@@ -49,6 +49,7 @@ public class Sounds : MonoBehaviour {
 			GameObject o = new GameObject("Audio");
 			o.AddComponent<AudioSource>();
 			o.AddComponent<SoundVolume>();
+			//o.AddComponent<PlaySoundOnStart>();
 			o.AddComponent<AutodestructSound>();
 			return o.GetComponent<AudioSource>();
 		}
@@ -86,6 +87,8 @@ public class Sounds : MonoBehaviour {
 		source.clip = sc;
 		source.volume = Settings.soundVolume;
 		source.Play();
+		
+		
 		return source;
 	}
 	
