@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -393,7 +393,7 @@ public class ZWindow {
 	
 	
 	
-	public void StringField(string label, string valueName, params GUILayoutOption[] options) {
+	public void StringReflectionField(string label, string valueName, params GUILayoutOption[] options) {
 		BeginHorizontal(); {
 			Label(label, options);
 			
@@ -404,7 +404,7 @@ public class ZWindow {
 		
 	}
 	
-	public void FloatField(string label, string valueName, params GUILayoutOption[] options) {
+	public void FloatReflectionField(string label, string valueName, params GUILayoutOption[] options) {
 		BeginHorizontal(); {
 			Label(label, options);
 			
@@ -415,7 +415,7 @@ public class ZWindow {
 		
 	}
 	
-	public void IntField(string label, string valueName, params GUILayoutOption[] options) {
+	public void IntReflectionField(string label, string valueName, params GUILayoutOption[] options) {
 		BeginHorizontal(); {
 			Label(label, options);
 			
