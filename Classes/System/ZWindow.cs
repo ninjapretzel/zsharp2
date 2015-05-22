@@ -344,6 +344,27 @@ public class ZWindow {
 		
 		return val;
 	}
+	
+	public static string TextField(string label, string text, params GUILayoutOption[] options) {
+		string s;
+		BeginHorizontal(); {
+			Label(label, options);
+			s = TextField(text, options);
+		} EndHorizontal();
+		return s;
+	}
+	
+	public static float FloatField(string label, float val, params GUILayoutOption[] options) {
+		float f;
+		BeginHorizontal(); {
+			Label(label, options);
+			f = FloatField(val, options);
+		} EndHorizontal();
+		return f;
+	}
+	
+	
+	
 	public static int IntField(int value, params GUILayoutOption[] options) {
 		int val = value;
 		string str;
