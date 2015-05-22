@@ -4,6 +4,42 @@ using System.Collections.Generic;
 
 public static class TransformUtils {
 	
+	/** <summary>
+	Copys all transform information from other and its children into t. 
+	If objects do not exist in other, but exist in t, they do not change their local positions.
+	</summary> */
+	public static void CopyLocalPositionsFrom(this Transform t, Transform other) {
+		Transform[] theses = t.GetComponentsInChildren<Transform>();
+		string str = "";
+		foreach (Transform thing in theses) {
+			string path = thing.GetRelativePath(t);
+			Transform found = other.Find(path);
+			if (found != null) {
+				thing.localPosition = found.localPosition;
+				thing.localRotation = found.localRotation;
+			}
+			//str += "\n"+path;
+			//str += " [" + found + "]";
+			
+			
+		}
+		
+		
+		
+		//Debug.Log(str);
+	}
+	
+	/** <summary>
+	Get the relative path from someParent to t.
+	If someParent is not a parent of t (or is null), then it gets the path from the scene root
+	</summary> */
+	public static string GetRelativePath(this Transform t, Transform someParent = null) {
+		if (t == null) { return ""; }
+		if (t.parent == null || t.parent == someParent) { return t.gameObject.name; }
+		return GetRelativePath(t.parent, someParent) + "/" + t.gameObject.name;
+	}
+		
+	
 	public static Vector3 DirectionTo(this Component c, Vector3 position) { return position - c.transform.position; }
 	public static Vector3 DirectionTo(this Component c, Component other) { return other.transform.position - c.transform.position; }
 	
