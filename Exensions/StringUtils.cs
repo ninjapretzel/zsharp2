@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Text;
 using System.Linq;
 using System.Collections;
@@ -31,6 +32,25 @@ public static class StringUtils {
 			str.Append(" ");
 		}
 		return str.ToString();
+	}
+	
+	///<summary>
+	///Changes camel cased strings into uncamel cased strings for beautification
+	///"exampleStupidStringThingy" -> "Example Stupid String Thingy"
+	///"AnotherStupidExampleThingy" -> "Another Stupid Example Thingy"
+	///</summary>
+	public static string UnCamelCase(this string str) {
+		char capA = 'A';
+		char capZ = 'Z';
+		string s = "" + char.ToUpper(str[0]);
+		for (int i = 1; i < str.Length; i++) {
+			if (char.IsUpper(str[i])) {
+				s += " " + str[i];
+			} else {
+				s += str[i];
+			}
+		}
+		return s;
 	}
 	
 	public static bool EndsWith(this string s, string check) {
