@@ -40,8 +40,6 @@ public static class StringUtils {
 	///"AnotherStupidExampleThingy" -> "Another Stupid Example Thingy"
 	///</summary>
 	public static string UnCamelCase(this string str) {
-		char capA = 'A';
-		char capZ = 'Z';
 		string s = "" + char.ToUpper(str[0]);
 		for (int i = 1; i < str.Length; i++) {
 			if (char.IsUpper(str[i])) {

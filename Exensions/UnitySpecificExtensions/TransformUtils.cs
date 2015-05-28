@@ -10,7 +10,6 @@ public static class TransformUtils {
 	///</summary>
 	public static void CopyLocalPositionsFrom(this Transform t, Transform other) {
 		Transform[] theses = t.GetComponentsInChildren<Transform>();
-		string str = "";
 		foreach (Transform thing in theses) {
 			string path = thing.GetRelativePath(t);
 			Transform found = other.Find(path);
@@ -18,15 +17,8 @@ public static class TransformUtils {
 				thing.localPosition = found.localPosition;
 				thing.localRotation = found.localRotation;
 			}
-			//str += "\n"+path;
-			//str += " [" + found + "]";
-			
-			
 		}
 		
-		
-		
-		//Debug.Log(str);
 	}
 	
 	///<summary>
