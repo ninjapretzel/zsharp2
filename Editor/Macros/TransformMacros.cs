@@ -1,10 +1,24 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 
+
+
+
 public class TransformMacros : Editor {
+	[MenuItem("Macros/Snap Selection To Ground &v")]
+	public static void SnapToGround() {
+		foreach (Transform t in Selection.transforms) {
+			RaycastHit rayhit;
+			if (Physics.Raycast(t.position, Vector3.down, out rayhit)) {
+				t.position = rayhit.point;
+			}
+		}
+	}
 	
+
 	[MenuItem ("Macros/Fix Parent Rotation &#f")]
 	public static void FixParentRotation() {
 		foreach (Transform t in Selection.transforms) {
@@ -50,3 +64,7 @@ public class TransformMacros : Editor {
 	}
 	
 }
+
+
+
+#endif

@@ -71,33 +71,58 @@ public static class StringUtils {
 		return ss.Replace(MAC_NEWLINE, UNIX_NEWLINE);
 	}
 	
-	///Returns the substring of a string up to the first instance of a character.
+	///<summary>Returns the substring of a string up to the first instance of a character.</summary>
 	public static string UpToFirst(this string s, char c) {
 		int index = s.IndexOf(c);
 		if (index == -1) { return s; }
 		return s.Substring(0, index);
 	}
+	///<summary>Returns the substring of a string up to the first instance of a string.</summary>
+	public static string UpToFirst(this string s, string c) {
+		int index = s.IndexOf(c);
+		if (index == -1) { return s; }
+		return s.Substring(0, index);
+	}
 	
-	///Returns the substring of a string up to the last instance of a character.
+	///<summary>Returns the substring of a string up to the last instance of a character.</summary>
 	public static string UpToLast(this string s, char c) {
 		int lastIndex = s.LastIndexOf(c);
 		if (lastIndex == -1) { return s; }
 		return s.Substring(0, lastIndex);
 	}
+	///<summary>Returns the substring of a string up to the last instance of a string.</summary>
+	public static string UpToLast(this string s, string c) {
+		int lastIndex = s.LastIndexOf(c);
+		if (lastIndex == -1) { return s; }
+		return s.Substring(0, lastIndex);
+	}
 	
-	///Returns the substring of a string from the first instance of a character. (Not Inclusive)
+	///<summary>Returns the substring of a string from the first instance of a character. (Not Inclusive)</summary>
 	public static string FromFirst(this string s, char c) {
 		int index = s.IndexOf(c);
 		if (index == -1) { return s; }
 		return s.Substring(index+1);
 	}
+	///<summary>Returns the substring of a string from the first instance of a string. (Not Inclusive)</summary>
+	public static string FromFirst(this string s, string c) {
+		int index = s.IndexOf(c);
+		if (index == -1) { return s; }
+		return s.Substring(index+c.Length);
+	}
 	
-	///Returns the substring of a string from the last instance of a character. (Not Inclusive)
+	///<summary>Returns the substring of a string from the last instance of a character. (Not Inclusive)</summary>
 	public static string FromLast(this string s, char c) {
 		int lastIndex = s.LastIndexOf(c);
 		if (lastIndex == -1) { return s; }
 		return s.Substring(lastIndex+1);
 	}
+	///<summary>Returns the substring of a string from the last instance of a string. (Not Inclusive)</summary>
+	public static string FromLast(this string s, string c) {
+		int lastIndex = s.LastIndexOf(c);
+		if (lastIndex == -1) { return s; }
+		return s.Substring(lastIndex+c.Length);
+	}
+	
 	
 	///Converts all backslashes in a path to forward slashes.
 	public static string ForwardSlashPath(this string path) {
