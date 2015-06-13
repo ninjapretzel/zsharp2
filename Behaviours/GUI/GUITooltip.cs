@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+#if XtoJSON
 public class GUITooltip : MonoBehaviour {
 	
 	public static JsonObject tooltip;
@@ -44,3 +45,4 @@ public class GUITooltip : MonoBehaviour {
 	}
 	
 }
+#endif

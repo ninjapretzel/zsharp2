@@ -630,6 +630,7 @@ public static class DataFTable {
 
 public static class DataFiles {
 	
+#if XtoJSON
 	public static JsonObject TryConvertCSVToJSON(string file) {
 		string[] lines = File.ReadAllLines(file);
 		string targetFile = file.UpToLast('.') + ".json";
@@ -669,6 +670,7 @@ public static class DataFiles {
 		
 		return null;
 	}
+#endif
 }
 
 

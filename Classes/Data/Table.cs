@@ -357,7 +357,8 @@ public class Table : Dictionary<string, float> {
 		//Debug.Log("ToLine: [" + str.ToString() + "]");
 		return str.ToString();
 	}
-	
+
+#if XtoJSON
 	public void LoadJson(string json) {
 		JsonObject obj = Json.Parse(json) as JsonObject;
 		if (obj != null) {
@@ -400,6 +401,7 @@ public class Table : Dictionary<string, float> {
 		
 		return obj.PrettyPrint();
 	}
+#endif
 	
 	public float Sum() {
 		float f = 0;
