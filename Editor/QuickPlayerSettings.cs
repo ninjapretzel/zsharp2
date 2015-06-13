@@ -470,7 +470,11 @@ public class QuickPlayerSettings : EditorWindow {
 			output += "Android.useAPKExpansionFiles," + PlayerSettings.Android.useAPKExpansionFiles + "\n";
 			output += "Android.showActivityIndicatorOnLoading," + PlayerSettings.Android.showActivityIndicatorOnLoading;
 			#endregion
+#if UNITY_4_6
+		} else if(currentPlatform == BuildTargetGroup.iPhone) {
+#else
 		} else if(currentPlatform == BuildTargetGroup.iOS) {
+#endif
 			#region iOS
 			output += "iOS.applicationDisplayName," + PlayerSettings.iOS.applicationDisplayName + "\n";
 			output += "iOS.scriptCallOptimization," + PlayerSettings.iOS.scriptCallOptimization + "\n";

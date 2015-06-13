@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -11,7 +11,9 @@ public static class ZEditorExtensions {
 	public static void LegacyParticle() {
 		
 		GameObject gob = new GameObject("Legacy Particle System");
+#if !UNITY_4_6
 		gob.AddComponent<EllipsoidParticleEmitter>();
+#endif
 		gob.AddComponent<ParticleAnimator>();
 		gob.AddComponent<ParticleRenderer>();
 		
