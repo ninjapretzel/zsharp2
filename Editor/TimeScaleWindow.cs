@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -23,6 +23,7 @@ public class TimeScaleWindow : ZEditorWindow {
 		window = EditorWindow.GetWindow(typeof(TimeScaleWindow)) as TimeScaleWindow;
 		
 	}
+
 	
 	public TimeScaleWindow() : base() {
 		maxSize = new Vector2(1600, 55);
@@ -30,7 +31,7 @@ public class TimeScaleWindow : ZEditorWindow {
 		timeScale = 1;
 		lastTimeScale = 1;
 		frame = 0;
-		title = "Time Scale";
+		titleContent = new GUIContent("Time Scale");
 		wasPlaying = EditorApplication.isPlaying;
 	}
 	
