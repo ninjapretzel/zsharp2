@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 using UnityGUI = UnityEngine.GUI;
@@ -74,7 +74,7 @@ public static class GUI {
 	
 	
 	public static GUISkin blankSkin { get { return Resources.Load<GUISkin>("blank"); } }
-	
+	public static Texture2D pixel { get { return Resources.Load<Texture2D>("pixel"); } }
 	
 	
 	#region passthroughs

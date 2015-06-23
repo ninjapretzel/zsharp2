@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -57,37 +57,45 @@ public static class Colors {
 	///And convert to and from HSV space as needed.
 	///Some common things (like shifting hue) are supported as extensions.
 	
-	///Construct a new RGB color using given HSV coordinates and alpha value.
+	///<summary>Construct a new RGB color using given HSV coordinates and alpha value.</summary
 	public static Color HSV(float h, float s, float v, float a = 1) { return new Color(h, s, v, a).HSVtoRGB(); }
-	///Create a RGB color with a randomized hue value, with given saturation and value.
+	///<summary>Create a RGB color with a randomized hue value, with given saturation and value.</summary>
 	public static Color RandomHue(float s, float v, float a = 1) { return new Color(Random.Range(0, 1), s, v, a).HSVtoRGB(); }
-	
-	///Lerp between colors by HSV coordinates, rather than by RGB coordinates.
-	///Returns an RGB color
+
+	///<summary>Lerp between colors by HSV coordinates, rather than by RGB coordinates.
+	///Returns an RGB color</summary>
 	public static Color HSVLerp(Color a, Color b, float val) {
 		Color ahsv = a.RGBtoHSV();
 		Color bhsv = b.RGBtoHSV();
 		return Color.Lerp(ahsv, bhsv, val).HSVtoRGB();
 	}
-	
-	///Shift the hue of a color by shift percent across the spectrum.
-	//Returns an RGB color.
+
+	///<summary>Shift the hue of a color by shift percent across the spectrum.
+	///Takes an RGB Color
+	///Returns an RGB color.</summary>
 	public static Color ShiftHue(this Color c, float shift) {
 		Color hsv = c.RGBtoHSV();
 		hsv.r = (hsv.r + shift) % 1f;
 		return hsv.HSVtoRGB();
 	}
-	
-	//Adds Saturation to a color.
-	//Keeps saturation between [0, 1]
-	//Returns an RGB color.
+
+	///<summary>Adds Saturation to an RGB color.
+	///Keeps saturation between [0, 1]
+	///Returns an RGB color.</summary>
+	///<param name="c">Color to modify</param>
+	///<param name="saturation">Saturation to add. Range [-1, 1]</param>
+	///<returns>Input color with saturation modified</returns>
 	public static Color Saturate(this Color c, float saturation) {
 		Color hsv = c.RGBtoHSV();
 		hsv.g = Mathf.Clamp01(hsv.g + saturation);
 		return hsv.HSVtoRGB();
 	}
-	
-	///RGB -> HSV logic.
+
+	/// <summary>
+	/// Returns HSV color matching input RGB color
+	/// </summary>
+	/// <param name="c">RGB color to convert</param>
+	/// <returns>HSV version of input</returns>
 	public static Color RGBtoHSV(this Color c) {
 		Color hsv = new Color(0, 0, 0, c.a);
 		
@@ -125,7 +133,11 @@ public static class Colors {
 		return hsv;
 	}
 	
-	//HSV -> RGB Logic
+	/// <summary>
+	/// Returns RGB color matching input HSV color
+	/// </summary>
+	/// <param name="c">HSV color to convert</param>
+	/// <returns>RGB version of input</returns>
 	public static Color HSVtoRGB(this Color c) {
 		int i;
 		
@@ -168,17 +180,20 @@ public static class Colors {
 	#region extra functions
 	///Extra functions dealing with standard colors
 	
-	///A rename of Color.Lerp as an extension, with an implicit 50% parameter.
+	///<summary>A rename of Color.Lerp as an extension, with an implicit 50% parameter.</summary>
 	public static Color Blend(this Color a, Color b, float f = .5f) { return Color.Lerp(a, b, f); }
-	
-	///Make a new color that has RGB elements multiplied by some percentage, ignoring the alpha component
+
+	///<summary>Make a new color that has RGB elements multiplied by some percentage, ignoring the alpha component</summary>
 	public static Color MultRGB(this Color c, float f) { return new Color(c.r * f, c.g * f, c.b * f, c.a); }
-	///Halves all RGB values, returns the resultant color.
+	///<summary>Halves all RGB values, returns the resultant color.</summary>
 	public static Color Half(this Color c) { return c.MultRGB(.5f); }
-	
-	///Pulses the alpha of a color by adding a value times the cosine of time.
+
+	///<summary>Returns a copy of this color with its alpha set to a given value</summary>
+	public static Color Alpha(this Color c, float a) { return new Color(c.r, c.g, c.b, a); }
+
+	///<summary>Pulses the alpha of a color by adding a value times the cosine of time.
 	///Intended to not scale with Time.timeScale
-	///Best use is to _not_ overwrite  variables with the return value.
+	///Best use is to _not_ overwrite  variables with the return value.</summary>
 	public static Color CosAlpha(this Color c, float change) { return c.CosAlpha(change, 1); }
 	public static Color CosAlpha(this Color c, float change, float timeScale) {
 		Color col = c;
@@ -186,13 +201,13 @@ public static class Colors {
 		col.a += pos * change;
 		return col;
 	}
-	
-	///Get a simple string representing each component separated by a comma
+
+	///<summary>Get a simple string representing each component separated by a comma</summary>
 	public static string ToString(this Color c, char delim) { 
 		return "" + c.r + delim + c.g + delim + c.b + delim + c.a;
 	}
-	
-	///Parse a string into a color
+
+	///<summary>Parse a string into a color</summary>
 	public static Color FromString(string s, char delim = ',') {
 		string[] strs = s.Split(delim);
 		Color c = Color.white;
@@ -206,8 +221,8 @@ public static class Colors {
 		if (strs.Length >= 4) { c.a = strs[3].ParseFloat(); }
 		return c;
 	}
-	
-	///Get a color at some position across an array of colors.
+
+	///<summary>Get a color at some position across an array of colors.</summary>
 	public static Color Lerp(this Color[] colors, float position) {
 		if (colors.Length == 0) { return Color.white; }
 		else if (colors.Length == 1) { return colors[0]; }
