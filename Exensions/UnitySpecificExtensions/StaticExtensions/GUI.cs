@@ -149,7 +149,24 @@ public static class GUI {
 	public static void Label(Rect position, string text, GUIStyle style) { UnityGUI.Label(position, text, style); }
 	public static void Label(Rect position, Texture image, GUIStyle style) { UnityGUI.Label(position, image, style); }
 	public static void Label(Rect position, GUIContent content, GUIStyle style) { UnityGUI.Label(position, content, style); }
-	
+
+
+
+	public static void QOutlinedLabel(Rect area, string content, int outlineSize = 1) { QOutlinedLabel(area, new GUIContent(content), outlineSize); }
+	public static void QOutlinedLabel(Rect area, Texture2D content, int outlineSize = 1) { QOutlinedLabel(area, new GUIContent(content), outlineSize); }
+	public static void QOutlinedLabel(Rect area, GUIContent c, int outlineSize = 1) {
+		GUI.PushColor(new Color(0, 0, 0, color.a * color.a));
+
+		GUI.Label(area.Shift(0, -outlineSize), c);
+		GUI.Label(area.Shift(0, outlineSize), c);
+		GUI.Label(area.Shift(-outlineSize, 0), c);
+		GUI.Label(area.Shift(outlineSize, 0), c);
+
+		GUI.PopColor();
+		GUI.Label(area, c);
+	}
+
+
 	public static void OutlinedLabel(Rect area, string content, int outlineSize = 1) { OutlinedLabel(area, new GUIContent(content), outlineSize); }
 	public static void OutlinedLabel(Rect area, Texture2D content, int outlineSize = 1) { OutlinedLabel(area, new GUIContent(content), outlineSize); }
 	public static void OutlinedLabel(Rect area, GUIContent c, int outlineSize = 1) { 
@@ -168,6 +185,8 @@ public static class GUI {
 		GUI.PopColor();
 		GUI.Label(area, c);
 	}
+
+
 	
 	public static Rect ModalWindow(int id, Rect clientRect, UnityGUI.WindowFunction func, string text) { return UnityGUI.ModalWindow(id, clientRect, func, text); }
 	public static Rect ModalWindow(int id, Rect clientRect, UnityGUI.WindowFunction func, Texture image) { return UnityGUI.ModalWindow(id, clientRect, func, image); }
