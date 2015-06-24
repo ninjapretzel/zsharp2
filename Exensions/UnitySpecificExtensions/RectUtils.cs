@@ -122,6 +122,8 @@ public static class RectUtils {
 	
 	public static Rect Craft(Vector2 pos, Vector2 size) { return new Rect(pos.x, pos.y, size.x, size.y); }
 	public static Rect Make(Vector2 pos, Vector2 size) { return new Rect(pos.x, pos.y, size.x, size.y); }
+
+	public static Rect Centered(Vector2 pos, Vector2 size) { return new Rect(pos.x, pos.y, size.x, size.y).Shift(-size.x/2f, -size.y/2f); }
 	
 	public static Rect Top(this Rect r, float p) { return r.UpperLeft(1, p); }
 	public static Rect Upper(this Rect r, float p) { return r.UpperLeft(1, p); }

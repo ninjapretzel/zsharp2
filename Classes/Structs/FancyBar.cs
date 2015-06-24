@@ -56,31 +56,41 @@ public class FancyBar {
 		GUI.PushColor(Color.black);
 		GUI.DrawTexture(padded, GUI.pixel);
 		GUI.PopColor();
-
 		
 		Rect filled = leftToRight ? pos.Left(fill) : pos.Right(fill);
+		Rect empty = !leftToRight ? pos.Left(1-fill) : pos.Right(1-fill);
 
 		Color baseColor = GUI.color.Alpha(1);
 		Color colorA = baseColor.ShiftHue( hueShiftA).Alpha(alpha);
 		Color colorB = baseColor.ShiftHue( hueShiftB).Alpha(alpha);
 
 		Rect coordsA = new Rect(scaleA.x * time, scaleA.y * Mathf.Sin(time * scaleA.width), ratio * scaleA.height, scaleA.height);
+		Rect coordsAfill = leftToRight ? coordsA.Left(fill) : coordsA.Right(fill);
+		Rect coordsAempty = !leftToRight ? coordsA.Left(1 - fill) : coordsA.Right(1 - fill);
+
 		Rect coordsB = new Rect(scaleB.x * time, scaleB.y * Mathf.Sin(time * scaleB.width), ratio * scaleB.height, scaleB.height);
+		Rect coordsBfill = leftToRight ? coordsB.Left(fill) : coordsB.Right(fill);
+		Rect coordsBempty = !leftToRight ? coordsB.Left(1 - fill) : coordsB.Right(1 - fill);
 
 		GUI.PushColor(baseColor.MultRGB(darkening.Clamp01()));
-		GUI.DrawTexture(pos, bar);
+		GUI.DrawTexture(empty, bar);
 		GUI.PopColor();
-
 		GUI.DrawTexture(filled, bar);
 
-
-		
 		GUI.PushColor(colorA);
-		GUI.DrawTextureWithTexCoords(pos, noiseA, coordsA);
+		GUI.DrawTextureWithTexCoords(filled, noiseA, coordsAfill);
+		GUI.PopColor();
+
+		GUI.PushColor(colorA.MultRGB(darkening));
+		GUI.DrawTextureWithTexCoords(empty, noiseA, coordsAempty);
 		GUI.PopColor();
 		
 		GUI.PushColor(colorB);
-		GUI.DrawTextureWithTexCoords(pos, noiseB, coordsB);
+		GUI.DrawTextureWithTexCoords(filled, noiseB, coordsBfill);
+		GUI.PopColor();
+
+		GUI.PushColor(colorB.MultRGB(darkening));
+		GUI.DrawTextureWithTexCoords(empty, noiseB, coordsBempty);
 		GUI.PopColor();
 
 	}

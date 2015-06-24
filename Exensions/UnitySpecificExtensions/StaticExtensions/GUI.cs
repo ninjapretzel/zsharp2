@@ -153,7 +153,7 @@ public static class GUI {
 	public static void OutlinedLabel(Rect area, string content, int outlineSize = 1) { OutlinedLabel(area, new GUIContent(content), outlineSize); }
 	public static void OutlinedLabel(Rect area, Texture2D content, int outlineSize = 1) { OutlinedLabel(area, new GUIContent(content), outlineSize); }
 	public static void OutlinedLabel(Rect area, GUIContent c, int outlineSize = 1) { 
-		GUI.PushColor(Color.black);
+		GUI.PushColor(new Color(0, 0, 0, color.a * color.a * color.a));
 		
 		GUI.Label(area.Shift(0, -outlineSize), c);
 		GUI.Label(area.Shift(0, outlineSize), c);

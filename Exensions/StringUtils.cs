@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Text;
 using System.Linq;
@@ -200,14 +200,30 @@ public static class StringUtils {
 		return s;
 	}
 	
-	static string[] notations = { "", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc", "No"};
+	static string[] notations = { "K", 
+									"M",   "B",   "T",   "Qa",   "Qi",   "Sx",   "Sp",   "Oc",   "Nn",   "Dc", 
+									"UDc", "DDc", "TDc", "QaDc", "QtDc", "SxDc", "SpDc", "OcDc", "NnDc", "Vg",
+									"UVg", "DVg", "TVg", "QaVg", "QtVg", "SxVg", "SpVg", "OcVg", "NnVg", "Tg",
+									"UTg", "DTg", "TTg", "QaTg", "QtTg", "SxTg", "SpTg", "OcTG", "NnTg", "Qd",
+									"UQd", "DQd", "TQd", "QaQd", "QtQd", "SxQd", "SpQd", "OcQd", "NnQd", "Qq",
+									"UQq", "DQq", "TQq", "QaQq", "QtQq", "SxQq", "SpQq", "OcQq", "NnQq", "Sg",
+									"USg", "DSg", "TSg", "QaSg", "QtSg", "SxSg", "SpSg", "OcSg", "NnSg", "St",
+									"USt", "DSt", "TSt", "QaSt", "QtSt", "SxSt", "SpSt", "OcSt", "NnSt", "Og",
+									"UOg", "DOg", "TOg", "QaOg", "QtOg", "SxOg", "SpOg", "OcOg", "NnOg", "Ng",
+									"UNg", "DNg", "TNg", "QaNg", "QtNg", "SxNg", "SpNg", "OcNg", "NnNg", "Cnt",
+									"UCnt"
+								};
+
 	public static string ShortString(this float f, int places = 3) {
 		if (f.IsNAN()) { return "NaN"; }
-		
+		if (f == 0) { return "0"; }
+
 		string notationValue = "";
 		float val = f;
-		
-		if (f >= 1000000f) {
+		bool neg = val < 0;
+		if (neg) { val *= -1; }
+
+		if (f >= 1000f) {
 			val /= 1000f;
 			int b = 0;
 			
@@ -221,11 +237,34 @@ public static class StringUtils {
 		}
 		
 		if (notationValue == "") { return f.Commify(places); }
-		return Mathf.Round(val * 1000f) / 1000f + notationValue;
+		return (neg ? "-" : "") +  Mathf.Round(val * 1000f) / 1000f + notationValue;
 	}
-	
-	
-	
+
+
+	public static string ShortStringD(this double d, int places = 3) {
+		if (d == double.NaN) { return "NaN"; }
+		if (d == 0) { return "0"; }
+
+		string notationValue = "";
+		double val = d;
+		bool neg = val < 0;
+		if (neg) { val *= -1; }
+
+		if (d >= 1000d) {
+			val /= 1000d;
+			int b = 0;
+
+			while (val.Round() >= 1000) {
+				val /= 1000d;
+				b++;
+			}
+			if (b >= notations.Length) { return "WAY TOO HIGH"; } else { notationValue = notations[b]; }
+
+		}
+
+		if (notationValue == "") { return ((float)d).Commify(places); }
+		return Math.Round(val * 1000d) / 1000d + notationValue;
+	}
 	
 	
 	//Formats a float as if it represents time in seconds
