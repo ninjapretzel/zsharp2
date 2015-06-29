@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR && !UNITY_WEBPLAYER
+#if UNITY_EDITOR && !UNITY_WEBPLAYER
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -7,6 +7,8 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
+
+#if LEGACY_ITEMS
 public class ItemEditorWindow : ZEditorWindow {
 	
 	public static string path { get { return Application.dataPath + "/Data/Resources/"; } } 
@@ -769,6 +771,7 @@ public static class ItemEditorWindowUtils {
 	}
 }
 
+#endif
 
 
 #endif

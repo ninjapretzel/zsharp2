@@ -2,18 +2,10 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-[System.Serializable]
 public class FancyBar {
 
-	public static Texture2D _noise;
-	public static Texture2D _bar;
-
-	public static bool loaded = Load();
-	public static bool Load() {
-		_noise = Resources.Load<Texture2D>("noise");
-		_bar = Resources.Load<Texture2D>("bar");
-		return true;
-	}
+	public static Texture2D _noise { get { return Resources.Load<Texture2D>("noise"); } }
+	public static Texture2D _bar { get { return Resources.Load<Texture2D>("bar"); } } 
 
 
 	public Texture2D noiseA;
@@ -45,6 +37,37 @@ public class FancyBar {
 		noiseA = nA;
 		noiseB = nB;
 	}
+
+#if XtoJSON
+	public FancyBar(JsonObject data) {
+		Json.ReflectInto(data, this);
+		noiseA = Resources.Load<Texture2D>(data.GetString("noiseA"));
+		noiseB = Resources.Load<Texture2D>(data.GetString("noiseB"));
+		bar = Resources.Load<Texture2D>(data.GetString("bar"));
+	}
+#endif
+
+	public FancyBar(FancyBar s) { 
+		bar = s.bar;
+		noiseA = s.noiseA;
+		noiseB = s.noiseB;
+
+		timeScale = s.timeScale;
+		timeOffset = s.timeOffset;
+		padding = s.padding;
+		hueShiftA = s.hueShiftA;
+		hueShiftB = s.hueShiftB;
+
+		leftToRight = s.leftToRight;
+
+		darkening = s.darkening;
+		alpha = s.alpha;
+
+		scaleA = s.scaleA;
+		scaleB = s.scaleB;
+	}
+
+	public FancyBar Clone() { return new FancyBar(this); }
 
 	public void Draw(Rect pos, float fill) {
 		float time = Time.time + timeOffset;

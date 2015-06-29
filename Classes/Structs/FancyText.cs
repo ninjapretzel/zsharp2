@@ -35,7 +35,7 @@ public class FancyText {
 		}
 
 		public Display(float val, Vector2 pos, DisplaySettings sets, Color col) {
-			text = val.ShortString(0);
+			text = val.ShortString();
 			
 			position = pos;
 			settings = sets;

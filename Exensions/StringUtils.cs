@@ -214,7 +214,7 @@ public static class StringUtils {
 									"UCnt"
 								};
 
-	public static string ShortString(this float f, int places = 3) {
+	public static string ShortString(this float f, int places = 0) {
 		if (f.IsNAN()) { return "NaN"; }
 		if (f == 0) { return "0"; }
 

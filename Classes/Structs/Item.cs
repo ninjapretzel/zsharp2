@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Text;
 using System.Linq;
@@ -6,7 +6,8 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 
-
+//#define LEGACY_ITEMS
+#if LEGACY_ITEMS
 
 
 public class Inventory : List<Item> {
@@ -529,3 +530,6 @@ public class Item : IComparable<Item> {
 	
 	
 }
+
+
+#endif
