@@ -5,7 +5,6 @@ using System.Collections.Generic;
 [System.Serializable]
 public class FancyText {
 
-
 	public class Display {
 		public Vector2 position;
 		public Vector2 velocity;
@@ -46,14 +45,14 @@ public class FancyText {
 
 		public bool Update() { return Update(Time.deltaTime); }
 		public bool Update(float time) {
-			position += velocity * time;
+			position += velocity * time * screenRatio;
 			velocity += gravity * time;
 			timeout += time;
 			return timeout >= lifetime;
 		}
 
 		public void Draw() {
-			Rect brush = RectUtils.Centered(position, Vector2.one * 200);
+			Rect brush = RectUtils.Centered(position, Vector2.one * 200 * scale);
 			for (int i = 0; i < text.Length; i++) {
 				float fadePosition = (timeout - (i * delay)) / fadeTime;
 				if (fadePosition <= 0) { return; }
@@ -98,6 +97,8 @@ public class FancyText {
 	public GUISkin skin;
 	public DisplaySettings settings;
 
+
+	public static float scale { get { return ((float)Screen.height) / 720f; } }
 	static float screenRatio;
 	List<Display> displays;
 	
@@ -127,7 +128,7 @@ public class FancyText {
 	}
 	
 	public void Update() {
-		screenRatio = (Screen.height / 720f);
+		screenRatio = scale;
 		for (int i = 0; i < displays.Count; i++) {
 			if (displays[i].Update()) {
 				displays.RemoveAt(i);

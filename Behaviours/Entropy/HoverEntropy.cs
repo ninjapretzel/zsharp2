@@ -39,6 +39,7 @@ public class HoverEntropy : MonoBehaviour {
 					Oscillator osci = hover.oscis[i];
 					
 					osci.maxTime *= time.Perlin(pos.x, pos.y);
+					osci.curTime = osci.maxTime * new BMM(true, 0, 1).Perlin(pos.z, pos.x);
 					float val = scale.Perlin(pos.x, pos.y);
 					osci.minVal *= val;
 					osci.maxVal *= val;
@@ -62,6 +63,7 @@ public class HoverEntropy : MonoBehaviour {
 					Oscillator osci = hover.oscis[i];
 					
 					osci.maxTime *= time.value;
+					osci.curTime = osci.maxTime * Random.value;
 					float val = scale.value;
 					osci.minVal *= val;
 					osci.maxVal *= val;

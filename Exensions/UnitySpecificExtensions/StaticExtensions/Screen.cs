@@ -10,6 +10,7 @@ public static class Screen {
 	#region basic features
 	public static int width { get { return Scrn.width; } }
 	public static int height { get { return Scrn.height; } }
+	public static float scale { get { return ((float)height) / 720f; } }
 	public static int sleepTimeout { get { return Scrn.sleepTimeout; } set { Scrn.sleepTimeout = value; } }
 	
 	public static Resolution currentResolution { get { return Scrn.currentResolution; } }
@@ -45,6 +46,7 @@ public static class Screen {
 	public static float h { get { return height; } } 
 	
 	public static float aspect { get { return width/height; } }
+	public static float iaspect { get { return height / width; } }
 	public static Rect all { get { return new Rect(0, 0, w, h); } }
 	
 	#endregion
