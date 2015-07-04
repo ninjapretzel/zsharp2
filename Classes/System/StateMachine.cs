@@ -2,30 +2,37 @@ using UnityEngine;
 using System;
 using System.Collections;
 
-//Simple state machine implementation
-//
-//
-public class StateMachine<T> where T : Component {
+/// <summary>
+/// StateMachine class
+/// </summary>
+/// <typeparam name="T">Object type operate on</typeparam>
+public class StateMachine<T>  {
+
+	/// <summary> Current, active state </summary>
 	public State<T> currentState;
+	/// <summary> The state that was just switched away from. </summary>
 	public State<T> previousState;
+	/// <summary> Object which the StateMachine is attached to. State objects switched to will recieve this object as their target. </summary>
 	public T owner;
-	
+
 	private bool switchedLastFrame = false;
 	private bool doneSwitching = false;
-	
+
+	/// <summary> Construct a StateMachine with a target object. </summary>
 	public StateMachine(T target) {
 		currentState = State<T>.baseInstance;
 		owner = target;
 		currentState.Enter();
 	}
 	
+	/// <summary> Construct a StateMachine with a starting state and target object. </summary>
 	public StateMachine(State<T> initialState, T target) {
 		currentState = initialState;
 		owner = target;
 		currentState.Enter();
 	}
-	
-	//Switch and return if state was actually switched.
+
+	/// <summary> Attempt to switch to a different state. Returns if the state was actually switched or not. </summary>
 	public bool Switch(State<T> s) {
 		if (s == null) { return Switch(State<T>.baseInstance); }
 		if (s == currentState) { return false; }
@@ -41,90 +48,159 @@ public class StateMachine<T> where T : Component {
 		
 		return true;
 	}
-	
+
+	#region General Functions
+	/// <summary> 
+	/// Update the state machine.
+	/// If the object switched last frame, calls the EnterFrame() for the active state.
+	/// Calls the Update() for the current state
+	/// Calls the OffUpdate() for the previous state (if it exists)
+	/// </summary>
 	public void Update() { 
 		if (doneSwitching) { doneSwitching = false; switchedLastFrame = false; }
 		if (switchedLastFrame) { currentState.EnterFrame(); doneSwitching = true; }
 		currentState.Update();
 		if (previousState != null) { previousState.OffUpdate(); }
 	}
-	
+
+	/// <summary> 
+	/// Calls LateUpdate() for the current state. 
+	/// Calls OffLateUpdate() for the previous state.
+	/// </summary>
 	public void LateUpdate() { 
 		currentState.LateUpdate(); 
 		if (previousState != null) { previousState.OffLateUpdate(); }
 		
 	}
-	
+
+	/// <summary> 
+	/// Calls FixedUpdate() for the current state.
+	/// Calls OffFixedUpdate for the previous state.
+	/// </summary>
 	public void FixedUpdate() { 
 		currentState.FixedUpdate();
 		if (previousState != null) { previousState.OffFixedUpdate(); }
 		
 	}
-	
+
+	/// <summary> 
+	/// Calls the OnGUI() for the current state.
+	/// If the object switched last frame, calls the EnterGUI() of the current state, and de-focuses any GUI controls.
+	/// Calls the OffGUI() for the previous state.
+	/// </summary>
 	public void OnGUI() {
 		currentState.OnGUI(); 
 		if (switchedLastFrame) { currentState.EnterGUI(); GUI.FocusControl("nothing"); }
 		if (previousState != null) { previousState.OffGUI(); }
-		
 	}
-	
+
+	#endregion
+
+
+	#region Optional UnityEngine.MonoBehaviour pass-through methods
+	/// <summary> Calls the OnCollisionEnter() for the current state. </summary>
 	public void OnCollisionEnter(Collision c) { currentState.OnCollisionEnter(c); }
+	/// <summary> Calls the OnCollisionStay() for the current state. </summary>
 	public void OnCollisionStay(Collision c) { currentState.OnCollisionStay(c); }
+	/// <summary> Calls the OnCollisionExit() for the current state. </summary>
 	public void OnCollisionExit(Collision c) { currentState.OnCollisionExit(c); }
-	
+
+	/// <summary> Calls the TriggerEnter() for the current state. </summary>
 	public void OnTriggerEnter(Collider c) { currentState.OnTriggerEnter(c); }
+	/// <summary> Calls the TriggerStay() for the current state. </summary>
 	public void OnTriggerStay(Collider c) { currentState.OnTriggerStay(c); }
+	/// <summary> Calls the TriggerExit() for the current state. </summary>
 	public void OnTriggerExit(Collider c) { currentState.OnTriggerExit(c); }
-	
+
+	/// <summary> Calls the OnMouseEnter() for the current state. </summary>
 	public void OnMouseEnter() { currentState.OnMouseEnter(); }
+	/// <summary> Calls the OnMouseOver() for the current state. </summary>
 	public void OnMouseOver() { currentState.OnMouseOver(); }
+	/// <summary> Calls the OnMouseExit() for the current state. </summary>
 	public void OnMouseExit() { currentState.OnMouseExit(); }
+	/// <summary> Calls the OnMouseDown() for the current state. </summary>
 	public void OnMouseDown() { currentState.OnMouseDown(); }
+	/// <summary> Calls the OnMouseUp() for the current state. </summary>
 	public void OnMouseUp() { currentState.OnMouseUp(); }
+	/// <summary> Calls the OnMouseUpAsButton for the current state. </summary>
 	public void OnMouseUpAsButton() { currentState.OnMouseUpAsButton(); }
+
+	#endregion
 
 }
 
-//State blueprint
-public class State<T> where T : Component {
+/// <summary>
+/// State[T] blueprint class for use with StateMachine[T]
+/// </summary>
+/// <typeparam name="T">Type the state acts with</typeparam>
+public class State<T> {
+
+	/// <summary> Empty state with no behaviour. </summary>
 	public static State<T> baseInstance = new State<T>();
+
+	/// <summary> Target object that the state is keeping track of. </summary>
 	public T target;
 	
-	public State() { target = null; }
-	
+	public State() { target = default(T); }
+
+	/// <summary> Simple hook for states to respond to different 'stimulus' </summary>
 	public virtual void Action(string a) { Debug.LogWarning("Missing override to Action(string a) in " + GetType()); }
 	
 	#region Virtuals
 	
+	/// <summary> Called by the state machine when it enters a new state </summary>
 	public virtual void Enter() {}
+	/// <summary> Called by the state machine when it transitions to a new state </summary>
 	public virtual void Exit() {}
-	
+
+	/// <summary> Called by OnGUI() of the state machine _AFTER_ the state's OnGUI() the first frame after the state is entered. </summary>
 	public virtual void EnterGUI() {}
+	/// <summary> Called by Update() of the state machine _BEFORE_ the state's Update() the first frame after the state is entered.  </summary>
 	public virtual void EnterFrame() {}
-	
+
+	/// <summary> Called by Update() of the state machine, if it is the active state. </summary>
 	public virtual void Update() {}
+	/// <summary> Called by LateUpdate() of the state machine, if it is the active state. </summary>
 	public virtual void LateUpdate() {}
+	/// <summary> Called by FixedUpdate() of the state machine, if it is the active state. </summary>
 	public virtual void FixedUpdate() {}
+	/// <summary> Called by OnGUI() of the state machine, if it is the active state. </summary>
 	public virtual void OnGUI() {}
-	
+
+	/// <summary> Called by Update() of the state machine, if it is previous state. </summary>
 	public virtual void OffUpdate() {}
+	/// <summary> Called by LateUpdate() of the state machine, if it is the previous state. </summary>
 	public virtual void OffLateUpdate() {}
+	/// <summary> Called by FixedUpdate() of the state machine, if it is the previous state. </summary>
 	public virtual void OffFixedUpdate() {}
+	/// <summary> Called by OnGUI() of the state machine, if it is the previous state. </summary>
 	public virtual void OffGUI() {}
-	
+
+	/// <summary> Called by OnTriggerEnter() of the state machine, if it is the active state. </summary>
 	public virtual void OnTriggerEnter(Collider c) {}
+	/// <summary> Called by OnTriggerStay() of the state machine, if it is the active state. </summary>
 	public virtual void OnTriggerStay(Collider c) {}
+	/// <summary> Called by OnTriggerExit() of the state machine, if it is the active state. </summary>
 	public virtual void OnTriggerExit(Collider c) {}
-	
+
+	/// <summary> Called by OnCollisionEnter() of the state machine, if it is the active state. </summary>
 	public virtual void OnCollisionEnter(Collision c) {}
+	/// <summary> Called by OnCollisionStay() of the state machine, if it is the active state. </summary>
 	public virtual void OnCollisionStay(Collision c) {}
+	/// <summary> Called by OnCollisionExit() of the state machine, if it is the active state. </summary>
 	public virtual void OnCollisionExit(Collision c) {}
-	
+
+	/// <summary> Called by OnMouseEnter() of the state machine, if it is the active state. </summary>
 	public virtual void OnMouseEnter() {}
+	/// <summary> Called by OnMouseOver() of the state machine, if it is the active state. </summary>
 	public virtual void OnMouseOver() {}
+	/// <summary> Called by OnMouseExit() of the state machine, if it is the active state. </summary>
 	public virtual void OnMouseExit() {}
+	/// <summary> Called by OnMouseDown() of the state machine, if it is the active state. </summary>
 	public virtual void OnMouseDown() {}
+	/// <summary> Called by OnMouseUp() of the state machine, if it is the active state. </summary>
 	public virtual void OnMouseUp() {}
+	/// <summary> Called by OnMouseUpAsButton() of the state machine, if it is the active state. </summary>
 	public virtual void OnMouseUpAsButton() {}
 	
 	#endregion

@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(GUIDrag), typeof(GUITooltip))]
 public class GUIRoot : MonoBehaviour {
 	
 	public static GUIRoot main;
@@ -9,7 +10,8 @@ public class GUIRoot : MonoBehaviour {
 	public static List<ZWindow> windows = new List<ZWindow>();
 	
 	public static Dictionary<string, ZWindow> binds = new Dictionary<string, ZWindow>();
-	
+
+
 	public static void AddWindow(ZWindow window) {
 		windows.Add(window);
 	}
@@ -60,17 +62,36 @@ public class GUIRoot : MonoBehaviour {
 			window.open = true;
 		}
 	}
-	
+
+
+
 	void OnGUI() {
 		GUI.depth = 0;
-		
+
 		foreach (ZWindow window in windows) {
 			window.Draw();
 		}
 		
+#if XtoJSON
+		JsonObject dragging = GUIDrag.dragging;
+
+		if (dragging != null) {
+			Texture2D back = Resources.Load<Texture2D>(dragging.GetString("back"));
+			Texture2D icon = Resources.Load<Texture2D>(dragging.GetString("icon"));
+			Color backColor = Json.GetValue<Color>(dragging["backColor"]);
+			Color iconColor = Json.GetValue<Color>(dragging["iconColor"]);
+			if (backColor == Color.clear) { backColor = Color.white; }
+			if (iconColor == Color.clear) { iconColor = Color.white; }
+			Vector3 mouse = Input.mousePosition;
+			Rect brush = new Rect(mouse.x, mouse.y, 32, 32);
+			
+			if (back != null) { GUI.color = backColor; GUI.DrawTexture(brush, back); }
+			if (icon != null) { GUI.color = iconColor; GUI.DrawTexture(brush, icon); }
+
+		}
+#endif
 		
-		
-		
+
 	}
 	
 	
