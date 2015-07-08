@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections;
@@ -33,8 +33,9 @@ public static class MarkdownReplacements {
 		codes['e'] = new Color(1, .6f, 0);
 		codes['t'] = new Color(.8f, 1, .8f);
 		codes['p'] = new Color(.8f, 1, .8f);
-		codes['n'] = new Color(.52549f, 0.7098f, .85098f);
-		
+		codes['j'] = new Color(.5259f, 0.7098f, .8508f);
+		codes['m'] = new Color(.8259f, 0.3214f, .8109f);
+
 		return codes;
 	}
 	

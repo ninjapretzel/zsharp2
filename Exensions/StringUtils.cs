@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 
 public static class StringUtils {
 	
@@ -164,6 +165,9 @@ public static class StringUtils {
 	
 	///Format a float to some number of decimal places
 	public static string Format(this float f, int dec) {
+		bool neg = f < 0;
+		if (neg) { f *= -1; }
+		
 		int ir = (int)f;
 		float fr = f - ir;
 		string s = "";
@@ -171,14 +175,14 @@ public static class StringUtils {
 			s = "0.";
 			if (f < 0) { s = "-" + s; }
 			for (int i = 0; i < dec; i++) { s += "0"; }
-			return s;
+			return (neg ? "-" : "") + s;
 		}
 		if (dec > 0 && fr > 0) {
 			s = "" + fr;
 			if (s.Length <= dec+1) { s = s.Substring(1); }
 			else { s = s.Substring(1, dec+1); }
 		}
-		return "" + ir + s;
+		return (neg ? "-" : "") + ir + s;
 	}
 	//Formats an int value so commas are inserted every 3 places.
 	public static string Commify(this int i) {
@@ -293,6 +297,7 @@ public static class StringUtils {
 	//Parsing functions
 	public static float ParseFloat(this string s) { return float.Parse(s); }
 	public static int ParseInt(this string s) { return int.Parse(s); }
+	public static byte ParseByte(this string s) { return byte.Parse(s, NumberStyles.HexNumber); }
 	public static Color ParseColor(this string s) { return Colors.FromString(s); }
 	public static Color ParseColor(this string s, char delim) { return Colors.FromString(s, delim); }
 	public static Table ParseTable(this string s) { return Table.CreateFromLine(s); }

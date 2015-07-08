@@ -14,6 +14,22 @@ public static class Colors {
 		str += c.a.ToHex();
 		return str;
 	}
+
+	public static Color ToColorFromHex(this string s) {
+		Color32 c = new Color32();
+		int pos = s.StartsWith("#") ? 1 : 0;
+		
+		string r = s.Substring(pos + 0, 2);
+		string g = s.Substring(pos + 2, 2);
+		string b = s.Substring(pos + 4, 2);
+		string a = (s.Length > (pos + 6)) ? s.Substring(pos + 6, 2) : "FF";
+
+		try {
+			c = new Color32(r.ParseByte(), g.ParseByte(), b.ParseByte(), a.ParseByte());
+		} catch { }
+
+		return (Color)c;
+	}
 	
 	#region color making functions
 	///These functions create a color by name with a given intensity.
