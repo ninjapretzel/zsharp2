@@ -8,6 +8,7 @@ public class GUITooltip : MonoBehaviour {
 	public static JsonObject tooltip;
 	
 	public static float tooltip_width = 240;
+
 	void OnGUI() {
 		GUI.depth = -100;
 		GUI.skin = Resources.Load<GUISkin>("Standard");

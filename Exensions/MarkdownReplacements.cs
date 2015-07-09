@@ -26,16 +26,17 @@ public static class MarkdownReplacements {
 		codes['w'] = Color.white;
 		codes['k'] = Color.black;
 		
-		codes['l'] = Colors.HSV(76f/360f, .77f, .60f);
+		codes['u'] = Colors.HSV(76f/360f, .77f, .60f);
 		
 		codes['h'] = new Color(.5f, .5f, .5f);
 		codes['q'] = new Color(.8f, .8f, .8f);
 		codes['e'] = new Color(1, .6f, 0);
 		codes['t'] = new Color(.8f, 1, .8f);
 		codes['p'] = new Color(.8f, 1, .8f);
-		codes['j'] = new Color(.5259f, 0.7098f, .8508f);
-		codes['m'] = new Color(.8259f, 0.3214f, .8109f);
-
+		codes['j'] = new Color(.5259f, .7098f, .8508f);
+		codes['m'] = new Color(.8259f, .3214f, .8109f);
+		codes['l'] = new Color(.5151f, .9131f, .3212f);
+		
 		return codes;
 	}
 	
@@ -54,7 +55,8 @@ public static class MarkdownReplacements {
 	
 	public static string ReplaceColors(this string markdown) {
 		string str = markdown;
-		str = str.Replace(">", "\\l>");
+		//gotta be able to be >implying things
+		str = str.Replace(">", "\\u>");
 		bool open = false;
 		while (colorCode.IsMatch(str)) {
 			Match match = colorCode.Match(str);
