@@ -50,7 +50,16 @@ public class GUITooltip : MonoBehaviour {
 			.Add("y", Input.mousePosition.y)
 			.Add("content", content);
 	}
+
+
+	public static void SetTooltip(Vector2 pos, string content) {
+		tooltip = new JsonObject()
+			.Add("x", pos.x)
+			.Add("y", pos.y)
+			.Add("content", content);
+	}
 	
+
 	public static void SetTooltip(float x, float y, string content) {
 		tooltip = new JsonObject()
 			.Add("x", x)

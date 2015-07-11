@@ -9,9 +9,7 @@ public class GUIDrag : MonoBehaviour {
 #if XtoJSON
 
 	public static JsonObject dragging;
-	public static void StartDrag(JsonObject obj) {
-		dragging = obj;
-	}
+	
 
 	public static void OnDragRelease(System.Action<JsonObject> act) {
 		if (dragging != null && GUIEvent.leftClickUp) {

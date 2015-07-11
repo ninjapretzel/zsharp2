@@ -45,6 +45,9 @@ public static class GUIEvent {
 	public static bool leftClickDown { get { return evt.type == EventType.MouseDown && evt.button == 0; } }
 	public static bool leftClickUp { get { return evt.type == EventType.MouseUp && evt.button == 0; } }
 
+	public static bool middleClickDown { get { return evt.type == EventType.MouseDown && evt.button == 2; } }
+	public static bool middleClickUp { get { return evt.type == EventType.MouseUp && evt.button == 2; } }
+
 	public static bool rightClickDown { get { return evt.type == EventType.MouseDown && evt.button == 1; } }
 	public static bool rightClickUp { get { return evt.type == EventType.MouseUp && evt.button == 1; } }
 

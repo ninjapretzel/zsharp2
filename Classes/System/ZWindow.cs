@@ -31,6 +31,7 @@ public class ZWindow {
 	public bool open;
 	public bool invisibleBackground;
 	public bool dragable;
+	public bool eatClicks;
 	
 	public bool hasCloseButton;
 	public bool hasMiniButton;
@@ -47,6 +48,7 @@ public class ZWindow {
 	public float resizeAreaSize = 18;
 	
 	public bool focused { get { return lastFocused == id; } }
+
 	
 	public float x { get { return area.x; } set { area.x = value; } }
 	public float y { get { return area.y; } set { area.y = value; } }
@@ -147,6 +149,7 @@ public class ZWindow {
 		invisibleBackground = false;
 		dragable = true;
 		resizable = true;
+		eatClicks = true;
 		
 		hasCloseButton = true;
 		hasMiniButton = false;
@@ -218,7 +221,7 @@ public class ZWindow {
 		
 		if (dragable) { GUI.DragWindow(draggableArea); }
 		
-		
+		if (GUIEvent.clickDown && eatClicks) { GUIEvent.Use(); }
 		Bound();
 		//SetSkin();
 	}
@@ -273,6 +276,9 @@ public class ZWindow {
 		if (x > Screen.width - 60) { x = Screen.width - 60; }
 		if (y > Screen.height - 20) { y = Screen.height - 20; }
 	}
+
+	public Rect GetScreenRect(Rect r) { return GetScreenRect(r, Vector2.zero); }
+	public Rect GetScreenRect(Rect r, Vector2 offset) { return r.Shift(area.UpperLeft() + offset); }
 	
 	#region GUI Extensions
 	public static void Label(string s, params GUILayoutOption[] options) { GUILayout.Label(s, options); }
