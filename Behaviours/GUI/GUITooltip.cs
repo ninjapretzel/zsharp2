@@ -41,9 +41,23 @@ public class GUITooltip : MonoBehaviour {
 		Rect brush = new Rect(x, y, width, height);
 		GUI.Box(brush, content);
 		
-		
-		
 	}
+	
+	
+	public static void SetTooltip(string content) {
+		tooltip = new JsonObject()
+			.Add("x", Input.mousePosition.x)
+			.Add("y", Input.mousePosition.y)
+			.Add("content", content);
+	}
+	
+	public static void SetTooltip(float x, float y, string content) {
+		tooltip = new JsonObject()
+			.Add("x", x)
+			.Add("y", y)
+			.Add("content", content);
+	}
+		
 	
 }
 #endif

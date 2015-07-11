@@ -44,7 +44,21 @@ public class FancyBar {
 		noiseA = Resources.Load<Texture2D>(data.GetString("noiseA"));
 		noiseB = Resources.Load<Texture2D>(data.GetString("noiseB"));
 		bar = Resources.Load<Texture2D>(data.GetString("bar"));
+		scaleA = GetRect(data["scaleA"] as JsonObject);
+		scaleB = GetRect(data["scaleB"] as JsonObject);
+
+		
 	}
+
+	public static Rect GetRect(JsonObject obj) {
+		Rect r = new Rect();
+		r.x = obj.Extract<float>("x", 0);
+		r.y = obj.Extract<float>("y", 0);
+		r.width = obj.Extract<float>("width", 1);
+		r.height = obj.Extract<float>("height", 1);
+		return r;
+	}
+
 #endif
 
 	public FancyBar(FancyBar s) { 
@@ -94,6 +108,7 @@ public class FancyBar {
 		Rect coordsB = new Rect(scaleB.x * time, scaleB.y * Mathf.Sin(time * scaleB.width), ratio * scaleB.height, scaleB.height);
 		Rect coordsBfill = leftToRight ? coordsB.Left(fill) : coordsB.Right(fill);
 		Rect coordsBempty = !leftToRight ? coordsB.Left(1 - fill) : coordsB.Right(1 - fill);
+
 
 		GUI.PushColor(baseColor.MultRGB(darkening.Clamp01()));
 		GUI.DrawTexture(empty, bar);

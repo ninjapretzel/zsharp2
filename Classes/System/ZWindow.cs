@@ -41,11 +41,12 @@ public class ZWindow {
 	
 	private int id;
 	public static int next_id = 10000;
+
 	public static int lastFocused = 0;
 	public float closeButtonSize = 18;
 	public float resizeAreaSize = 18;
 	
-	
+	public bool focused { get { return lastFocused == id; } }
 	
 	public float x { get { return area.x; } set { area.x = value; } }
 	public float y { get { return area.y; } set { area.y = value; } }
@@ -191,7 +192,8 @@ public class ZWindow {
 	
 	public void DrawWindow(int windowID) {
 		//SetSkin();
-		if ((Event.current.button == 0) && (Event.current.type == EventType.MouseDown)) {
+		
+		if ((GUIEvent.button == 0) && (GUIEvent.clickDown)) {
 			lastFocused = id;
 		}
 		
@@ -225,25 +227,25 @@ public class ZWindow {
 		if (!open) { return; }
 		if (resizing == null || resizing == this) {
 			
-			if (resizable) {
+			if (resizable && lastFocused == id) {
 				GUI.DrawTexture(screenResizeArea, resizeStyle.normal.background);
-				if (Event.current.type == EventType.MouseDown) {
+				if (GUIEvent.clickDown) {
 					if (screenResizeArea.Contains(Input.mousePosition)) {
 						resizing = this;
-						Event.current.Use();
+						GUIEvent.Use();
 						resizeBaseSize = new Vector3(width, height, 0);
 						resizeClickPoint = Input.mousePosition;
 					}
-				} else if (resizing == this && Event.current.type == EventType.MouseUp) {
+				} else if (resizing == this && GUIEvent.mouseUp) {
 					resizing = null;
-					Event.current.Use();
-				} else if (Event.current.type == EventType.MouseDrag) {
+					GUIEvent.Use();
+				} else if (GUIEvent.mouseDrag) {
 					if (resizing == this) {
 						Vector3 diff = Input.mousePosition - resizeClickPoint;
 						width = resizeBaseSize.x + diff.x;
 						height = resizeBaseSize.y + diff.y;
 						
-						Event.current.Use();
+						GUIEvent.Use();
 					}
 				}
 				
