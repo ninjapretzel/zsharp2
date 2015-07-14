@@ -59,6 +59,8 @@ public class ZWindow {
 	static Vector3 resizeBaseSize;
 	static ZWindow resizing = null;
 	static GUIStyle resizeStyle;
+
+	static Color closeButtonColor = new Color(.75f, 0, 0);
 	
 	bool lastOpenedState = false;
 	
@@ -204,7 +206,7 @@ public class ZWindow {
 		Window();
 		
 		if (hasCloseButton) {
-			GUI.PushColor(Color.red);
+			GUI.PushColor(closeButtonColor);
 			if (GUI.Button(closeButtonArea, "X")) {
 				open = false;
 			}
