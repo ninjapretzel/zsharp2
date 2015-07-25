@@ -78,8 +78,6 @@ public class QuickPlayerSettings : EditorWindow {
 				if(GUILayout.Button("Open Player Settings")) {
 					EditorApplication.ExecuteMenuItem("Edit/Project Settings/Player");
 					//Debug.Log(typeof(PlayerSettings).Summary());
-					//Debug.Log(typeof(PlayerSettings.Android).Summary());
-					//Debug.Log(typeof(PlayerSettings.iOS).Summary());
 					changed = true;
 				}
 				EditorGUILayout.BeginVertical("box"); {
@@ -238,11 +236,6 @@ public class QuickPlayerSettings : EditorWindow {
 			case "use32BitDisplayBuffer":
 				PlayerSettings.use32BitDisplayBuffer = Boolean.Parse(val);
 				break;
-			case "targetGlesGraphics":
-				TargetGlesGraphics temptargetGlesGraphics;
-				EnumUtils.TryParse<TargetGlesGraphics>(val, out temptargetGlesGraphics);
-				PlayerSettings.targetGlesGraphics = temptargetGlesGraphics;
-				break;
 			case "apiCompatibilityLevel":
 				ApiCompatibilityLevel tempapiCompatibilityLevel;
 				EnumUtils.TryParse<ApiCompatibilityLevel>(val, out tempapiCompatibilityLevel);
@@ -272,9 +265,6 @@ public class QuickPlayerSettings : EditorWindow {
 				RenderingPath tempmobileRenderingPath;
 				EnumUtils.TryParse<RenderingPath>(val, out tempmobileRenderingPath);
 				PlayerSettings.renderingPath = tempmobileRenderingPath;
-				break;
-			case "useDirect3D11":
-				PlayerSettings.useDirect3D11 = Boolean.Parse(val);
 				break;
 			case "stereoscopic3D":
 				PlayerSettings.stereoscopic3D = Boolean.Parse(val);
@@ -437,7 +427,6 @@ public class QuickPlayerSettings : EditorWindow {
 		output += "allowedAutorotateToLandscapeLeft," + PlayerSettings.allowedAutorotateToLandscapeLeft + "\n";
 		output += "useAnimatedAutorotation," + PlayerSettings.useAnimatedAutorotation + "\n";
 		output += "use32BitDisplayBuffer," + PlayerSettings.use32BitDisplayBuffer + "\n";
-		output += "targetGlesGraphics," + PlayerSettings.targetGlesGraphics + "\n";
 		output += "apiCompatibilityLevel," + PlayerSettings.apiCompatibilityLevel + "\n";
 		output += "stripUnusedMeshComponents," + PlayerSettings.stripUnusedMeshComponents + "\n";
 		output += "aotOptions," + PlayerSettings.aotOptions + "\n";
@@ -446,7 +435,6 @@ public class QuickPlayerSettings : EditorWindow {
 		output += "mobileMTRendering," + PlayerSettings.mobileMTRendering + "\n";
 		output += "renderingPath," + PlayerSettings.renderingPath + "\n";
 		output += "mobileRenderingPath," + PlayerSettings.renderingPath + "\n";
-		output += "useDirect3D11," + PlayerSettings.useDirect3D11 + "\n";
 		output += "stereoscopic3D," + PlayerSettings.stereoscopic3D + "\n";
 		#endregion
 		if(currentPlatform == BuildTargetGroup.Android) {
