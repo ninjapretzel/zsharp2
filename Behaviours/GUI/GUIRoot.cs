@@ -2,7 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+#if XtoJSON
 [RequireComponent(typeof(GUIDrag), typeof(GUITooltip))]
+#endif
 public class GUIRoot : MonoBehaviour {
 	
 	public static GUIRoot main;
