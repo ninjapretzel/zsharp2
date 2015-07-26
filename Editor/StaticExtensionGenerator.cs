@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
@@ -14,7 +14,8 @@ public class StaticExtensionGenerator : EditorWindow {
 	public static string path { get { return Application.dataPath + "/Standard Assets/"; } }
 
 	private string parentClassAlias;
-	public Type type = typeof(Physics);
+	public Type type = null;
+	public string typeName = "UnityEngine.Physics,UnityEngine";
 
 	[MenuItem("Utilities/Static Class Extension Generator")]
 	public static void ShowWindow() {
@@ -26,16 +27,13 @@ public class StaticExtensionGenerator : EditorWindow {
 	}
 
 	public void Start() {
-		//type = Type.GetType("UnityEngine.Rigidbody,Assembly-CSharp", false, false);
-		if(type == null) {
-			Debug.Log("Type is null");
-		} else {
-			Debug.Log("Type is " + type);
-		}
+		
 	}
 
 	public void OnGUI() {
-		if(GUILayout.Button("Generate class for type " + type.Name)) {
+		typeName = GUILayout.TextField(typeName);
+		if(GUILayout.Button("Generate class")) {
+			type = Type.GetType(typeName);
 			parentClassAlias = "Original" + type.Name;
 			if(File.Exists(path + type.Name + ".cs")) {
 				File.Delete(path + type.Name + ".cs");
