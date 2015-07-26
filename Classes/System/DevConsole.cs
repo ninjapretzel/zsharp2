@@ -608,11 +608,15 @@ public class DevConsole : MonoBehaviour {
 	// Returns: object reference to a "public static main" object of the same type as the class provided, if it exists within the class provided.
 	public static object GetMainOfClass(System.Type targetClass) {
 		FieldInfo mainField = targetClass.GetField("main", BindingFlags.Public | BindingFlags.Static);
-		if(mainField != null && mainField.FieldType == targetClass && IsAccessible(mainField)) {
+		if (mainField != null && mainField.FieldType.IsAssignableFrom(targetClass) && IsAccessible(mainField)) {
 			return mainField.GetValue(null);
 		}
 		mainField = targetClass.GetField("instance", BindingFlags.Public | BindingFlags.Static);
-		if(mainField != null && mainField.FieldType == targetClass && IsAccessible(mainField)) {
+		if (mainField != null && mainField.FieldType.IsAssignableFrom(targetClass) && IsAccessible(mainField)) {
+			return mainField.GetValue(null);
+		}
+		mainField = targetClass.GetField("singleton", BindingFlags.Public | BindingFlags.Static);
+		if (mainField != null && mainField.FieldType.IsAssignableFrom(targetClass) && IsAccessible(mainField)) {
 			return mainField.GetValue(null);
 		}
 		return null;
