@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
 public static class NetworkUtils {
 
-	public static string ipAddress { get { return Network.player.ipAddress; } }
-	public static bool connected { get { return Network.peerType == NetworkPeerType.Server || Network.peerType == NetworkPeerType.Client; } }
+	//public static string ipAddress { get { return Network.player.ipAddress; } }
+	public static bool connected { get { return NetworkServer.active || NetworkClient.active; } }
 	
 	public static string Details(this NetworkPlayer p) {
 		string str = "networkPlayer : {";
