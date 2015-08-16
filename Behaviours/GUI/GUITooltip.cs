@@ -39,7 +39,7 @@ public class GUITooltip : MonoBehaviour {
 			else {}
 
 			if (y > Screen.height / 2) { y -= height + sizey; } 
-			else { }
+			else {}
 
 		} else {
 			if (y + height > Screen.height) { 

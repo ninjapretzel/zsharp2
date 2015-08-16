@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR && !UNITY_WEBPLAYER
+#if UNITY_EDITOR && !UNITY_WEBPLAYER
 using UnityEditor;
 using UnityEngine;
 using System.Collections;
@@ -24,7 +24,7 @@ public class ImageTransparency : ZEditorWindow {
 		
 	}
 	
-	[MenuItem ("Window/Texture Transparency")]
+	[MenuItem("Window/ZSharp/Texture Transparency")]
 	static void ShowWindow() {
 		window = (ImageTransparency)EditorWindow.GetWindow (typeof (ImageTransparency));
 		

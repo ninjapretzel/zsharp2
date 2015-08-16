@@ -72,6 +72,8 @@ public class ZEditorWindow : EditorWindow {
 		GUI.FocusControl(name);
 	}
 	
+
+	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,12 +177,14 @@ public class ZEditorWindow : EditorWindow {
 	public static GUILayoutOption MinHeight(float val) { return GUILayout.MinHeight(val); }
 	public static GUILayoutOption MaxHeight(float val) { return GUILayout.MaxHeight(val); }
 	public static GUILayoutOption ExpandHeight(bool expand) { return GUILayout.ExpandHeight(expand); }
+
 	
 	public static GUILayoutOption Width(float size) { return GUILayout.Width(size); }
 	public static GUILayoutOption MinWidth(float val) { return GUILayout.MinWidth(val); }
 	public static GUILayoutOption MaxWidth(float val) { return GUILayout.MaxWidth(val); }
 	public static GUILayoutOption ExpandWidth(bool expand) { return GUILayout.ExpandWidth(expand); }
 	
+	public static GUILayoutOption[] FixedWidth(float size) { return new GUILayoutOption[] { Width(size), ExpandWidth(false) }; }
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -411,6 +415,30 @@ public class ZEditorWindow : EditorWindow {
 		
 		return c;
 	}
+
+	public int AlternateColor(int i) { return AlternateColor(i, Color.white, new Color(.8f, .8f, .8f, 1)); }
+	public int AlternateColor(int i, Color a, Color b) {
+		if (i % 2 == 0) { GUI.color = a; } else { GUI.color = b; }
+		return ++i;
+	}
+
+	public int AlternateColor(int i, Color[] colors) {
+		GUI.color = colors[i % colors.Length];
+		return ++i;
+	}
+
+	
+	public bool ExpandCollapse(bool expanded, string label = "") {
+		bool retval = expanded;
+		BeginHorizontal(); {
+			if (Button(expanded ? "V" : ">", FixedWidth(20))) { retval = !retval; }
+			Label(label, FixedWidth(220));
+		} EndHorizontal();
+		return retval;
+	}
+
+
+
 	
 	
 }

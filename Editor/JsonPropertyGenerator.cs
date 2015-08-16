@@ -16,8 +16,8 @@ public class JsonPropertyGenerator : ZEditorWindow {
 	[System.NonSerialized] List<string> list;
 	[System.NonSerialized] int timeout;
 	Vector2 scroll;
-	
-	[MenuItem ("Window/JsonAccessors")]
+
+	[MenuItem("Window/ZSharp/JsonAccessors")]
 	public static void ShowWindow() {
 		EditorWindow.GetWindow(typeof(JsonPropertyGenerator));
 		

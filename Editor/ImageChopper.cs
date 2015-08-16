@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR && !UNITY_WEBPLAYER
+#if UNITY_EDITOR && !UNITY_WEBPLAYER
 using UnityEngine;
 using UnityEditor;
 using System.IO;
@@ -10,7 +10,7 @@ public class ImageChopper : EditorWindow {
 	public static ImageChopper window;
 	public Vector2 size;
 	
-	[MenuItem ("Window/Texture Chopper")]
+	[MenuItem("Window/ZSharp/Texture Chopper")]
 	static void ShowWindow() {
 		window = (ImageChopper)EditorWindow.GetWindow (typeof (ImageChopper));
 	}

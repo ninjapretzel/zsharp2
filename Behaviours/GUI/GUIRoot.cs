@@ -79,7 +79,15 @@ public class GUIRoot : MonoBehaviour {
 
 		if (dragging != null) {
 			Texture2D back = Resources.Load<Texture2D>(dragging.GetString("back"));
-			Texture2D icon = Resources.Load<Texture2D>(dragging.GetString("icon"));
+			
+			string iconString = dragging.GetString("icon");
+			SpriteInfo iconInfo = Icons.GetIcon(iconString);
+			Texture2D icon = null;
+			if (iconInfo == null) {
+				icon = Resources.Load<Texture2D>(iconString);
+			}
+
+
 			Color backColor = Json.GetValue<Color>(dragging["backColor"]);
 			Color iconColor = Json.GetValue<Color>(dragging["iconColor"]);
 			if (backColor == Color.clear) { backColor = Color.white; }
@@ -88,8 +96,11 @@ public class GUIRoot : MonoBehaviour {
 			Rect brush = new Rect(mouse.x, mouse.y, 32, 32);
 			
 			if (back != null) { GUI.color = backColor; GUI.DrawTexture(brush, back); }
-			if (icon != null) { GUI.color = iconColor; GUI.DrawTexture(brush, icon); }
-
+			if (iconInfo != null) {
+				GUI.color = iconColor; GUI.DrawTexture(brush, iconInfo);
+			} else {
+				if (icon != null) { GUI.color = iconColor; GUI.DrawTexture(brush, icon); }
+			}
 		}
 #endif
 		

@@ -122,6 +122,26 @@ public static class GUI {
 
 	public static void DragWindow(Rect position) { UnityGUI.DragWindow(position); }
 
+	public static void DrawTexture(Rect position, Sprite sprite, ScaleMode scaleMode = ScaleMode.StretchToFill, bool alphaBlend = true, float imageAspect = 0) {
+		float w = sprite.texture.width; float h = sprite.texture.height;
+		Rect texCoords = sprite.rect;
+		texCoords.x /= w; texCoords.width /= w;
+		texCoords.y /= h; texCoords.height /= h;
+		DrawTextureWithTexCoords(position, sprite.texture, texCoords); 
+	}
+
+	public static void DrawTexture(Rect position, SpriteInfo sprite, bool alphaBlend = true) {
+		if (sprite != null) {
+			Rect texCoords = sprite.nRect;
+			DrawTextureWithTexCoords(position, sprite.texture, texCoords, alphaBlend);
+		} else {
+			PushColor(Color.red.ShiftHue(Time.time%1));
+			DrawTexture(position, GUI.pixel);
+			Box(position, "Missing SpriteInfo");
+			PopColor();
+		}
+	}
+
 	public static void DrawTexture(Rect position, Texture image, ScaleMode scaleMode = ScaleMode.StretchToFill, bool alphaBlend = true, float imageAspect = 0) { UnityGUI.DrawTexture(position, image, scaleMode, alphaBlend, imageAspect); }
 
 	public static void DrawTextureWithTexCoords(Rect position, Texture image, Rect texCoords, bool alphaBlend = true) { UnityGUI.DrawTextureWithTexCoords(position, image, texCoords, alphaBlend); }
