@@ -1,0 +1,38 @@
+﻿{
+	"defaultSprite":"UISprite",
+	"path":"Skin/Standard/",
+	"disabled":"_disabled",
+	"active":"_active",
+	"hover":"_hover",
+	"off":"Off",
+	"on":"On",	
+	"font":"TAHOMA",
+	"fontSize":16,
+	"sprites":{
+		"box":"box",
+		"button":"button",
+		"buttonDown":"buttonDown",
+		"buttonUp":"buttonUp",
+		"buttonLeft":"buttonLeft",
+		"buttonRight":"buttonRight",
+		"dropdown":"dropdown",
+		"dropdownTop":"dropdownTop",
+		"resizer":"resizer",
+		"scrollBar":"scrollBar",
+		"textfield":"textfield",
+		"toggle":"toggle",
+		"window":"window",
+	},
+	
+	"colors":{
+		"normal":"#FFFFFFFF",
+		"highlight":"#F5F5F5FF",
+		"pressed":"#C8C8C8FF",
+		"disabled":"#C8C8C880",
+	},
+	
+	"text":{
+		
+	},
+	
+}

@@ -126,7 +126,7 @@ public static class Icons {
 				SheetInfo sheetInfo = sheets[sheetName];
 				Texture2D atlas = sheetInfo.atlas;
 				int size = sheetInfo.iconSize;
-				Vector2 pivot = Vector2.one * size/2;
+				//Vector2 pivot = Vector2.one * size/2;
 				Rect r = new Rect();
 				r.x = x * size;
 				r.y = sheetInfo.atlas.height - (y+1) * size;

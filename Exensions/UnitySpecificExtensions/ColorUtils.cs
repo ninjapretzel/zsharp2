@@ -5,30 +5,55 @@ using System.Collections.Generic;
 ///Class for extension methods and static methods for adding additional features to Unity's 'Color' class
 
 public static class Colors {
-	
+
+	/// <summary> Create a hex string from a Color, in the form #RRGGBBAA </summary>
+	public static string HexString(this Color c) { return ((Color32)c).HexString(); }
+
+	/// <summary> Create a hex string from a Color32, in the form #RRGGBBAA </summary>
 	public static string HexString(this Color32 c) {
-		string str = "";
+		string str = "#";
 		str += c.r.ToHex();
 		str += c.g.ToHex();
 		str += c.b.ToHex();
-		str += c.a.ToHex();
+		if (c.a < 255) { str += c.a.ToHex(); }
 		return str;
 	}
 
-	public static Color ToColorFromHex(this string s) {
-		Color32 c = new Color32();
-		int pos = s.StartsWith("#") ? 1 : 0;
-		
-		string r = s.Substring(pos + 0, 2);
-		string g = s.Substring(pos + 2, 2);
-		string b = s.Substring(pos + 4, 2);
-		string a = (s.Length > (pos + 6)) ? s.Substring(pos + 6, 2) : "FF";
+	/// <summary>
+	/// Parses a hex string into a Color object
+	/// # is optional
+	/// 'FF' is used for alpha if not present
+	/// FF0000 = #FF0000 = #FF0000FF
+	/// </summary>
+	public static Color ToColorFromHex(this string s) { return (Color)s.ParseHex32(); }
+	
+	/// <summary>
+	/// Parses a hex string into a Color object
+	/// # is optional
+	/// 'FF' is used for alpha if not present
+	/// FF0000 = #FF0000 = #FF0000FF
+	/// </summary>
+	public static Color ParseHex(this string s) { return (Color)s.ParseHex32(); }
 
+	/// <summary> 
+	/// Parses a hex string into a Color32 object.
+	/// # is optional
+	/// 'FF' is used for alpha if not present.
+	/// </summary>
+	public static Color32 ParseHex32(this string s) {
+		Color32 c = new Color32(0, 0, 0, 0);
 		try {
+			int pos = s.StartsWith("#") ? 1 : 0;
+
+			string r = s.Substring(pos + 0, 2);
+			string g = s.Substring(pos + 2, 2);
+			string b = s.Substring(pos + 4, 2);
+			string a = (s.Length > (pos + 6)) ? s.Substring(pos + 6, 2) : "FF";
+
 			c = new Color32(r.ParseByte(), g.ParseByte(), b.ParseByte(), a.ParseByte());
 		} catch { }
 
-		return (Color)c;
+		return c;
 	}
 	
 	#region color making functions
