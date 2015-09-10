@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,6 +8,8 @@ public static class UnityUtils {
 		Vector3 offset = Vector3.Scale(c.center, c.transform.lossyScale);
 		return pos + c.transform.rotation * offset;
 	}
+
+	
 	
 	public static T GetComponentOnOrAbove<T>(this Component c) where T : Component {
 		Transform test = c.transform;
@@ -91,8 +93,7 @@ public static class UnityUtils {
 	public static T Require<T>(this GameObject o) where T : Component { return o.transform.Require<T>(); }
 	public static T Require<T>(this Component c) where T : Component {
 		Component check = c.GetComponent<T>();
-		return (check != null ? check : c.gameObject.AddComponent<T>()) as T;
-		
+		return ((check != null) ? check : c.gameObject.AddComponent<T>()) as T;
 	}
 	
 	public static void SetColor(this Component c, string property, Color color) {

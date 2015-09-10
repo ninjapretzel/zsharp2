@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 
 public class ZWindow {
+
 	public string name;
 	public Rect area;
 	public int padding = 0;
@@ -266,12 +267,18 @@ public class ZWindow {
 	}
 	
 	#region Virtual functions
+	public virtual void Update() { }
+	public virtual void LateUpdate() { }
 	public virtual void Window() { }
 	public virtual void OnClose() { }
 	public virtual void OnOpen() { }
 	
 	#endregion
 	
+
+	public void Focus() { GUI.FocusWindow(id); lastFocused = id; }
+	public void Unfocus() { GUI.FocusWindow(-1); lastFocused = -1; }
+
 	public void Bound() {
 		if (x < -width+60) { x = -width+60; }
 		if (y < 0) { y = 0; }

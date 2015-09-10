@@ -240,6 +240,12 @@ public class DevConsole : MonoBehaviour {
 		}
 	}
 
+	public static void NetExec(string line) {
+		// TODO: check to see if this line has the right attribute
+		// Networked attribute on the command function
+		Execute(line);
+	}
+
 	// Execute takes a line and attempts to turn it into commands which will be executed, through reflection.
 	// Order: Fields (Variables), Methods (Functions), Properties, Aliases
 	public static void Execute(string line) {
@@ -267,7 +273,7 @@ public class DevConsole : MonoBehaviour {
 			string targetMemberName = null;
 			// Separate class specification from member call
 			int indexOfDot = command.LastIndexOf('.');
-			System.Type targetClass;
+			System.Type targetClass = null;
 			if(indexOfDot > 0) {
 				targetClassName = command.Substring(0, indexOfDot);
 				if(classBlacklist.Contains(targetClassName)) {
@@ -279,17 +285,10 @@ public class DevConsole : MonoBehaviour {
 #endif
 				}
 				targetMemberName = command.Substring(indexOfDot+1);
-				targetClass = System.Type.GetType(targetClassName);
-				if(targetClass == null) {
-					targetClass = System.Type.GetType(targetClassName + ",Assembly-UnityScript-firstpass");
-					if(targetClass == null) {
-						targetClass = System.Type.GetType(targetClassName + ",Assembly-CSharp");
-						if(targetClass == null) {
-							targetClass = System.Type.GetType(targetClassName + ",Assembly-UnityScript");
-							if(targetClass == null) {
-								targetClass = System.Type.GetType(targetClassName + ",UnityEngine");
-							}
-						}
+				foreach (string assembly in ReflectionUtils.assemblies) {
+					targetClass = System.Type.GetType(targetClassName + assembly);
+					if (targetClass != null) {
+						break;
 					}
 				}
 			} else {
@@ -954,6 +953,9 @@ public class ConsoleWindow : ZWindow {
 	public override void Window() {
 		GUILayout.BeginVertical(); {
 			scrollPos = GUILayout.BeginScrollView(scrollPos, GUIStyle.none, GUI.skin.verticalScrollbar); {
+				if (textWindow.Length > 16382) {
+					textWindow = textWindow.Substring(textWindow.Length - 16382, 16382);
+				}
 				Label(textWindow);
 			} GUILayout.EndScrollView();
 			GUILayout.BeginHorizontal(); {

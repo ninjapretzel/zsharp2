@@ -34,6 +34,17 @@ public class GUIRoot : MonoBehaviour {
 				pair.Value.open = !pair.Value.open;
 			}
 		}
+
+		foreach (var window in windows) {
+			window.Update();
+		}
+		
+	}
+
+	void LateUpdate() {
+		foreach (var window in windows) {
+			window.LateUpdate();
+		}
 		
 	}
 	

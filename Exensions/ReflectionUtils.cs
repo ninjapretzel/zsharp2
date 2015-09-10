@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Text;
 using System.Linq;
@@ -344,38 +344,38 @@ public static class ReflectionUtils {
 		StringBuilder output = new StringBuilder("");
 		
 		if (type.IsPublic) {
-			output.Append("public ");
+			output += "public ";
 		}
 		
 		if (type.IsInterface) {
-			output.Append("interface ");
+			output += "interface ";
 		} else {
 			if (type.IsAbstract) {
-				output.Append("abstract ");
+				output += "abstract ";
 			}
-			output.Append("class ");
+			output += "class ";
 		}
 		
-		output.Append(type.ShortName());
+		output += (type.ShortName());
 		
 		
 		Type[] interfaces = type.GetInterfaces();
 		if (type.BaseType == typeof(System.Object) || type.BaseType == null) {
 			if (interfaces.Length > 0) {
-				output.Append(" : ");
+				output += " : ";
 			}
 		} else {
-			output.Append(" : " + type.BaseType.ShortName());
+			output += " : " + type.BaseType.ShortName();
 			if (interfaces.Length > 0) {
-				output.Append(", ");
+				output += ", ";
 			}
 			
 		}
 
 		for (int i = 0; i < interfaces.Length; i++) {
-			output.Append(interfaces[i].ShortName());
+			output += (interfaces[i].ShortName());
 			if (i != interfaces.Length-1) { 
-				output.Append(", ");
+				output += ", ";
 			}
 			
 		}
@@ -383,62 +383,73 @@ public static class ReflectionUtils {
 		
 		
 		
-		output.Append(" {");
+		output += " {";
 		
-		output.Append("\n\n\t//Fields:----------------------------------------------\n");
+		output += "\n\n\t//Fields:----------------------------------------------\n";
 		foreach (FieldInfo info in fields) {
 			if (info.IsInherited()) {
 				if (info.DeclaringType != lastInheritedType) {
 					lastInheritedType = info.DeclaringType;
-					output.Append("\n\t//Inherited from <" + info.DeclaringType.ToString() + ">\n");
+					output += "\n\t//Inherited from <" + info.DeclaringType.ToString() + ">\n";
 					
 				}
 			}
-			output.Append("\t" + info.Summary() + "\n");
+			output += "\t" + info.Summary() + "\n";
 		}
 		
 		lastInheritedType = null;
-		output.Append("\n\n\t//Properties:----------------------------------------------\n");
+		output += "\n\n\t//Properties:----------------------------------------------\n";
 		foreach (PropertyInfo info in properties) {
 			if (info.IsInherited()) {
 				if (info.DeclaringType != lastInheritedType) {
 					lastInheritedType = info.DeclaringType;
-					output.Append("\n\t//Inherited from <" + info.DeclaringType.ToString() + ">\n");
+					output += "\n\t//Inherited from <" + info.DeclaringType.ToString() + ">\n";
 					
 				}
 			}
-			output.Append("\t" + info.Summary() + "\n");
+			output += "\t" + info.Summary() + "\n";
 		}
 		
-		output.Append("\n\n\t//Constructors:----------------------------------------------\n");
+		output += "\n\n\t//Constructors:----------------------------------------------\n";
 		foreach (ConstructorInfo info in constructors) {
-			output.Append("\t" + info.Summary() + "\n");
+			output += "\t" + info.Summary() + "\n";
 		}
 		
 		
 		//Give summary of each method info
 		lastInheritedType = null;
-		output.Append("\n\n\t//Methods:----------------------------------------------\n");
+		output += "\n\n\t//Methods:----------------------------------------------\n";
 		foreach (MethodInfo info in methods) {
 			if (info.IsSpecialName && !showHidden) { continue; }
 			if (info.IsInherited()) {
 				if (info.DeclaringType != lastInheritedType) {
 					lastInheritedType = info.DeclaringType;
-					output.Append("\n\t//Inherited from <" + info.DeclaringType.ToString() + ">\n");
+					output += "\n\t//Inherited from <" + info.DeclaringType.ToString() + ">\n";
 					
 				}
 			}
-			output.Append("\t" + info.Summary() + "\n");
+			output += "\t" + info.Summary() + "\n";
 		}
 		
 		
-		output.Append("\n}");
+		output += "\n}";
 		
 		return output.ToString();
 		
 		
 		
 		
+	}
+
+	public static IEnumerable<string> assemblies {
+		get {
+			yield return "";
+			yield return ",UnityEngine";
+			yield return ",Assembly-UnityScript";
+			yield return ",Assembly-CSharp";
+			yield return ",Assembly-UnityScript-firstpass";
+			yield return ",Assembly-CSharp-firstpass";
+		}
 	}
 	
 	public static int CompareMethods(this MethodInfo info, MethodInfo other) {
@@ -482,146 +493,154 @@ public static class ReflectionUtils {
 		} else { return (info.IsInherited() ? 1 : -1); }
 	}
 	
-	public static string Summary(this ConstructorInfo info) {
+	public static string AttributeSummary(this MemberInfo info) {
 		StringBuilder str = new StringBuilder();
-		
-		if (info.IsPublic) {
-			str.Append("public ");
-		} else if (info.IsPrivate) {
-			str.Append("private ");
-		} 
-		
-		if (info.IsFamily) {
-			str.Append("protected ");
+
+		var atts = info.GetCustomAttributes(typeof(Attribute), true);
+		foreach (var attInfo in atts) {
+			str += "[" + attInfo.GetType().FullName + "]" + (atts.Length > 1 ? "\n" : "");
 		}
-		if (info.IsAssembly) {
-			str.Append("internal ");
-		}
-		
-		
-		str.Append(info.DeclaringType.Name + "(");
-		
-		ParameterInfo[] pinfos = info.GetParameters();
+
+		return str.ToString();
+	}
+
+	public static string ParameterSummary(this ParameterInfo[] pinfos) {
+		StringBuilder str = new StringBuilder();
+
 		for (int i = 0; i < pinfos.Length; i++) {
 			ParameterInfo pinfo = pinfos[i];
-			
-			
-			if (pinfo.IsOut) { str.Append("out "); }
-			str.Append(pinfo.ParameterType.ShortName() + " " + pinfo.Name);
+
+
+			if (pinfo.IsOut) { str += "out "; }
+			str += (pinfo.ParameterType.ShortName() + " " + pinfo.Name);
 			/*
 			//Unity's Mono does not have this functionality... :(
 			if (pinfo.HasDefaultValue) {
-				str.Append(" = " + pinfo.DefaultValue.ToString().RemoveAll("\n"));
+				str += " = " + pinfo.DefaultValue.ToString().RemoveAll("\n"));
 			}
-			//*///
-			
-			if (i < pinfos.Length-1) { str.Append(", "); }
-			
+			//*/
+			//
+
+			if (i < pinfos.Length - 1) { str += ", "; }
+
+		}
+		return str.ToString();
+	}
+
+	public static string Summary(this ConstructorInfo info) {
+		StringBuilder str = new StringBuilder();
+
+		str += info.AttributeSummary();
+		
+		if (info.IsPublic) {
+			str += "public ";
+		} else if (info.IsPrivate) {
+			str += "private ";
+		} 
+		
+		if (info.IsFamily) {
+			str += "protected ";
+		}
+		if (info.IsAssembly) {
+			str += "internal ";
 		}
 		
-		str.Append(");");
+		
+		str += (info.DeclaringType.Name + "(");
+		
+		str += info.GetParameters().ParameterSummary();
+		
+		str += ");";
 		
 		return str.ToString();
 	}
 	
 	public static string Summary(this MethodInfo info) {
 		StringBuilder str = new StringBuilder();
-		
-		
-		
+
+		str += info.AttributeSummary();
+
 		if (info.IsPublic) {
-			str.Append("public ");
+			str += "public ";
 		} else if (info.IsPrivate) {
-			str.Append("private ");
+			str += "private ";
 		} 
 		
 		if (info.IsFamily) {
-			str.Append("protected ");
+			str += "protected ";
 		}
 		if (info.IsAssembly) {
-			str.Append("internal ");
+			str += "internal ";
 		}
 		
 		if (info.IsSpecialName) {
-			str.Append("hidden ");
+			str += "hidden ";
 		}
 		
 		
 		if (info.IsStatic) {
-			str.Append("static ");
+			str += "static ";
 		} else {
 			
 			if (info.IsVirtual) {
-				str.Append("virtual ");
+				str += "virtual ";
 			}
 			if (info.IsAbstract) {
-				str.Append("abstract ");
+				str += "abstract ";
 			}
 		}
-		str.Append(info.ReturnType.ShortName() + " " + info.Name + "(");
+		str += (info.ReturnType.ShortName() + " " + info.Name + "(");
 		
-		ParameterInfo[] pinfos = info.GetParameters();
-		for (int i = 0; i < pinfos.Length; i++) {
-			ParameterInfo pinfo = pinfos[i];
-			
-			
-			if (pinfo.IsOut) { str.Append("out "); }
-			str.Append(pinfo.ParameterType.ShortName() + " " + pinfo.Name);
-			/*
-			//Unity's Mono does not have this functionality... :(
-			if (pinfo.HasDefaultValue) {
-				str.Append(" = " + pinfo.DefaultValue.ToString().RemoveAll("\n"));
-			}
-			//*///
-			
-			if (i < pinfos.Length-1) { str.Append(", "); }
-			
-		}
+		str += info.GetParameters().ParameterSummary();
 		
-		str.Append(");");
+		
+		str += ");";
 		
 		return str.ToString();
 	}
 	
 	public static string Summary(this PropertyInfo info) {
 		StringBuilder str = new StringBuilder("");
-		
+
+
+		str += info.AttributeSummary();
+
 		if (info.IsPublic()) {
-			str.Append("public ");
+			str += "public ";
 		} else if (info.IsPrivate()) {
-			str.Append("private ");
+			str += "private ";
 		} 
 		
 		/*
 		if (info.IsFamily) {
-			str.Append("protected ");
+			str += "protected ");
 		}
 		if (info.IsAssembly) {
-			str.Append("internal ");
+			str += "internal ");
 		}
 		*/
 		
 		if (info.IsSpecialName) {
-			str.Append("hidden ");
+			str += "hidden ";
 		}
 		
 		
 		
 		if (info.IsStatic()) {
-			str.Append("static ");
+			str += "static ";
 		} else {
 			
 		}
 		
-		str.Append(info.PropertyType.ShortName() + " " + info.Name + " {");
+		str += (info.PropertyType.ShortName() + " " + info.Name + " {");
 		
 		MethodInfo getter = info.GetGetMethod();
 		MethodInfo setter = info.GetSetMethod();
 		
-		if (getter != null) { str.Append(" get; "); }
-		if (setter != null) { str.Append(" set; "); }
+		if (getter != null) { str += " get; "; }
+		if (setter != null) { str += " set; "; }
 		
-		str.Append("}");
+		str += "}";
 		
 		
 		return str.ToString();
@@ -630,38 +649,40 @@ public static class ReflectionUtils {
 	//[ZDoc("Creates A summary of a FieldInfo as an extension method.")]
 	public static string Summary(this FieldInfo info) {
 		StringBuilder str = new StringBuilder("");
-		
-		if (info.IsNotSerialized) {
-			str.Append("[System.NotSerialized] ");
-		}
+
+		str += info.AttributeSummary();
+
+		/*if (info.IsNotSerialized) {
+			str += "[System.NotSerialized] ";
+		}*/
 		
 		if (info.IsPublic) {
-			str.Append("public ");
+			str += "public ";
 		} else if (info.IsPrivate) {
-			str.Append("private ");
+			str += "private ";
 		} 
 		
 		
 		if (info.IsFamily) {
-			str.Append("protected ");
+			str += "protected ";
 		}
 		if (info.IsAssembly) {
-			str.Append("internal ");
+			str += "internal ";
 		}
 		
 		if (info.IsSpecialName) {
-			str.Append("hidden ");
+			str += "hidden ";
 		}
 		
 		
 		
 		if (info.IsStatic) {
-			str.Append("static ");
+			str += "static ";
 		} else {
 			
 		}
 		
-		str.Append(info.FieldType.ShortName() + " " + info.Name + ";");
+		str += (info.FieldType.ShortName() + " " + info.Name + ";");
 		
 		
 		

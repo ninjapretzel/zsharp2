@@ -6,6 +6,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
+public class Anchors {
+	/// <summary> returns new Rect(0, 0, 1, 1) </summary>
+	public static Rect stretchAll { get { return new Rect(0, 0, 1, 1); } }
+	/// <summary> returns new Rect(.5f, .5f, .5f, .5f) </summary>
+	public static Rect middleCenter { get { return new Rect(.5f, .5f, .5f, .5f); } }
+
+
+}
+
 #if XtoJSON
 public static class UGUIz {
 
@@ -17,9 +26,9 @@ public static class UGUIz {
 	const float textScaling = 4f;
 	
 	/// <summary> returns new Rect(0, 0, 1, 1) </summary>
-	public static Rect stretchAll { get { return new Rect(0, 0, 1, 1); } }
+	public static Rect stretchAll { get { return Anchors.stretchAll; } }
 	/// <summary> returns new Rect(.5f, .5f, .5f, .5f) </summary>
-	public static Rect middleCenter { get { return new Rect(.5f, .5f, .5f, .5f); } }
+	public static Rect middleCenter { get { return Anchors.middleCenter; } }
 
 	private static Canvas _canvas = null;
 	private static Transform _eventSystem = null;
@@ -76,9 +85,9 @@ public static class UGUIz {
 		sim.cancelButton = "Cancel";
 		sim.inputActionsPerSecond = 10;
 		sim.repeatDelay = .5f;
-		sim.allowActivationOnMobileDevice = false;
+		sim.forceModuleActive = false;
 
-		tim.allowActivationOnStandalone = false;
+		tim.forceModuleActive = false;
 
 
 		return obj.transform;
@@ -152,29 +161,29 @@ public static class UGUIz {
 
 
 	public static RectTransform MakeScrollView(Rect area, bool scrollHorizontal, bool scrollVertical) {
-		var obj = new GameObject("ScrollViewSetup");
+		var obj = new GameObject("ScrollView");
 		obj.layer = LAYER;
 		RectTransform rect = obj.transform.PositionRect(area, canvas.transform);
 		
 		if (scrollHorizontal) {
-			Rect hScrollArea = area.Right(.05f);
+			Rect hScrollArea = area.BottomLeft(.95f, .05f);
 			RectTransform hScrollBar = MakeScrollBar(hScrollArea, true).PositionRect(hScrollArea, obj.transform);
 		}
 
 		if (scrollVertical) {
-			Rect vScrollArea = area.Right(.05f);
+			Rect vScrollArea = area.UpperRight(.05f, .95f);
 			RectTransform vScrollBar = MakeScrollBar(vScrollArea, false).PositionRect(vScrollArea, obj.transform);
 		}
 
-		var scrollWindow = new GameObject("ScrollView");
-		scrollWindow.layer = LAYER;
+		var scrollWindow = Box(area, "", "background"); 
+		scrollWindow.gameObject.layer = LAYER;
 
 		return rect;
 	}
 
 
 	public static RectTransform MakeScrollBar(Rect area, bool isHorizontal, string style = "background", string handleStyle = "handle", UnityAction<float> onValChange = null) {
-		var obj = new GameObject("ScrollBar");
+		var obj = new GameObject((isHorizontal ? "Horizontal" : "Vertical") + "ScrollBar");
 		obj.layer = LAYER;
 		RectTransform rect = obj.transform.PositionRect(area);
 		rect.AddImage(style);
