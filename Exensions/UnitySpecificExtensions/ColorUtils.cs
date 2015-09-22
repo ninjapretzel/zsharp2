@@ -11,7 +11,7 @@ public static class Colors {
 
 	/// <summary> Create a hex string from a Color32, in the form #RRGGBBAA </summary>
 	public static string HexString(this Color32 c) {
-		string str = "#";
+		string str = "";
 		str += c.r.ToHex();
 		str += c.g.ToHex();
 		str += c.b.ToHex();
