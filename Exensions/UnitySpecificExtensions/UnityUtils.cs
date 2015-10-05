@@ -103,6 +103,14 @@ public static class UnityUtils {
 			}
 		}
 	}
+
+	public static void SetLayerRecursively(this GameObject go, int layer) {
+		if (go == null) { return; }
+		go.layer = layer;
+		foreach (Transform t in go.transform) {
+			t.gameObject.SetLayerRecursively(layer);
+		}
+	}
 	
 	
 	
