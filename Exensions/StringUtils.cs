@@ -415,35 +415,52 @@ public static class StringUtils {
 		return input.Replace("\\n", "\n");
 	}
 
-	// This will split a string using the split character, but ignores split characters which are between two
-	// of the "container" characters. For example, splitting the string using spaces unless inside quotes
-	// "I like pie" said the farmer.
-	// returns an array of strings { "I like pie", "said", "the", "farmer" }
-	public static List<string> SplitUnlessInContainer(this string st, char split, char container) {
-		List<string> result = new List<string>();
-		st = st.Trim(split);
-		if(st.IndexOf(split) < 0) {
-			if(st[0] == container && st[st.Length - 1] == container) {
-				result.Add(st.Substring(1, st.Length - 2));
-			} else {
-				result.Add(st);
+	/// <summary>
+	/// Splits a <c>string</c> using a Unicode character, unless that character is between two instances of a container.
+	/// </summary>
+	/// <param name="st">The <c>string</c> to split</param>
+	/// <param name="separator">Unicode character that delimits the substrings in this instance</param>
+	/// <param name="container">Container character. Any <paramref name="separator"/> characters that occur between two instances of this character will be ignored</param>
+	/// <returns>Array of <c>string</c> objects that are the resulting substrings</returns>
+	public static string[] SplitUnlessInContainer(this string st, char separator, char container, StringSplitOptions options = StringSplitOptions.None) {
+		List<string> results = new List<string>();
+		bool inContainer = false;
+		StringBuilder current = new StringBuilder();
+		foreach (char c in st) {
+			if (c == container) {
+				inContainer = !inContainer;
+				continue;
 			}
-		} else {
-			bool inContainer = false;
-			int lastSplitChar = -1;
-			for(int i = 0; i < st.Length; i++) {
-				if(st[i] == container) { inContainer = !inContainer; continue; }
-				if(!inContainer && st[i] == split) {
-					string substring = st.Substring(lastSplitChar + 1, i - lastSplitChar);
-					if(substring.Length > 0) {
-						result.Add(substring.Trim(split).Replace(container.ToString(), ""));
+
+			if (!inContainer) {
+				if (c == separator) {
+					switch (options) {
+						case StringSplitOptions.RemoveEmptyEntries: {
+							if (current.Length > 0) {
+								results.Add(current.ToString());
+							}
+							current.Length = 0;
+							break;
+						}
+						case StringSplitOptions.None: {
+							results.Add(current.ToString());
+							current.Length = 0;
+							break;
+						}
 					}
-					lastSplitChar = i;
+				} else {
+					current.Append(c);
 				}
+			} else {
+				current.Append(c);
 			}
-			result.Add(st.Substring(lastSplitChar + 1).Replace(container.ToString(), ""));
 		}
-		return result;
+
+		if (current.Length > 0) {
+			results.Add(current.ToString());
+		}
+
+		return results.ToArray<string>();
 	}
 
 	// Similar to the previous method, this will replace one character with another, but only outside of the container character.

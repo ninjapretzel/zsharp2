@@ -9,15 +9,152 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Reflection;
 
 public static class DataUtils {
-	
+
+	#region Maximal Selectors
+	public static T Maximal<T>(this IEnumerable<T> e, Func<T, float> selector) {
+		T max = default(T);
+		float val = float.MinValue;
+		foreach (T t in e) {
+			float tval = selector(t);
+			if (tval > val) {
+				val = tval;
+				max = t;
+			}
+		}
+
+		return max;
+	}
+	public static T Maximal<T>(this IEnumerable<T> e, Func<T, double> selector) {
+		T max = default(T);
+		double val = double.MinValue;
+		foreach (T t in e) {
+			double tval = selector(t);
+			if (tval > val) {
+				val = tval;
+				max = t;
+			}
+		}
+
+		return max;
+	}
+	public static T Maximal<T>(this IEnumerable<T> e, Func<T, int> selector) {
+		T max = default(T);
+		int val = int.MinValue;
+		foreach (T t in e) {
+			int tval = selector(t);
+			if (tval > val) {
+				val = tval;
+				max = t;
+			}
+		}
+
+		return max;
+	}
+	public static T Maximal<T>(this IEnumerable<T> e, Func<T, long> selector) {
+		T max = default(T);
+		long val = long.MinValue;
+		foreach (T t in e) {
+			long tval = selector(t);
+			if (tval > val) {
+				val = tval;
+				max = t;
+			}
+		}
+
+		return max;
+	}
+	public static T Maximal<T>(this IEnumerable<T> e, Func<T, decimal> selector) {
+		T max = default(T);
+		decimal val = decimal.MinValue;
+		foreach (T t in e) {
+			decimal tval = selector(t);
+			if (tval > val) {
+				val = tval;
+				max = t;
+			}
+		}
+
+		return max;
+	}
+	#endregion
+
+	#region Minimal Selectors
+	public static T Minimal<T>(this IEnumerable<T> e, Func<T, float> selector) {
+		T min = default(T);
+		float val = float.MaxValue;
+		foreach (T t in e) {
+			float tval = selector(t);
+			if (tval < val) {
+				val = tval;
+				min = t;
+			}
+		}
+
+		return min;
+	}
+	public static T Minimal<T>(this IEnumerable<T> e, Func<T, double> selector) {
+		T min = default(T);
+		double val = double.MaxValue;
+		foreach (T t in e) {
+			double tval = selector(t);
+			if (tval < val) {
+				val = tval;
+				min = t;
+			}
+		}
+
+		return min;
+	}
+	public static T Minimal<T>(this IEnumerable<T> e, Func<T, int> selector) {
+		T min = default(T);
+		int val = int.MaxValue;
+		foreach (T t in e) {
+			int tval = selector(t);
+			if (tval < val) {
+				val = tval;
+				min = t;
+			}
+		}
+
+		return min;
+	}
+	public static T Minimal<T>(this IEnumerable<T> e, Func<T, long> selector) {
+		T min = default(T);
+		long val = long.MaxValue;
+		foreach (T t in e) {
+			long tval = selector(t);
+			if (tval < val) {
+				val = tval;
+				min = t;
+			}
+		}
+
+		return min;
+	}
+	public static T Minimal<T>(this IEnumerable<T> e, Func<T, decimal> selector) {
+		T min = default(T);
+		decimal val = decimal.MaxValue;
+		foreach (T t in e) {
+			decimal tval = selector(t);
+			if (tval < val) {
+				val = tval;
+				min = t;
+			}
+		}
+
+		return min;
+	}
+
+	#endregion
+
 	public static void LogEach<T>(this T[] array) { array.LogEach(1); }
 	public static void LogEach<T>(this T[] array, int perLine) {
 		StringBuilder str = new StringBuilder();
 		
-		for (int i = 0; i < array.Length; i++) {
+		for (int i = 0; i < array.Length; ++i) {
 			str.Append(array[i].ToString());
 			str.Append(", ");
-			if ((1+i)%perLine == 0) { str.Append('\n'); }
+			if ((1 + i) % perLine == 0) { str.Append('\n'); }
 		}
 		Debug.Log(str.ToString());
 	}
@@ -26,7 +163,7 @@ public static class DataUtils {
 	public static int SimpleHash(this byte[] data) {
 		if (data != null) {
 			int res = data.Length * data.Length * 31337;
-			for (int i=0;i<data.Length;i++) {
+			for (int i = 0; i < data.Length; ++i) {
 				res ^= (data[i] << ((i % 4) * 8));
 			}
 			return res;
@@ -41,7 +178,7 @@ public static class DataUtils {
 			size = array.Length - start;
 		}
 		byte[] chopped = new byte[size];
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < size; ++i) {
 			chopped[i] = array[i + start];
 		}
 		return chopped;
@@ -75,10 +212,10 @@ public static class DataUtils {
 	public static List<int> Permutation(int max) { return Permutation(max, max); }
 	public static List<int> Permutation(int max, int length) {
 		List<int> nums = new List<int>(max);
-		for (int i = 0; i < max; i++) { nums.Add(i); }
+		for (int i = 0; i < max; ++i) { nums.Add(i); }
 		
 		List<int> chosen = new List<int>(length);
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < length; ++i) {
 			int j = nums.RandomIndex();
 			chosen.Add(nums[j]);
 			nums.RemoveAt(j);
@@ -89,7 +226,7 @@ public static class DataUtils {
 	
 	public static List<T> TrimToLength<T>(this List<T> list, int length) {
 		List<T> l = new List<T>();
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < length; ++i) {
 			l.Add(list[i]);
 		}
 		return l;
@@ -117,33 +254,33 @@ public static class DataUtils {
 	public static Vector3 ToVector3(this byte[] b, int i) {
 		Vector3 v = Vector3.zero;
 		v.x = b.ToFloat(i);
-		v.y = b.ToFloat(i+4);
-		v.z = b.ToFloat(i+8);
+		v.y = b.ToFloat(i + 4);
+		v.z = b.ToFloat(i + 8);
 		return v;
 	}
 	
 	public static Quaternion ToQuaternion(this byte[] b, int i) {
 		Quaternion q = Quaternion.identity;
 		q.x = b.ToFloat(i);
-		q.y = b.ToFloat(i+4);
-		q.z = b.ToFloat(i+8);
-		q.w = b.ToFloat(i+12);
+		q.y = b.ToFloat(i + 4);
+		q.z = b.ToFloat(i + 8);
+		q.w = b.ToFloat(i + 12);
 		return q;
 	}
 	
 	//Quick stupid accessor functions
-	public static T LastElement<T>(this List<T> list) { if (list.Count == 0) { return default(T); } return list[list.Count-1]; }
+	public static T LastElement<T>(this List<T> list) { if (list.Count == 0) { return default(T); } return list[list.Count - 1]; }
 	public static T FirstElement<T>(this List<T> list) { return list[0]; }
 	
 	//Get the nth element from the end of the list
-	public static T FromEnd<T>(this List<T> list, int offset) { return list[list.Count-1-offset]; }
+	public static T FromEnd<T>(this List<T> list, int offset) { return list[list.Count - 1 - offset]; }
 	
 	//Add a list to the end of this list.
 	public static void Append<T>(this List<T> list, List<T> add) { foreach (T o in add) { list.Add(o); } }
 	public static void Append<T>(this List<T> list, T[] add) { foreach (T o in add) { list.Add(o); } }
 	
 	public static int IndexOf<T>(this List<T> list, Func<T, bool> search) {
-		for (int i = 0; i < list.Count; i++) {
+		for (int i = 0; i < list.Count; ++i) {
 			if (search(list[i])) { return i; }
 		}
 		return -1;
@@ -181,10 +318,10 @@ public static class DataUtils {
 	public static string ListString<T>(this List<T> list) { return list.ListString<T>(','); }
 	public static string ListString<T>(this List<T> list, char delim) {
 		StringBuilder str = new StringBuilder();
-		for (int i = 0; i < list.Count; i++) {
+		for (int i = 0; i < list.Count; ++i) {
 			T t = list[i];
 			str.Append(t);
-			if (i != list.Count-1) { str.Append(""+delim); }
+			if (i != list.Count - 1) { str.Append("" + delim); }
 		}
 		return str.ToString();
 	}
@@ -196,7 +333,7 @@ public static class DataUtils {
 		if (num >= list.Count) { return list.Shuffled(); }
 		List<T> stuff = list.Clone();
 		List<T> chosen = new List<T>();
-		for (int i = 0; i < num; i++) {
+		for (int i = 0; i < num; ++i) {
 			int index = stuff.RandomIndex();
 			chosen.Add(stuff[index]);
 			stuff.RemoveAt(index);
@@ -221,7 +358,7 @@ public static class DataUtils {
 		
 		List<T> chosen = new List<T>();
 		
-		for (int i = 0; i < num; i++) {
+		for (int i = 0; i < num; ++i) {
 			int index = Random.WeightedChoose(weightsCopy);
 			//Debug.Log(index);
 			
@@ -238,7 +375,7 @@ public static class DataUtils {
 	public static List<T> Shuffled<T>(this List<T> list) {
 		List<T> stuff = list.Clone();
 		List<T> shuffled = new List<T>(list.Count);
-		for (int i = 0; i < list.Count; i++) {
+		for (int i = 0; i < list.Count; ++i) {
 			int index = stuff.RandomIndex();
 			shuffled[i] = stuff[index];
 			stuff.RemoveAt(index);
@@ -265,7 +402,7 @@ public static class DataUtils {
 	//Does not mutate original list.
 	public static List<T> RemoveAll<T>(this List<T> list, T toRemove) {
 		List<T> l = new List<T>(list.Count);
-		for (int i = 0; i < list.Count; i++) {
+		for (int i = 0; i < list.Count; ++i) {
 			if (!list[i].Equals(toRemove)) {
 				l.Add(list[i]);
 			}
@@ -276,21 +413,21 @@ public static class DataUtils {
 	//Generate an array of strings from a list of objects
 	public static string[] ToStringArray<T>(this List<T> list) {
 		string[] strings = new string[list.Count];
-		for (int i = 0; i < list.Count; i++) { strings[i] = list[i].ToString(); }
+		for (int i = 0; i < list.Count; ++i) { strings[i] = list[i].ToString(); }
 		return strings;
 	}
 	
 	//Generate a list of strings from a list of objects
 	public static List<string> ToStringList<T>(this List<T> list) {
 		List<string> strings = new List<string>(list.Count);
-		for (int i = 0; i < list.Count; i++) { strings.Add(list[i].ToString()); }
+		for (int i = 0; i < list.Count; ++i) { strings.Add(list[i].ToString()); }
 		return strings;
 	}
 	
 	//Generate an array of strings from an array of objects
 	public static string[] ToStringArray<T>(this T[] list) {
 		string[] strings = new string[list.Length];
-		for (int i = 0; i < list.Length; i++) { strings[i] = list[i].ToString(); }
+		for (int i = 0; i < list.Length; ++i) { strings[i] = list[i].ToString(); }
 		return strings;
 	}
 	
@@ -298,16 +435,16 @@ public static class DataUtils {
 	//Another list containing all of the elements in the same order as another list
 	public static List<T> Clone<T>(this List<T> list) {
 		List<T> clone = new List<T>(list.Count);
-		for (int i = 0; i < list.Count; i++) { clone.Add(list[i]); }
+		for (int i = 0; i < list.Count; ++i) { clone.Add(list[i]); }
 		return clone;
 	}
 	
 	//Quick stupid accessors for arrays
-	public static T LastElement<T>(this T[] list) { return list[list.Length-1]; }
+	public static T LastElement<T>(this T[] list) { return list[list.Length - 1]; }
 	public static T FirstElement<T>(this T[] list) { return list[0]; }
 	
 	//Grab the nth element from the end of the list
-	public static T FromEnd<T>(this T[] list, int offset) { return list[list.Length-1-offset]; }
+	public static T FromEnd<T>(this T[] list, int offset) { return list[list.Length - 1 - offset]; }
 	
 	//Get a random valid index
 	public static int RandomIndex<T>(this T[] array) { return (int)(Random.value * array.Length); }
@@ -321,7 +458,7 @@ public static class DataUtils {
 	
 	//Choose an element from an array using weights
 	public static T Choose<T>(this T[] array, float[] weights) {
-		int index = (int)Mathf.Clamp(Random.WeightedChoose(weights), 0, array.Length-1);
+		int index = (int)Mathf.Clamp(Random.WeightedChoose(weights), 0, array.Length - 1);
 		return array[index];
 	}
 	
@@ -329,8 +466,8 @@ public static class DataUtils {
 	
 	public static string LoadTextAsset(string filename) {
 		TextAsset file = Resources.Load(filename, typeof(TextAsset)) as TextAsset;
-		if (file == null) { 
-			Debug.Log("Tried to load " + filename + ".txt/" + filename + ".csv - File does not exist");
+		if (file == null) {
+			Debug.LogFormat("Tried to load {0}.txt/{0}.csv - File does not exist", filename);
 			return "";
 		}
 		return file.text;
@@ -347,7 +484,7 @@ public static class DataUtils {
 	
 	//Further converts it into a list by newlines and ','
 	public static List<string> LoadList(string filename) {
-		string text = Load(filename).ConvertNewlines().Replace(",\n","\n").Replace("\n", ",");
+		string text = Load(filename).ConvertNewlines().Replace(",\n", "\n").Replace("\n", ",");
 		return text.Split(',').ToList();
 		
 	}
@@ -359,106 +496,111 @@ public static class DataUtils {
 	/// Returns: object reference of the result. Null if improper parameters.
 	/// </summary>
 	/// <param name="typeName">The type of the returned object</param>
-	/// <returns></returns>
-	public static object ParseParameterListIntoType(this List<string> parameters, string typeName) {
+	/// <returns>The resulting object</returns>
+	public static object ParseParameterListIntoType(this string[] parameters, string typeName) {
 		switch(typeName) {
-			case "Vector2":
+			case "Vector2": {
 				Vector2 targetV2;
 				PropertyInfo vector2ByName = typeof(Vector2).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
-				if(vector2ByName != null) {
-					if(parameters.Count != 1) { return null; }
+				if (vector2ByName != null) {
+					if (parameters.Length != 1) { return null; }
 					targetV2 = (Vector2)vector2ByName.GetValue(null, null);
 				} else {
-					if(parameters.Count != 2) { return null; }
+					if (parameters.Length != 2) { return null; }
 					float x = 0.0f;
 					try {
 						x = System.Single.Parse(parameters[0]);
-					} catch(System.FormatException) { return null; }
+					} catch (System.FormatException) { return null; }
 					float y = 0.0f;
 					try {
 						y = System.Single.Parse(parameters[1]);
-					} catch(System.FormatException) { return null; }
+					} catch (System.FormatException) { return null; }
 					targetV2 = new Vector2(x, y);
 				}
 				return targetV2;
-			case "Vector3":
+			}
+			case "Vector3": {
 				Vector3 targetV3;
 				PropertyInfo vector3ByName = typeof(Vector3).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
-				if(vector3ByName != null) {
-					if(parameters.Count != 1) { return null; }
+				if (vector3ByName != null) {
+					if (parameters.Length != 1) { return null; }
 					targetV3 = (Vector3)vector3ByName.GetValue(null, null);
 				} else {
-					if(parameters.Count != 3) { return null; }
+					if (parameters.Length != 3) { return null; }
 					float x = 0.0f;
 					try {
 						x = System.Single.Parse(parameters[0]);
-					} catch(System.FormatException) { return null; }
+					} catch (System.FormatException) { return null; }
 					float y = 0.0f;
 					try {
 						y = System.Single.Parse(parameters[1]);
-					} catch(System.FormatException) { return null; }
+					} catch (System.FormatException) { return null; }
 					float z = 0.0f;
 					try {
 						z = System.Single.Parse(parameters[2]);
-					} catch(System.FormatException) { return null; }
+					} catch (System.FormatException) { return null; }
 					targetV3 = new Vector3(x, y, z);
 				}
 				return targetV3;
-			case "Color":
+			}
+			case "Color": {
 				Color targetColor;
 				PropertyInfo colorByName = typeof(Color).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
-				if(colorByName != null) {
-					if(parameters.Count != 1) { return null; }
+				if (colorByName != null) {
+					if (parameters.Length != 1) { return null; }
 					targetColor = (Color)colorByName.GetValue(null, null);
 				} else {
-					if(parameters.Count != 4) { return null; }
+					if (parameters.Length != 4) { return null; }
 					float r = 0.0f;
 					try {
 						r = System.Single.Parse(parameters[0]);
-					} catch(System.FormatException) { return null; }
+					} catch (System.FormatException) { return null; }
 					float g = 0.0f;
 					try {
 						g = System.Single.Parse(parameters[1]);
-					} catch(System.FormatException) { return null; }
+					} catch (System.FormatException) { return null; }
 					float b = 0.0f;
 					try {
 						b = System.Single.Parse(parameters[2]);
-					} catch(System.FormatException) { return null; }
+					} catch (System.FormatException) { return null; }
 					float a = 1.0f;
 					try {
 						a = System.Single.Parse(parameters[3]);
-					} catch(System.FormatException) { return null; }
+					} catch (System.FormatException) { return null; }
 					targetColor = new Color(r, g, b, a);
 				}
 				return targetColor;
-			case "Rect":
-				if(parameters.Count != 4) { return null; }
+			}
+			case "Rect": {
+				if (parameters.Length != 4) { return null; }
 				Rect targetRect;
 				float l = 0.0f;
 				try {
 					l = System.Single.Parse(parameters[0]);
-				} catch(System.FormatException) { return null; }
+				} catch (System.FormatException) { return null; }
 				float t = 0.0f;
 				try {
 					t = System.Single.Parse(parameters[1]);
-				} catch(System.FormatException) { return null; }
+				} catch (System.FormatException) { return null; }
 				float w = 0.0f;
 				try {
 					w = System.Single.Parse(parameters[2]);
-				} catch(System.FormatException) { return null; }
+				} catch (System.FormatException) { return null; }
 				float h = 1.0f;
 				try {
 					h = System.Single.Parse(parameters[3]);
-				} catch(System.FormatException) { return null; }
+				} catch (System.FormatException) { return null; }
 				targetRect = new Rect(l, t, w, h);
 				return targetRect;
-			case "String":
+			}
+			case "String": {
 				System.Text.StringBuilder bob = new System.Text.StringBuilder();
-				foreach(string st in parameters) {
+				foreach (string st in parameters) {
 					bob.Append(st + " ");
 				}
 				string allparams = bob.ToString();
 				return allparams.Substring(0, allparams.Length - 1);
+			}
 			case "Char":
 			case "SByte":
 			case "Int16":
@@ -469,34 +611,37 @@ public static class DataUtils {
 			case "UInt32":
 			case "UInt64":
 			case "Single":
-			case "Double":
-				if(parameters.Count != 1) { return null; }
+			case "Double": {
+				if (parameters.Length != 1) { return null; }
 				try {
 					// Use reflection to call the proper Parse method. Because I can.
-					return System.Type.GetType("System."+typeName).GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new System.Type[] { typeof(string) }, null).Invoke(null, new string[] { parameters[0] });
-				} catch(System.Reflection.TargetInvocationException) { // Is thrown in place of the Parse method's exceptions
+					return System.Type.GetType("System." + typeName).GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new System.Type[] { typeof(string) }, null).Invoke(null, new string[] { parameters[0] });
+				} catch (System.Reflection.TargetInvocationException) { // Is thrown in place of the Parse method's exceptions
 					return null;
 				}
-			case "Boolean":
-				if(parameters.Count != 1) { return null; }
-				if(parameters[0] == "1" || parameters[0].Equals("on", System.StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("yes", System.StringComparison.InvariantCultureIgnoreCase)) {
+			}
+			case "Boolean": {
+				if (parameters.Length != 1) { return null; }
+				if (parameters[0] == "1" || parameters[0].Equals("on", System.StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("yes", System.StringComparison.InvariantCultureIgnoreCase)) {
 					return true;
-				} else if(parameters[0] == "0" || parameters[0].Equals("off", System.StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("no", System.StringComparison.InvariantCultureIgnoreCase)) {
+				} else if (parameters[0] == "0" || parameters[0].Equals("off", System.StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("no", System.StringComparison.InvariantCultureIgnoreCase)) {
 					return false;
 				} else {
 					try {
 						float val = System.Single.Parse(parameters[0]);
 						return val >= 0.5f;
-					} catch(System.FormatException) {
+					} catch (System.FormatException) {
 						try {
 							return System.Boolean.Parse(parameters[0]);
-						} catch(System.FormatException) {
+						} catch (System.FormatException) {
 							return null;
 						}
 					}
 				}
-			default:
+			}
+			default: {
 				return null;
+			}
 		}
 
 	}
@@ -570,8 +715,8 @@ public static class DataFUnity {
 	}
 
 	/*public static bool Contains<T>(this T[] a, T search) where T : IEquatable<T> {
-		foreach(T item in a) {
-			if(item.Equals(search)) {
+		foreach (T item in a) {
+			if (item.Equals(search)) {
 				return true;
 			}
 		}
@@ -591,12 +736,12 @@ public static class DataFTable {
 	public static List<Color> ToColorList(this Table table) {
 		List<Color> list = new List<Color>();
 		int i = 0;
-		string key = ""+i;
+		string key = i.ToString();
 		while (table.ContainsColor(key)) {
 			list.Add(table.GetColor(key));
 			
-			i++;
-			key = "" + i;
+			++i;
+			key = i.ToString();
 		}
 		
 		return list;
@@ -606,8 +751,8 @@ public static class DataFTable {
 	public static Table ToTable(this List<Color> list) {
 		Table t = new Table();
 		
-		for (int i = 0; i < list.Count; i++) {
-			t.SetColor("" + i, list[i]); 
+		for (int i = 0; i < list.Count; ++i) {
+			t.SetColor(i.ToString(), list[i]); 
 		}
 		
 		return t;
@@ -616,8 +761,8 @@ public static class DataFTable {
 	public static Table ToTable(this Color[] array) {
 		Table t = new Table();
 		
-		for (int i = 0; i < array.Length; i++) {
-			t.SetColor("" + i, array[i]);
+		for (int i = 0; i < array.Length; ++i) {
+			t.SetColor(i.ToString(), array[i]);
 		}
 		
 		return t;
@@ -659,9 +804,9 @@ public static class DataFiles {
 			try {
 				File.WriteAllText(targetFile, values.PrettyPrint());
 				File.Delete(file);
-				Debug.Log("Converted " + file + " to json successfully");
+				Debug.LogFormat("Converted {0} to json successfully", file);
 			} catch (Exception e) {
-				Debug.Log("Tried to convert " + file + " to json. Unsuccessful: " + e.GetType());
+				Debug.LogFormat("Tried to convert {0} to json. Unsuccessful: {1}", file, e.GetType());
 			}
 			
 			

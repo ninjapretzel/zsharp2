@@ -33,8 +33,8 @@ public class DevConsole : MonoBehaviour {
 	public void Awake() {
 		autoexecPath = Application.persistentDataPath + "/autoexec.cfg";
 		classBlacklist = blacklistedClasses.ToList<string>();
-		if(!classBlacklist.Contains("InAppPurchases")) { classBlacklist.Add("InAppPurchases"); }
-		if(!classBlacklist.Contains("AdManager")) { classBlacklist.Add("AdManager"); }
+		if (!classBlacklist.Contains("InAppPurchases")) { classBlacklist.Add("InAppPurchases"); }
+		if (!classBlacklist.Contains("AdManager")) { classBlacklist.Add("AdManager"); }
 
 	}
 
@@ -45,7 +45,7 @@ public class DevConsole : MonoBehaviour {
 			.Area(Screen.all.MiddleCenter(0.7f, 0.8f).Move(0.1f, 0.0f));
 		window.textWindow = initialText.ParseNewlines();
 
-		if(File.Exists(configPath)) {
+		if (File.Exists(configPath)) {
 			Execute(persistent.Split('\n'));
 			// If config exists, clear binds after loading persistent file (we want the default aliases but not the keybinds)
 			binds = new Dictionary<KeyCode, string>();
@@ -54,7 +54,7 @@ public class DevConsole : MonoBehaviour {
 #endif
 			// All preexisting keybinds will be reloaded from this file instead
 			Exec(configPath);
-			if(File.Exists(autoexecPath)) {
+			if (File.Exists(autoexecPath)) {
 				Exec(autoexecPath);
 			}
 			//Clear();
@@ -81,71 +81,70 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public void Update() {
-		if(!window.open) {
-			foreach(KeyCode bind in binds.Keys) {
-				if(Input.GetKeyDown(bind)) {
-					Execute(binds[bind]);
+		if (!window.open) {
+			foreach (KeyValuePair<KeyCode, string> pair in binds) {
+				if (Input.GetKeyDown(pair.Key)) {
+					Execute(pair.Value);
 				}
-				if(binds[bind][0] == '+') {
-					if(Input.GetKeyUp(bind)) {
-						int semicolonindex = binds[bind].IndexOf(';');
-						if(semicolonindex > 0) {
-							Execute('-' + binds[bind].Substring(1, semicolonindex - 1));
-						} else {
-							Execute('-' + binds[bind].Substring(1));
+				if (Input.GetKeyUp(pair.Key)) {
+					string[] cmds = pair.Value.SplitUnlessInContainer(';', '\"', System.StringSplitOptions.RemoveEmptyEntries);
+					foreach (string cmd in cmds) {
+						if (cmd[0] == '+') {
+							Execute('-' + cmd.Substring(1));
 						}
 					}
+
 				}
 			}
-			foreach(string mapping in axisMappings.Keys) {
-				if(mapping[mapping.Length - 1] == '-') {
-					string axis = mapping.Substring(0, mapping.Length - 1);
-					if(axisMappings[mapping].Contains("%value%") || axisMappings[mapping].Contains("%nvalue%")) {
-						if(Input.GetAxisRaw(axis) < 0) {
-							Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
+			foreach (KeyValuePair<string, string> pair in axisMappings) {
+				if (pair.Key[pair.Key.Length - 1] == '-') {
+					string axis = pair.Key.Substring(0, pair.Key.Length - 1);
+					if (pair.Value.Contains("%value%") || pair.Value.Contains("%nvalue%")) {
+						if (Input.GetAxisRaw(axis) < 0) {
+							Execute(pair.Value.Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
 						} else {
-							Execute(axisMappings[mapping].Replace("%value%", "0").Replace("%nvalue%", "0"));
+							Execute(pair.Value.Replace("%value%", "0").Replace("%nvalue%", "0"));
 						}
 					} else {
-						if(Input.GetAxisRaw(axis) < -0.5f) {
-							Execute(axisMappings[mapping]);
+						if (Input.GetAxisRaw(axis) < -0.5f) {
+							Execute(pair.Value);
 						}
-						if(axisMappings[mapping][0] == '+') {
-							if(Input.GetAxisRaw(axis) >= -0.5f) {
-								int semicolonindex = axisMappings[mapping].IndexOf(';');
-								if(semicolonindex > 0) {
-									Execute('-' + axisMappings[mapping].Substring(1, semicolonindex - 1));
+						if (pair.Value[0] == '+') {
+							if (Input.GetAxisRaw(axis) >= -0.5f) {
+								int semicolonindex = pair.Value.IndexOf(';');
+								if (semicolonindex > 0) {
+									Execute('-' + pair.Value.Substring(1, semicolonindex - 1));
 								} else {
-									Execute('-' + axisMappings[mapping].Substring(1));
+									Execute('-' + pair.Value.Substring(1));
 								}
 							}
 						}
 					}
-				} else if(mapping[mapping.Length - 1] == '+') {
-					string axis = mapping.Substring(0, mapping.Length - 1);
-					if(axisMappings[mapping].Contains("%value%") || axisMappings[mapping].Contains("%nvalue%")) {
-						if(Input.GetAxisRaw(axis) > 0) {
-							Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
+				} else if (pair.Key[pair.Key.Length - 1] == '+') {
+					string axis = pair.Key.Substring(0, pair.Key.Length - 1);
+					if (pair.Value.Contains("%value%") || pair.Value.Contains("%nvalue%")) {
+						if (Input.GetAxisRaw(axis) > 0) {
+							Execute(pair.Value.Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
 						} else {
-							Execute(axisMappings[mapping].Replace("%value%", "0").Replace("%nvalue%", "0"));
+							Execute(pair.Value.Replace("%value%", "0").Replace("%nvalue%", "0"));
 						}
 					} else {
-						if(Input.GetAxisRaw(axis) > 0.5f) {
-							Execute(axisMappings[mapping]);
+						if (Input.GetAxisRaw(axis) > 0.5f) {
+							Execute(pair.Value);
 						}
-						if(axisMappings[mapping][0] == '+') {
-							if(Input.GetAxisRaw(axis) <= 0.5f) {
-								int semicolonindex = axisMappings[mapping].IndexOf(';');
-								if(semicolonindex > 0) {
-									Execute('-' + axisMappings[mapping].Substring(1, semicolonindex - 1));
+						if (pair.Value[0] == '+') {
+							if (Input.GetAxisRaw(axis) <= 0.5f) {
+								int semicolonindex = pair.Value.IndexOf(';');
+								if (semicolonindex > 0) {
+									Execute('-' + pair.Value.Substring(1, semicolonindex - 1));
 								} else {
-									Execute('-' + axisMappings[mapping].Substring(1));
+									Execute('-' + pair.Value.Substring(1));
 								}
 							}
 						}
 					}
 				} else {
-					Execute(axisMappings[mapping].Replace("%value%", Input.GetAxisRaw(mapping).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(mapping)).ToString()));
+					Execute(pair.Value.Replace("%value%", Input.GetAxisRaw(pair.Key).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(pair.Key)).ToString()));
 				}
 			}
 		} else {
@@ -187,13 +186,13 @@ public class DevConsole : MonoBehaviour {
 		float heightOfFont = GUI.skin.button.LineSize();
 
 		// Handle some inputs
-		if(((Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return) || (GUI.Button(new Rect(consoleWindowRect.width * 0.9f + 5.0f, consoleWindowRect.height - heightOfFont - 5.0f, consoleWindowRect.width * 0.1f - 10.0f, heightOfFont), "Send"))) && window.textField.Length > 0) {
+		if (((Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return) || (GUI.Button(new Rect(consoleWindowRect.width * 0.9f + 5.0f, consoleWindowRect.height - heightOfFont - 5.0f, consoleWindowRect.width * 0.1f - 10.0f, heightOfFont), "Send"))) && window.textField.Length > 0) {
 			Echo("> " + window.textField);
 			try {
 				// Execute the current line
 				Execute(window.textField);
-			} catch(System.Exception e) {
-				Debug.LogError("Internal error executing console command:\n"+e);
+			} catch (System.Exception e) {
+				Debug.LogError("Internal error executing console command:\n" + e);
 			}
 			window.previousCommands.Add(window.textField);
 			window.cmdIndex = window.previousCommands.Count;
@@ -211,7 +210,7 @@ public class DevConsole : MonoBehaviour {
 		}
 		GUI.SetNextControlName("ConsoleInput");
 		window.textField = GUI.TextField(new Rect(5.0f, consoleWindowRect.height - heightOfFont - 5.0f, consoleWindowRect.width * 0.9f - 10.0f, heightOfFont), window.textField);
-		if(window.focusTheTextField) {
+		if (window.focusTheTextField) {
 			GUI.FocusControl("ConsoleInput");
 			window.focusTheTextField = false;
 		}
@@ -235,7 +234,7 @@ public class DevConsole : MonoBehaviour {
 #endif
 
 	public static void Execute(string[] lines) {
-		foreach(string line in lines) {
+		foreach (string line in lines) {
 			Execute(line);
 		}
 	}
@@ -250,10 +249,10 @@ public class DevConsole : MonoBehaviour {
 	// Order: Fields (Variables), Methods (Functions), Properties, Aliases
 	public static void Execute(string line) {
 		line = line.Trim();
-		if(line.Length < 1) { return; }
+		if (line.Length < 1) { return; }
 		// Allow for multiple commands separated by a semicolon
-		List<string> substrings = line.SplitUnlessInContainer(';', '\"');
-		if(substrings.Count > 1) {
+		string[] substrings = line.SplitUnlessInContainer(';', '\"');
+		if (substrings.Length > 1) {
 			foreach(string st in substrings) {
 				Execute(st);
 			}
@@ -262,7 +261,7 @@ public class DevConsole : MonoBehaviour {
 			int indexOfSpace = line.IndexOf(' ');
 			string command = "";
 			string parameters = "";
-			if(indexOfSpace > 0) {
+			if (indexOfSpace > 0) {
 				command = line.Substring(0, indexOfSpace);
 				parameters = line.Substring(indexOfSpace+1).Trim();
 			} else {
@@ -274,9 +273,9 @@ public class DevConsole : MonoBehaviour {
 			// Separate class specification from member call
 			int indexOfDot = command.LastIndexOf('.');
 			System.Type targetClass = null;
-			if(indexOfDot > 0) {
+			if (indexOfDot > 0) {
 				targetClassName = command.Substring(0, indexOfDot);
-				if(classBlacklist.Contains(targetClassName)) {
+				if (classBlacklist.Contains(targetClassName)) {
 #if !UNITY_DEBUG && !UNITY_EDITOR
 					Echo("Unknown command: "+command);
 					return;
@@ -296,12 +295,12 @@ public class DevConsole : MonoBehaviour {
 				targetMemberName = command;
 			}
 			// Attempt to reference the named member in named class
-			if(targetClass != null) {
+			if (targetClass != null) {
 				try {
-					if(!CallField(targetClass, targetMemberName, parameters)) {
-						if(!CallMethod(targetClass, targetMemberName, parameters)) {
-							if(!CallProperty(targetClass, targetMemberName, parameters)) {
-								if(!aliases.ContainsKey(command)) {
+					if (!CallField(targetClass, targetMemberName, parameters)) {
+						if (!CallMethod(targetClass, targetMemberName, parameters)) {
+							if (!CallProperty(targetClass, targetMemberName, parameters)) {
+								if (!aliases.ContainsKey(command)) {
 									Echo("Unknown command: "+command);
 								} else {
 									Execute(aliases[command] + " " + parameters);
@@ -309,7 +308,7 @@ public class DevConsole : MonoBehaviour {
 							}
 						}
 					}
-				} catch(TargetInvocationException e) {
+				} catch (TargetInvocationException e) {
 					DevConsole.Echo("Console triggered an exception in the runtime.\n" + e.ToString().Substring(108, e.ToString().IndexOf('\n') - 109));
 #if UNITY_DEBUG || UNITY_EDITOR
 					throw e;
@@ -328,24 +327,24 @@ public class DevConsole : MonoBehaviour {
 		// Attempt to find the field
 		FieldInfo targetVar = targetClass.GetField(varName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 		object targetInstance = null;
-		if(targetVar == null) {
+		if (targetVar == null) {
 			targetInstance = GetMainOfClass(targetClass);
-			if(targetInstance != null) {
+			if (targetInstance != null) {
 				targetVar = targetClass.GetField(varName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
 			}
 		}
-		if(targetVar == null || !IsAccessible(targetVar)) { return false; } // Fail: Couldn't find field, or it's marked inaccessible
+		if (targetVar == null || !IsAccessible(targetVar)) { return false; } // Fail: Couldn't find field, or it's marked inaccessible
 		// If field is found, deal with it appropriately based on the parameters given
-		if(parameters == null || parameters.Length < 1) {
+		if (parameters == null || parameters.Length < 1) {
 			string output = GetFieldValue(targetInstance, targetVar);
-			if(output == null) { return false; } // Fail: Field is not of a supported type
+			if (output == null) { return false; } // Fail: Field is not of a supported type
 			Echo(varName + " is " + output);
 			return true; // Success: Value is printed when no parameters given
 		}
-		if(IsCheat(targetVar) && !cheats) {
+		if (IsCheat(targetVar) && !cheats) {
 			PrintCheatMessage(targetVar.Name);
 		} else {
-			if(!SetFieldValue(targetInstance, targetVar, parameters.SplitUnlessInContainer(' ', '\"'))) {
+			if (!SetFieldValue(targetInstance, targetVar, parameters.SplitUnlessInContainer(' ', '\"'))) {
 				Echo("Invalid " + targetVar.FieldType.Name + ": " + parameters);
 			}
 		}
@@ -355,10 +354,10 @@ public class DevConsole : MonoBehaviour {
 	// Get the current value of the specified field owned by instance. If instance is null then field is static.
 	// Returns: results of the ToString method when called on the field, or null if field is of unsupported type.
 	public static string GetFieldValue(object instance, FieldInfo fieldInfo) {
-		if(fieldInfo == null) { return null; }
+		if (fieldInfo == null) { return null; }
 		// Only support types that can also be set by the user (see ParseParameterListIntoType)
 		// so as not to mislead the user into thinking they can modify other types of variables
-		switch(fieldInfo.FieldType.Name) {
+		switch (fieldInfo.FieldType.Name) {
 			case "Vector2":
 			case "Vector3":
 			case "Color":
@@ -374,18 +373,20 @@ public class DevConsole : MonoBehaviour {
 			case "UInt64":
 			case "Single":
 			case "Double":
-			case "Boolean":
+			case "Boolean": {
 				return fieldInfo.GetValue(instance).ToString();
-			default:
+			}
+			default: {
 				return null;
+			}
 		}
 	}
 
 	// Set the current value of the specified field owned by instance. If instance is null then field is static.
 	// Returns: boolean indicating whether the field was successfully changed
-	public static bool SetFieldValue(object instance, FieldInfo fieldInfo, List<string> parameters) {
+	public static bool SetFieldValue(object instance, FieldInfo fieldInfo, string[] parameters) {
 		object result = parameters.ParseParameterListIntoType(fieldInfo.FieldType.Name);
-		if(result != null) {
+		if (result != null) {
 			fieldInfo.SetValue(instance, result);
 			return true;
 		} else {
@@ -399,24 +400,24 @@ public class DevConsole : MonoBehaviour {
 		// Attempt to find the property
 		PropertyInfo targetProperty = targetClass.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 		object targetInstance = null;
-		if(targetProperty == null) {
+		if (targetProperty == null) {
 			targetInstance = GetMainOfClass(targetClass);
-			if(targetInstance != null) {
+			if (targetInstance != null) {
 				targetProperty = targetClass.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
 			}
 		}
-		if(targetProperty == null || !IsAccessible(targetProperty)) { return false; } // Fail: Couldn't find property, or it's marked inaccessible
+		if (targetProperty == null || !IsAccessible(targetProperty)) { return false; } // Fail: Couldn't find property, or it's marked inaccessible
 		// If field is found, deal with it appropriately based on the parameters given
-		if(parameters == null || parameters.Length < 1) {
+		if (parameters == null || parameters.Length < 1) {
 			string output = GetPropertyValue(targetInstance, targetProperty);
-			if(output == null) { return false; } // Fail: Property is not of a supported type
+			if (output == null) { return false; } // Fail: Property is not of a supported type
 			Echo(propertyName + " is " + output);
 			return true; // Success: Value is printed when no parameters given
 		}
-		if(IsCheat(targetProperty) && !cheats) {
+		if (IsCheat(targetProperty) && !cheats) {
 			PrintCheatMessage(targetProperty.Name);
 		} else {
-			if(!SetPropertyValue(targetInstance, targetProperty, parameters.SplitUnlessInContainer(' ', '\"'))) {
+			if (!SetPropertyValue(targetInstance, targetProperty, parameters.SplitUnlessInContainer(' ', '\"'))) {
 				Echo("Invalid " + targetProperty.PropertyType.Name + ": " + parameters);
 			}
 		}
@@ -426,9 +427,9 @@ public class DevConsole : MonoBehaviour {
 	// Get the current value of the specified property owned by instance. If instance is null then property is static.
 	// Returns: results of the ToString method when called on the result of the property, "write-only" if property is write-only, or null if property is of unsupported type.
 	public static string GetPropertyValue(object instance, PropertyInfo propertyInfo) {
-		if(propertyInfo == null) { return null; }
-		if(propertyInfo.GetGetMethod() == null) { return "write-only!"; }
-		switch(propertyInfo.PropertyType.Name) {
+		if (propertyInfo == null) { return null; }
+		if (propertyInfo.GetGetMethod() == null) { return "write-only!"; }
+		switch (propertyInfo.PropertyType.Name) {
 			case "Vector2":
 			case "Vector3":
 			case "Color":
@@ -444,25 +445,27 @@ public class DevConsole : MonoBehaviour {
 			case "UInt64":
 			case "Single":
 			case "Double":
-			case "Boolean":
+			case "Boolean": {
 				return propertyInfo.GetValue(instance, null).ToString();
-			default:
+			}
+			default: {
 				return null;
+			}
 		}
 	}
 
 	// Set the current value of the specified property owned by instance. If instance is null then property is static.
 	// Returns: boolean indicating whether the property was successfully changed, or if property is read-only.
-	public static bool SetPropertyValue(object instance, PropertyInfo propertyInfo, List<string> parameters) {
-		if(propertyInfo.GetSetMethod() == null) {
+	public static bool SetPropertyValue(object instance, PropertyInfo propertyInfo, string[] parameters) {
+		if (propertyInfo.GetSetMethod() == null) {
 			string output = GetPropertyValue(instance, propertyInfo);
-			if(output == null) { return false; } // Fail: Property is not of a supported type
+			if (output == null) { return false; } // Fail: Property is not of a supported type
 			Echo(propertyInfo.Name + " is read-only!");
 			Echo(propertyInfo.Name + " is " + output);
 			return true; // Success: Value is printed when property is read-only
 		}
 		object result = parameters.ParseParameterListIntoType(propertyInfo.PropertyType.Name);
-		if(result != null) {
+		if (result != null) {
 			propertyInfo.SetValue(instance, result, null);
 			return true;
 		} else {
@@ -478,24 +481,24 @@ public class DevConsole : MonoBehaviour {
 		MethodInfo[] targetMethods = targetClass.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy);
 		MethodInfo[] targetInstancedMethods = new MethodInfo[0];
 		object main = GetMainOfClass(targetClass);
-		if(main != null) {
+		if (main != null) {
 			targetInstancedMethods = targetClass.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy);
 		}
-		if(parameters != null && parameters.Length != 0) {
+		if (parameters != null && parameters.Length != 0) {
 			// Try to find a static method matching name and parameters
-			if(CallMethodMatchingParameters(null, methodName, targetMethods, parameters.SplitUnlessInContainer(' ', '\"'))) {
+			if (CallMethodMatchingParameters(null, methodName, targetMethods, parameters.SplitUnlessInContainer(' ', '\"'))) {
 				return true;
 			}
 			// Try to find an instanced method matching name and parameters if a main object to invoke on exists
-			if(main != null) {
-				if(CallMethodMatchingParameters(main, methodName, targetInstancedMethods, parameters.SplitUnlessInContainer(' ', '\"'))) {
+			if (main != null) {
+				if (CallMethodMatchingParameters(main, methodName, targetInstancedMethods, parameters.SplitUnlessInContainer(' ', '\"'))) {
 					return true;
 				}
 			}
 			// Try to find a static method matching name with one string parameter
 			MethodInfo targetMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new System.Type[] { typeof(string) }, null);
-			if(targetMethod != null && IsAccessible(targetMethod)) {
-				if(IsCheat(targetMethod) && !cheats) {
+			if (targetMethod != null && IsAccessible(targetMethod)) {
+				if (IsCheat(targetMethod) && !cheats) {
 					PrintCheatMessage(targetMethod.Name);
 				} else {
 					InvokeAndEchoResult(targetMethod, null, new string[] { parameters.SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType("String").ToString() });
@@ -503,10 +506,10 @@ public class DevConsole : MonoBehaviour {
 				return true;
 			}
 			// Try to find a method matching name with one string parameter if a main object to invoke on exists
-			if(main != null) {
+			if (main != null) {
 				MethodInfo targetInstancedMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new System.Type[] { typeof(string) }, null);
-				if(targetInstancedMethod != null && IsAccessible(targetInstancedMethod)) {
-					if(IsCheat(targetInstancedMethod) && !cheats) {
+				if (targetInstancedMethod != null && IsAccessible(targetInstancedMethod)) {
+					if (IsCheat(targetInstancedMethod) && !cheats) {
 						PrintCheatMessage(targetInstancedMethod.Name);
 					} else {
 						InvokeAndEchoResult(targetInstancedMethod, main, new string[] { parameters.SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType("String").ToString() });
@@ -517,8 +520,8 @@ public class DevConsole : MonoBehaviour {
 		}
 		// Try to find a static parameterless method matching name
 		MethodInfo targetParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new System.Type[] { }, null);
-		if(targetParameterlessMethod != null && IsAccessible(targetParameterlessMethod)) {
-			if(IsCheat(targetParameterlessMethod) && !cheats) {
+		if (targetParameterlessMethod != null && IsAccessible(targetParameterlessMethod)) {
+			if (IsCheat(targetParameterlessMethod) && !cheats) {
 				PrintCheatMessage(targetParameterlessMethod.Name);
 			} else {
 				InvokeAndEchoResult(targetParameterlessMethod, null, new object[] { });
@@ -526,10 +529,10 @@ public class DevConsole : MonoBehaviour {
 			return true;
 		}
 		// Try to find a parameterless method matching name if a main object to invoke on exists
-		if(main != null) {
+		if (main != null) {
 			MethodInfo targetInstancedParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new System.Type[] { }, null);
-			if(targetInstancedParameterlessMethod != null && IsAccessible(targetInstancedParameterlessMethod)) {
-				if(IsCheat(targetInstancedParameterlessMethod) && !cheats) {
+			if (targetInstancedParameterlessMethod != null && IsAccessible(targetInstancedParameterlessMethod)) {
+				if (IsCheat(targetInstancedParameterlessMethod) && !cheats) {
 					PrintCheatMessage(targetInstancedParameterlessMethod.Name);
 				} else {
 					InvokeAndEchoResult(targetInstancedParameterlessMethod, main, new object[] { });
@@ -538,18 +541,18 @@ public class DevConsole : MonoBehaviour {
 			}
 		}
 		// At this point no method will be invoked. Print an error message based on what has happened.
-		if(targetMethods.Length > 0 || targetInstancedMethods.Length > 0) {
+		if (targetMethods.Length > 0 || targetInstancedMethods.Length > 0) {
 			bool methodWithRightNameFound = false;
-			foreach(MethodInfo methodInfo in targetMethods) {
-				if(methodInfo.Name == methodName && IsAccessible(methodInfo)) { methodWithRightNameFound = true; break; }
+			foreach (MethodInfo methodInfo in targetMethods) {
+				if (methodInfo.Name == methodName && IsAccessible(methodInfo)) { methodWithRightNameFound = true; break; }
 			}
-			if(!methodWithRightNameFound) {
-				foreach(MethodInfo methodInfo in targetInstancedMethods) {
-					if(methodInfo.Name == methodName && IsAccessible(methodInfo)) { methodWithRightNameFound = true; break; }
+			if (!methodWithRightNameFound) {
+				foreach (MethodInfo methodInfo in targetInstancedMethods) {
+					if (methodInfo.Name == methodName && IsAccessible(methodInfo)) { methodWithRightNameFound = true; break; }
 				}
 			}
-			if(methodWithRightNameFound) {
-				if(parameters != null && parameters.Length != 0) {
+			if (methodWithRightNameFound) {
+				if (parameters != null && parameters.Length != 0) {
 					Echo("No method "+methodName+" matching the parameters provided could be found.");
 				} else {
 					Echo("No method "+methodName+" taking no parameters could be found. Provide some parameters!");
@@ -565,27 +568,27 @@ public class DevConsole : MonoBehaviour {
 	// Given a method name and an array of MethodInfo objects, try to match the name and parameter list provided on the given targetObject.
 	// If targetObject is null methods are static.
 	// Returns: boolean indicating whether a suitable method was found and invoked. Also whether command was handled here.
-	public static bool CallMethodMatchingParameters(object targetObject, string methodName, MethodInfo[] targetMethods, List<string> parameterList) {
-		foreach(MethodInfo targetMethod in targetMethods) {
-			if(targetMethod.Name != methodName || !IsAccessible(targetMethod)) { continue; }
-			if(IsCheat(targetMethod) && !cheats) {
+	public static bool CallMethodMatchingParameters(object targetObject, string methodName, MethodInfo[] targetMethods, string[] parameterList) {
+		foreach (MethodInfo targetMethod in targetMethods) {
+			if (targetMethod.Name != methodName || !IsAccessible(targetMethod)) { continue; }
+			if (IsCheat(targetMethod) && !cheats) {
 				PrintCheatMessage(targetMethod.Name);
 			} else {
 				ParameterInfo[] parameterInfos = targetMethod.GetParameters();
-				if(parameterInfos.Length != parameterList.Count) { continue; }
-				if(parameterInfos[0].ParameterType.Name == "String" && parameterInfos.Length == 1) { continue; }
+				if (parameterInfos.Length != parameterList.Length) { continue; }
+				if (parameterInfos[0].ParameterType.Name == "String" && parameterInfos.Length == 1) { continue; }
 				object[] parsedParameters = new object[parameterInfos.Length];
 				bool failed = false;
-				for(int i = 0; i < parsedParameters.Length; i++) {
+				for (int i = 0; i < parsedParameters.Length; ++i) {
 					// Need to split the given parameters AGAIN here if not in container, since ParseParameterListIntoType expects its parameters separately.
 					// For example, if a method takes an int and a Color as an attribute, the user could type
 					// Class.MethodName "7" "1 0.4 0.2 1"
 					// which would get split into "7" and "1 0.4 0.2 1", and this method would try to find a method matching two parameters.
 					// If such a method is found, it would further split "1 0.4 0.2 1" into four separate strings and pass them to ParseParameterListIntoType
 					parsedParameters[i] = parameterList[i].SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType(parameterInfos[i].ParameterType.Name);
-					if(parsedParameters[i] == null) { failed = true; break; }
+					if (parsedParameters[i] == null) { failed = true; break; }
 				}
-				if(failed) { continue; }
+				if (failed) { continue; }
 				InvokeAndEchoResult(targetMethod, targetObject, parsedParameters);
 			}
 			return true;
@@ -596,7 +599,7 @@ public class DevConsole : MonoBehaviour {
 	// Invokes the target method on the target object using the parameters supplied, and echoes the ToString of the result to the console.
 	// Echoes nothing if the method is void.
 	public static void InvokeAndEchoResult(MethodInfo targetMethod, object targetObject, object[] parameters) {
-		if(targetMethod.ReturnType == typeof(void)) {
+		if (targetMethod.ReturnType == typeof(void)) {
 			targetMethod.Invoke(targetObject, parameters);
 		} else {
 			Echo(targetMethod.Invoke(targetObject, parameters).ToString());
@@ -624,7 +627,7 @@ public class DevConsole : MonoBehaviour {
 	// Returns: boolean, true if member is not marked Inaccessible
 	public static bool IsAccessible(MemberInfo member) {
 #if UNITY_DEBUG || UNITY_EDITOR
-		if(System.Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) != null) {
+		if (System.Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked inaccessible and cannot be accessed normally!");
 		}
 		return true;
@@ -636,7 +639,7 @@ public class DevConsole : MonoBehaviour {
 	// Returns: boolean, true if member is marked cheat. Changing any property, field, or calling any method marked cheat through the console must trigger appropriate responses.
 	public static bool IsCheat(MemberInfo member) {
 #if UNITY_DEBUG
-		if(System.Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null) {
+		if (System.Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked a cheat and cannot be accessed normally without cheats!");
 		}
 		return false;
@@ -677,30 +680,33 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public static void Alias(string st) {
-		List<string> parameters = st.SplitUnlessInContainer(' ', '\"');
-		switch(parameters.Count) {
-			case 0:
+		string[] parameters = st.SplitUnlessInContainer(' ', '\"');
+		switch (parameters.Length) {
+			case 0: {
 				Alias();
 				break;
-			case 1:
-				if(aliases.ContainsKey(parameters[0])) {
-					Echo(parameters[0]+" is "+aliases[parameters[0]]);
+			}
+			case 1: {
+				if (aliases.ContainsKey(parameters[0])) {
+					Echo(parameters[0] + " is " + aliases[parameters[0]]);
 				} else {
-					Echo(parameters[0]+" does not exist!");
+					Echo(parameters[0] + " does not exist!");
 				}
 				break;
-			default:
+			}
+			default: {
 				bool containsQuote = (st.IndexOf('\"') >= 0);
-				if(!containsQuote) {
+				if (!containsQuote) {
 					System.Text.StringBuilder rest = new System.Text.StringBuilder();
-					for(int i=1; i<parameters.Count; i++) {
-						rest.Append(' '+parameters[i]);
+					for (int i = 1; i < parameters.Length; ++i) {
+						rest.Append(' ' + parameters[i]);
 					}
 					Alias(parameters[0], rest.ToString().Substring(1));
 				} else {
 					Alias(parameters[0], parameters[1]);
 				}
 				break;
+			}
 		}
 
 	}
@@ -711,12 +717,12 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public static void Alias(string name, string cmds) {
-		if(!aliases.ContainsKey(name)) {
+		if (!aliases.ContainsKey(name)) {
 			aliases.Add(name, "");
 		}
 		aliases[name] = "";
-		List<string> cmdList = cmds.SplitUnlessInContainer(';', '\"');
-		foreach(string cmd in cmdList) {
+		string[] cmdList = cmds.SplitUnlessInContainer(';', '\"');
+		foreach (string cmd in cmdList) {
 			aliases[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
 		}
 		aliases[name] = aliases[name].Substring(1);
@@ -730,48 +736,51 @@ public class DevConsole : MonoBehaviour {
 
 	public static void Unalias(string st) {
 		string unaliasMe = st.SplitUnlessInContainer(' ', '\"')[0];
-		if(aliases.ContainsKey(unaliasMe)) {
+		if (aliases.ContainsKey(unaliasMe)) {
 			aliases.Remove(unaliasMe);
 		}
 
 	}
 
 	public static void Bind(string st) {
-		List<string> parameters = st.SplitUnlessInContainer(' ', '\"');
-		switch(parameters.Count) {
-			case 0:
+		string[] parameters = st.SplitUnlessInContainer(' ', '\"');
+		switch (parameters.Length) {
+			case 0: {
 				Bind();
 				break;
-			case 1:
+			}
+			case 1: {
 				KeyCode targetKeyCode;
 				try {
-					 targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), parameters[0]);
-				} catch(System.ArgumentException) {
-					if(axisMappings.ContainsKey(parameters[0])) {
+					targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), parameters[0]);
+				} catch (System.ArgumentException) {
+					if (axisMappings.ContainsKey(parameters[0])) {
 						Echo(parameters[0] + " is " + axisMappings[parameters[0]]);
 					} else {
 						Echo(parameters[0] + " is not a valid KeyCode or the axis is not bound!");
 					}
 					break;
 				}
-				if(binds.ContainsKey(targetKeyCode)) {
-					Echo(parameters[0]+" is "+binds[targetKeyCode]);
+				if (binds.ContainsKey(targetKeyCode)) {
+					Echo(parameters[0] + " is " + binds[targetKeyCode]);
 				} else {
-					Echo(parameters[0]+" is unbound");
+					Echo(parameters[0] + " is unbound");
 				}
 				break;
-			default:
+			}
+			default: {
 				bool containsQuote = (st.IndexOf('\"') >= 0);
-				if(!containsQuote) {
+				if (!containsQuote) {
 					System.Text.StringBuilder rest = new System.Text.StringBuilder();
-					for(int i=1; i<parameters.Count; i++) {
-						rest.Append(' '+parameters[i]);
+					for (int i = 1; i < parameters.Length; ++i) {
+						rest.Append(' ' + parameters[i]);
 					}
 					Bind(parameters[0], rest.ToString().Substring(1));
 				} else {
 					Bind(parameters[0], parameters[1]);
 				}
 				break;
+			}
 		}
 
 	}
@@ -788,24 +797,24 @@ public class DevConsole : MonoBehaviour {
 		try {
 			targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), name); // Will throw exception if KeyCode doesn't exist
 			Bind(targetKeyCode, cmds);
-		} catch(System.ArgumentException) {
+		} catch (System.ArgumentException) {
 			try {
-				if(name[name.Length - 1] == '-' || name[name.Length - 1] == '+') {
+				if (name[name.Length - 1] == '-' || name[name.Length - 1] == '+') {
 					Input.GetAxisRaw(name.Substring(0, name.Length - 1)); // Will throw exception if axis doesn't exist
 				} else {
 					Input.GetAxisRaw(name); // Will throw exception if axis doesn't exist
 				}
-				if(!axisMappings.ContainsKey(name)) {
+				if (!axisMappings.ContainsKey(name)) {
 					axisMappings.Add(name, "");
 				} else {
 					axisMappings[name] = "";
 				}
-				List<string> cmdList = cmds.SplitUnlessInContainer(';', '\"');
-				foreach(string cmd in cmdList) {
+				string[] cmdList = cmds.SplitUnlessInContainer(';', '\"');
+				foreach (string cmd in cmdList) {
 					axisMappings[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
 				}
 				axisMappings[name] = axisMappings[name].Substring(1);
-			} catch(UnityException) {
+			} catch (UnityException) {
 				Echo(name + " is not a valid KeyCode or axis!");
 				return;
 			}
@@ -814,13 +823,13 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public static void Bind(KeyCode name, string cmds) {
-		if(!binds.ContainsKey(name)) {
+		if (!binds.ContainsKey(name)) {
 			binds.Add(name, "");
 		} else {
 			binds[name] = "";
 		}
-		List<string> cmdList = cmds.SplitUnlessInContainer(';', '\"');
-		foreach(string cmd in cmdList) {
+		string[] cmdList = cmds.SplitUnlessInContainer(';', '\"');
+		foreach (string cmd in cmdList) {
 			binds[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
 		}
 		binds[name] = binds[name].Substring(1);
@@ -837,10 +846,10 @@ public class DevConsole : MonoBehaviour {
 		string name = surface.SplitUnlessInContainer(' ', '\"')[0];
 		try {
 			pollMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
-		} catch(System.ArgumentException) {
+		} catch (System.ArgumentException) {
 			try {
 				Echo(name + " is " + Input.GetAxisRaw(name));
-			} catch(UnityException) {
+			} catch (UnityException) {
 				Echo(name + " is not a valid KeyCode or axis!");
 			}
 			return;
@@ -859,8 +868,8 @@ public class DevConsole : MonoBehaviour {
 		string name = st.SplitUnlessInContainer(' ', '\"')[0];
 		try {
 			unbindMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
-		} catch(System.ArgumentException) {
-			if(axisMappings.ContainsKey(name)) {
+		} catch (System.ArgumentException) {
+			if (axisMappings.ContainsKey(name)) {
 				axisMappings.Remove(name);
 			} else {
 				Echo(name + " is not a valid KeyCode or the axis is not bound!");
@@ -875,13 +884,13 @@ public class DevConsole : MonoBehaviour {
 
 	public static void Exec(string path) {
 		StreamReader sr;
-		if(File.Exists(path)) {
+		if (File.Exists(path)) {
 			sr = File.OpenText(path);
 		} else {
-			if(File.Exists(Application.persistentDataPath + "/" + path)) {
+			if (File.Exists(Application.persistentDataPath + "/" + path)) {
 				sr = File.OpenText(Application.persistentDataPath + "/" + path);
 			} else {
-				if(File.Exists(Application.dataPath + "/" + path)) {
+				if (File.Exists(Application.dataPath + "/" + path)) {
 					sr = File.OpenText(Application.dataPath + "/" + path);
 				} else {
 					Echo("Unable to find script file to execute "+path);
@@ -889,7 +898,7 @@ public class DevConsole : MonoBehaviour {
 				}
 			}
 		}
-		while(!sr.EndOfStream) {
+		while (!sr.EndOfStream) {
 			Execute(sr.ReadLine());
 		}
 		sr.Close();
@@ -898,19 +907,19 @@ public class DevConsole : MonoBehaviour {
 
 	public static void SaveConfigFile() {
 		#if !UNITY_WEBPLAYER
-		if(File.Exists(configPath)) {
+		if (File.Exists(configPath)) {
 			File.Delete(configPath);
 		}
 		
 		StreamWriter sw = File.CreateText(configPath);
 		sw.WriteLine("autoexecPath \"" + autoexecPath + "\"");
-		foreach(string alias in aliases.Keys) {
+		foreach (string alias in aliases.Keys) {
 			sw.WriteLine("Alias \"" + alias + "\" \"" + aliases[alias].Replace('\"', '\'') + "\"");
 		}
-		foreach(KeyCode bind in binds.Keys) {
+		foreach (KeyCode bind in binds.Keys) {
 			sw.WriteLine("Bind \"" + bind.ToString() + "\" \"" + binds[bind].Replace('\"', '\'') + "\"");
 		}
-		foreach(string bind in axisMappings.Keys) {
+		foreach (string bind in axisMappings.Keys) {
 			sw.WriteLine("Bind \"" + bind.ToString() + "\" \"" + axisMappings[bind].Replace('\"', '\'') + "\"");
 		}
 		sw.Close();
@@ -960,28 +969,28 @@ public class ConsoleWindow : ZWindow {
 			} GUILayout.EndScrollView();
 			GUILayout.BeginHorizontal(); {
 				GUI.SetNextControlName("ConsoleInput");
-				if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return && GUI.GetNameOfFocusedControl() == "ConsoleInput" && textField.Length > 0) {
+				if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return && GUI.GetNameOfFocusedControl() == "ConsoleInput" && textField.Length > 0) {
 					TryExecute(textField);
 					textField = "";
 					Event.current.Use();
-				} else if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.UpArrow && cmdIndex > 0) {
+				} else if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.UpArrow && cmdIndex > 0) {
 					cmdIndex--;
 					textField = previousCommands[cmdIndex];
-				} else if(Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.DownArrow && cmdIndex < previousCommands.Count - 1) {
+				} else if (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.DownArrow && cmdIndex < previousCommands.Count - 1) {
 					cmdIndex++;
 					textField = previousCommands[cmdIndex];
-				} else if(Event.current.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.Escape || (Event.current.keyCode == KeyCode.Menu && Application.platform == RuntimePlatform.Android))) {
+				} else if (Event.current.type == EventType.KeyDown && (Event.current.keyCode == KeyCode.Escape || (Event.current.keyCode == KeyCode.Menu && Application.platform == RuntimePlatform.Android))) {
 					open = false;
 					textField = "";
 				}
 				textField = GUILayout.TextField(textField);
-				if(GUILayout.Button("Send", GUILayout.ExpandWidth(false)) && textField.Length > 0) {
+				if (GUILayout.Button("Send", GUILayout.ExpandWidth(false)) && textField.Length > 0) {
 					TryExecute(textField);
 					textField = "";
 				}
 			} GUILayout.EndHorizontal();
 		} GUILayout.EndVertical();
-		if(focusTheTextField && Event.current.type == EventType.Repaint) {
+		if (focusTheTextField && Event.current.type == EventType.Repaint) {
 			GUI.FocusControl("ConsoleInput");
 		}
 	}
@@ -991,7 +1000,7 @@ public class ConsoleWindow : ZWindow {
 		try {
 			// Execute the current line
 			DevConsole.Execute(cmd);
-		} catch(System.Exception e) {
+		} catch (System.Exception e) {
 			Debug.LogError("Internal error executing console command:\n" + e);
 		}
 		previousCommands.Add(cmd);

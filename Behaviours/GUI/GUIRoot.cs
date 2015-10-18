@@ -12,11 +12,15 @@ public class GUIRoot : MonoBehaviour {
 	public static List<ZWindow> windows = new List<ZWindow>();
 	
 	public static Dictionary<string, ZWindow> binds = new Dictionary<string, ZWindow>();
+	public static Dictionary<string, ZWindow> holdBinds = new Dictionary<string,ZWindow>();
+	public static Dictionary<string, ZWindow> registeredWindows = new Dictionary<string,ZWindow>();
 
 
 	public static void AddWindow(ZWindow window) {
 		windows.Add(window);
 	}
+
+	
 	
 	void Awake() {
 		if (main == null) {
@@ -30,9 +34,14 @@ public class GUIRoot : MonoBehaviour {
 	void Update() {
 		
 		foreach (var pair in binds) {
+			
 			if (Input.GetKeyDown(pair.Key)) {
 				pair.Value.open = !pair.Value.open;
 			}
+		}
+
+		foreach (var pair in holdBinds) {
+			pair.Value.open = Input.GetKey(pair.Key);
 		}
 
 		foreach (var window in windows) {
@@ -47,15 +56,49 @@ public class GUIRoot : MonoBehaviour {
 		}
 		
 	}
+
+	public static void Register(string key, ZWindow window) {
+		registeredWindows[key] = window;
+		if (!windows.Contains(window)) { windows.Add(window); }
+	}
 	
 	public static void BindKey(string key, ZWindow window) {
 		binds[key] = window;
+		if (!windows.Contains(window)) { windows.Add(window); }
 	}
 	
+	public static void BindHold(string key, ZWindow window) {
+		holdBinds[key] = window;
+		if (!windows.Contains(window)) { windows.Add(window); }
+	}
+
 	public static void Unbind(string key) {
 		if (binds.ContainsKey(key)) {
 			binds.Remove(key);
 		}
+		if (holdBinds.ContainsKey(key)) {
+			holdBinds.Remove(key);
+		}
+	}
+
+	public static ZWindow Remove(string key) {
+		ZWindow window = null;
+		if (binds.ContainsKey(key)) {
+			window = binds[key];
+			windows.Remove(window);
+			binds.Remove(key);
+		}
+		if (holdBinds.ContainsKey(key)) {
+			window = holdBinds[key];
+			windows.Remove(window);
+			holdBinds.Remove(key);
+		}
+		if (registeredWindows.ContainsKey(key)) {
+			window = registeredWindows[key];
+			windows.Remove(window);
+			registeredWindows.Remove(key);
+		}
+		return window;
 	}
 	
 	public static void HideAllWindows() {

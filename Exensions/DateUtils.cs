@@ -1,9 +1,15 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
 public static class DateUtils {
+
+	public static long UnixTimestamp(this DateTime date) {
+		DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+		TimeSpan diff = DateTime.Now.Subtract(epoch);
+		return (long)diff.TotalMilliseconds;
+	}
 
 	public static float TimeUntilNow(this DateTime date) {
 		return (float)DateTime.Now.Subtract(date).TotalSeconds;
