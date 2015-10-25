@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
 public class MusicVolume : MonoBehaviour {
 	
 	void Update() {
-		GetComponent<AudioSource>().volume = Settings.musicVolume;
+		GetComponent<AudioSource>().volume = Settings.instance.musicVolume;
 	}
 	
 }

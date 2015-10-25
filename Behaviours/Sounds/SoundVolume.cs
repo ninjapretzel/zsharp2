@@ -18,7 +18,7 @@ public class SoundVolume : MonoBehaviour {
 	}
 	
 	void SetVolume() {
-		GetComponent<AudioSource>().volume = baseVolume * Settings.soundVolume;
+		GetComponent<AudioSource>().volume = baseVolume * Settings.instance.soundVolume;
 	}
 	
 }

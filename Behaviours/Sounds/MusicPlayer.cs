@@ -103,7 +103,7 @@ public class MusicPlayer : MonoBehaviour {
 			}
 		}
 		
-		GetComponent<AudioSource>().volume = time / fadeTime * Settings.musicVolume * volume;
+		GetComponent<AudioSource>().volume = time / fadeTime * Settings.instance.musicVolume * volume;
 	}
 	
 	public static void FadeIn() {

@@ -167,12 +167,12 @@ public static class UGUIz {
 		
 		if (scrollHorizontal) {
 			Rect hScrollArea = area.BottomLeft(.95f, .05f);
-			RectTransform hScrollBar = MakeScrollBar(hScrollArea, true).PositionRect(hScrollArea, obj.transform);
+			MakeScrollBar(hScrollArea, true).PositionRect(hScrollArea, obj.transform);
 		}
 
 		if (scrollVertical) {
 			Rect vScrollArea = area.UpperRight(.05f, .95f);
-			RectTransform vScrollBar = MakeScrollBar(vScrollArea, false).PositionRect(vScrollArea, obj.transform);
+			MakeScrollBar(vScrollArea, false).PositionRect(vScrollArea, obj.transform);
 		}
 
 		var scrollWindow = Box(area, "", "background"); 
@@ -195,7 +195,7 @@ public static class UGUIz {
 		scrollBar.interactable = true;
 		scrollBar.targetGraphic = handle.GetComponent<Image>();
 		scrollBar.transition = Selectable.Transition.ColorTint;
-		ColorBlock cblock = skin.GetColorBlock(handleStyle);
+		//ColorBlock cblock = skin.GetColorBlock(handleStyle);
 		
 		scrollBar.handleRect = handle;
 		scrollBar.direction = isHorizontal ? Scrollbar.Direction.LeftToRight : Scrollbar.Direction.TopToBottom;

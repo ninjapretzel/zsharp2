@@ -34,7 +34,7 @@ public class TextMeshReflectionFill : MonoBehaviour {
 
 	void Start() {
 		Type targetClass = null;
-		string[] splits = target.Split('.');
+		//string[] splits = target.Split('.');
 		string targetName = target.UpToLast('.');
 		string targetThing = target.FromLast('.');
 		

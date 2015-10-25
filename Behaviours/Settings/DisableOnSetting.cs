@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,9 +12,10 @@ public class DisableOnSetting : MonoBehaviour {
 	
 	public bool isEnabled { 
 		get { 
-			bool e = Settings.custom[setting] == 1;
+			/*bool e = Settings.custom[setting] == 1;
 			if (invert) { e = !e; }
-			return e;
+			return e;*/
+			return true;
 		} 
 	}
 	

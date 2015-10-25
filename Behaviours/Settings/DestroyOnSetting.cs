@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,10 +8,11 @@ public class DestroyOnSetting : MonoBehaviour {
 	public bool invert = false;
 	
 	public bool destroy { 
-		get { 
-			bool d = !(Settings.custom[setting] == 1);
+		get {
+			/*bool d = !(Settings.custom[setting] == 1);
 			if (invert) { d = !d; }
-			return d;
+			return d;*/
+			return false;
 		} 
 	}
 	

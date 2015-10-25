@@ -70,7 +70,7 @@ public class UGUIzTextField : MonoBehaviour {
 		if (input.text.EndsWith("\n")) {
 			//Debug.Log("Line Ended" + input.text);
 			if (onSend != null) {
-				onSend.Invoke(targetObject, new object[] { input.text.UpToLast('\n') } );
+				onSend.Invoke(targetComponent, new object[] { input.text.UpToLast('\n') });
 			}
 				
 			input.text = "";

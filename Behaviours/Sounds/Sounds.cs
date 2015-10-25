@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -85,7 +86,7 @@ public class Sounds : MonoBehaviour {
 		
 		AudioSource source = Instantiate(settings, pos, Quaternion.identity) as AudioSource;
 		source.clip = sc;
-		source.volume = Settings.soundVolume;
+		source.volume = Settings.instance.soundVolume;
 		source.Play();
 		
 		
@@ -177,4 +178,14 @@ public class Sounds : MonoBehaviour {
 		return true;
 	}
 	
+}
+
+public static class AudioMixerHelpers {
+	public static AudioMixerGroup Get(this AudioMixer mixer, string name) {
+		var groups = mixer.FindMatchingGroups(name);
+		foreach (var g in groups) {
+			if (g.name == name) { return g; }
+		}
+		return null;
+	}
 }
