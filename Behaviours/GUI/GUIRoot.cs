@@ -11,9 +11,9 @@ public class GUIRoot : MonoBehaviour {
 	
 	public static List<ZWindow> windows = new List<ZWindow>();
 	
-	public static Dictionary<string, ZWindow> binds = new Dictionary<string, ZWindow>();
-	public static Dictionary<string, ZWindow> holdBinds = new Dictionary<string,ZWindow>();
-	public static Dictionary<string, ZWindow> registeredWindows = new Dictionary<string,ZWindow>();
+	private static Dictionary<string, ZWindow> binds = new Dictionary<string, ZWindow>();
+	private static Dictionary<string, ZWindow> holdBinds = new Dictionary<string,ZWindow>();
+	private static Dictionary<string, ZWindow> registeredWindows = new Dictionary<string,ZWindow>();
 
 
 	public static void AddWindow(ZWindow window) {
@@ -35,13 +35,13 @@ public class GUIRoot : MonoBehaviour {
 		
 		foreach (var pair in binds) {
 			
-			if (Input.GetKeyDown(pair.Key)) {
+			if (ControlStates.Get<bool>(pair.Key)) {
 				pair.Value.open = !pair.Value.open;
 			}
 		}
 
 		foreach (var pair in holdBinds) {
-			pair.Value.open = Input.GetKey(pair.Key);
+			pair.Value.open = ControlStates.Get<bool>(pair.Key);
 		}
 
 		foreach (var window in windows) {
@@ -71,12 +71,19 @@ public class GUIRoot : MonoBehaviour {
 		holdBinds[key] = window;
 		if (!windows.Contains(window)) { windows.Add(window); }
 	}
+	public static bool HasWindow(string key) {
+		return registeredWindows.ContainsKey(key)
+			|| binds.ContainsKey(key)
+			|| holdBinds.ContainsKey(key);
+	}
 
 	public static void Unbind(string key) {
 		if (binds.ContainsKey(key)) {
+			registeredWindows[key] = binds[key];
 			binds.Remove(key);
 		}
 		if (holdBinds.ContainsKey(key)) {
+			registeredWindows[key] = holdBinds[key];
 			holdBinds.Remove(key);
 		}
 	}

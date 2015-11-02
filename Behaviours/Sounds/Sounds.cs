@@ -7,6 +7,7 @@ using System.Collections.Generic;
 public class Sound {
 	public string name = "un-initialized Sound";
 	public AudioSource overrideSource;
+	public string channel;
 	public List<AudioClip> clips;
 	
 	public int Count { get { return clips.Count; } }
@@ -15,6 +16,10 @@ public class Sound {
 	public Sound() { clips = new List<AudioClip>(); }
 	public Sound(string n) : this() { name = n; }
 	public Sound(string n, AudioClip c) : this(n) { clips.Add(c); }
+	public Sound(string n, Sound parent) : this(n) {
+		channel = parent.channel;
+		overrideSource = parent.overrideSource;
+	}
 	
 	public AudioClip GetSound() {
 		if (clips.Count == 1) { return clips[0]; }
@@ -32,7 +37,10 @@ public class Sounds : MonoBehaviour {
 	public AudioSource audioSet;
 	public List<Sound> soundSet;
 	
+	public AudioMixer audioMixer;
 	static Dictionary<string, Sound> sounds = new Dictionary<string, Sound>();
+
+	static AudioMixer mixer;
 	
 	private static AudioSource _audioSettings;
 	public static AudioSource audioSettings {
@@ -60,6 +68,7 @@ public class Sounds : MonoBehaviour {
 	void Awake() {
 		if (started) { return; }
 		audioSettings = audioSet;
+		mixer = audioMixer;
 		
 		foreach (Sound s in soundSet) { Add(s); }
 		
@@ -113,10 +122,16 @@ public class Sounds : MonoBehaviour {
 		if (!sounds.ContainsKey(sc) || sounds[sc] == null) { return audioSettings; }
 		Sound sound = sounds[sc];	
 		
+		AudioSource settings = audioSettings;
 		if (sound.overrideSource != null) {
-			return sound.overrideSource;
+			settings = sound.overrideSource;
 		}
-		return audioSettings;
+		var targetGroup = mixer.Get(sound.channel);
+		if (targetGroup != null) {
+			settings.outputAudioMixerGroup = targetGroup;
+		}
+
+		return settings;
 	}
 	
 	public static bool Has(string sc) { 
@@ -182,6 +197,7 @@ public class Sounds : MonoBehaviour {
 
 public static class AudioMixerHelpers {
 	public static AudioMixerGroup Get(this AudioMixer mixer, string name) {
+		if (name == null || name == "") { return null; }
 		var groups = mixer.FindMatchingGroups(name);
 		foreach (var g in groups) {
 			if (g.name == name) { return g; }

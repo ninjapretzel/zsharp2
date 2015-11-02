@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class DropdownList<T> : List<T> {
 	
 	public bool open = false;
-	int selectedIndex = 0;
+	public int selectedIndex { get; private set; }
 	Vector2 scrollPos;
 	public float maxHeight = .25f;
 	
@@ -56,6 +56,12 @@ public class DropdownList<T> : List<T> {
 			}
 		}
 		selectedIndex = 0;
+	}
+
+	public void SetIndex(int index) {
+		if (this.Count - 1 >= index) {
+			selectedIndex = index;
+		}
 	}
 	
 	public void Draw(Rect baseArea) {

@@ -1,0 +1,27 @@
+Alias "quit" "Quit"
+Alias "alias" "Alias"
+Alias "bind" "Bind"
+Alias "ehco" "Echo"
+Alias "unalias" "Unalias"
+Alias "unbind" "Unbind"
+Alias "poll" "Poll"
+
+Alias "AutoExec" "Exec autoexec.cfg"
+Alias "autoexec" "AutoExec"
+Alias "defaults" "Defaults"
+Bind F1 "ToggleConsole"
+Bind BackQuote "ToggleConsole"
+
+BindButton W "forward" "ControlStates.forward"
+BindButton S "back" "ControlStates.back"
+BindButton A "moveleft" "ControlStates.moveleft"
+BindButton D "moveright" "ControlStates.moveright"
+BindButton E "moveup" "ControlStates.moveup"
+BindButton Q "movedown" "ControlStates.movedown"
+
+BindButton Space "jump" "ControlStates.jump"
+
+Bind MouseAxisX "ControlStates.yawAxis %value%"
+Bind MouseAxisY "ControlStates.pitchAxis %value%"
+
+

@@ -25,7 +25,19 @@ public class DevConsole : MonoBehaviour {
 	private static Dictionary<KeyCode, string> binds = new Dictionary<KeyCode, string>();
 	private static Dictionary<string, string> axisMappings = new Dictionary<string, string>();
 	public static string configPath { get { return Application.persistentDataPath + "/config.cfg"; } }
-	public static string persistent { get { return Resources.Load<TextAsset>("defaults").text; } }
+	public static string persistent { 
+		get {
+			string per = Resources.Load<TextAsset>("persistent").text;
+			if (Resources.Load<TextAsset>("defaults") != null) {
+				StringBuilder strBuilder = new StringBuilder(per);
+				strBuilder += "\n";
+				strBuilder += Resources.Load<TextAsset>("defaults").text; 
+				return strBuilder.ToString();
+			}
+			return per;
+
+		} 
+	}
 	public static string autoexecPath;
 
 	private static ConsoleWindow window;
@@ -257,6 +269,10 @@ public class DevConsole : MonoBehaviour {
 				Execute(st);
 			}
 		} else {
+			// Disregard lines starting with '#'. These are "comments"!
+			if (line[0] == '#') {
+				return;
+			}
 			// Separate command from parameters
 			int indexOfSpace = line.IndexOf(' ');
 			string command = "";
@@ -679,6 +695,16 @@ public class DevConsole : MonoBehaviour {
 
 	}
 
+	public static void AliasButton(string thing, string location) {
+		Alias("+" + thing, location + " true");
+		Alias("-" + thing, location + " false");
+	}
+
+	public static void BindButton(string key, string thing, string location) {
+		AliasButton(thing, location);
+		Bind(key, "+"+thing);
+	}
+
 	public static void Alias(string st) {
 		string[] parameters = st.SplitUnlessInContainer(' ', '\"');
 		switch (parameters.Length) {
@@ -868,18 +894,20 @@ public class DevConsole : MonoBehaviour {
 		string name = st.SplitUnlessInContainer(' ', '\"')[0];
 		try {
 			unbindMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
+			Unbind(unbindMe);
 		} catch (System.ArgumentException) {
 			if (axisMappings.ContainsKey(name)) {
 				axisMappings.Remove(name);
 			} else {
 				Echo(name + " is not a valid KeyCode or the axis is not bound!");
 			}
-			return;
 		}
-		if(binds.ContainsKey(unbindMe)) {
-			binds.Remove(unbindMe);
-		}
+	}
 
+	public static void Unbind(KeyCode key) {
+		if (binds.ContainsKey(key)) {
+			binds.Remove(key);
+		}
 	}
 
 	public static void Exec(string path) {
@@ -934,6 +962,16 @@ public class DevConsole : MonoBehaviour {
 		Application.Quit();
 #endif
 
+	}
+
+	public static List<KeyCode> GetKeysByCommand(string command) {
+		List<KeyCode> ret = new List<KeyCode>();
+		foreach (KeyValuePair<KeyCode, string> kvp in binds) {
+			if (command == kvp.Value) {
+				ret.Add(kvp.Key);
+			}
+		}
+		return ret;
 	}
 
 	public class CheatAttribute : System.Attribute {
