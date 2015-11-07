@@ -9,6 +9,9 @@ using UnityEditor;
 
 public class DevConsole : MonoBehaviour {
 	
+#if UNITY_EDITOR
+	public bool runDefaultsOnStartup = false;
+#endif
 	public string initialText = "";
 	public GUISkin consoleSkin;
 	public static Color color = Color.white;
@@ -20,6 +23,7 @@ public class DevConsole : MonoBehaviour {
 #if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
 	private static Rect consoleWindowRect = new Rect(0.0f, 0.0f, Screen.width, Screen.height * 0.5f);
 #endif
+
 	public static bool consoleUp { get { return window.open; } }
 	private static Dictionary<string, string> aliases = new Dictionary<string, string>();
 	private static Dictionary<KeyCode, string> binds = new Dictionary<KeyCode, string>();
@@ -57,12 +61,19 @@ public class DevConsole : MonoBehaviour {
 			.Area(Screen.all.MiddleCenter(0.7f, 0.8f).Move(0.1f, 0.0f));
 		window.textWindow = initialText.ParseNewlines();
 
+#if UNITY_EDITOR
+		if (runDefaultsOnStartup) {
+			Defaults();
+		}
+#endif
+
 		if (File.Exists(configPath)) {
 			Execute(persistent.Split('\n'));
 			// If config exists, clear binds after loading persistent file (we want the default aliases but not the keybinds)
 			binds = new Dictionary<KeyCode, string>();
 #if UNITY_EDITOR
 			binds.Add(KeyCode.F1, "ToggleConsole");
+			
 #endif
 			// All preexisting keybinds will be reloaded from this file instead
 			Exec(configPath);

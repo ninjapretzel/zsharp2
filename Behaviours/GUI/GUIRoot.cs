@@ -62,8 +62,8 @@ public class GUIRoot : MonoBehaviour {
 
 
 		foreach (var pair in binds) {
-			
 			if (ControlStates.Get<bool>(pair.Key)) {
+				ControlStates.Set(pair.Key, "false");
 				pair.Value.open = !pair.Value.open;
 			}
 		}
