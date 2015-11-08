@@ -57,6 +57,7 @@ public class DevConsole : MonoBehaviour {
 	public void Start() {
 		window = (ConsoleWindow)new ConsoleWindow()
 			.Named("Developer Console")
+			.Resizable()
 			.Closed()
 			.Area(Screen.all.MiddleCenter(0.7f, 0.8f).Move(0.1f, 0.0f));
 		window.textWindow = initialText.ParseNewlines();
