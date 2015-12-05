@@ -47,20 +47,11 @@ public class DevConsole : MonoBehaviour {
 	private static ConsoleWindow window;
 
 	public void Awake() {
-		autoexecPath = Application.persistentDataPath + "/autoexec.cfg";
-		classBlacklist = blacklistedClasses.ToList<string>();
-		if (!classBlacklist.Contains("InAppPurchases")) { classBlacklist.Add("InAppPurchases"); }
-		if (!classBlacklist.Contains("AdManager")) { classBlacklist.Add("AdManager"); }
+		SetUpInitialData();
 
 	}
 
 	public void Start() {
-		window = (ConsoleWindow)new ConsoleWindow()
-			.Named("Developer Console")
-			.Resizable()
-			.Closed()
-			.Area(Screen.all.MiddleCenter(0.7f, 0.8f).Move(0.1f, 0.0f));
-		window.textWindow = initialText.ParseNewlines();
 
 #if UNITY_EDITOR
 		if (runDefaultsOnStartup) {
@@ -69,29 +60,14 @@ public class DevConsole : MonoBehaviour {
 #endif
 
 		if (File.Exists(configPath)) {
-			Execute(persistent.Split('\n'));
-			// If config exists, clear binds after loading persistent file (we want the default aliases but not the keybinds)
-			binds = new Dictionary<KeyCode, string>();
-#if UNITY_EDITOR
-			binds.Add(KeyCode.F1, "ToggleConsole");
-			
-#endif
-			// All preexisting keybinds will be reloaded from this file instead
-			Exec(configPath);
-			if (File.Exists(autoexecPath)) {
-				Exec(autoexecPath);
-			}
-			//Clear();
+			LoadConfigFile();
 		} else {
 			binds = new Dictionary<KeyCode, string>();
 			aliases = new Dictionary<string, string>();
 			axisMappings = new Dictionary<string, string>();
 			Execute(persistent.Split('\n'));
-			//Clear();
 			SaveConfigFile();
 		}
-
-		//consoleText = initialText.ParseNewlines();
 
 	}
 
@@ -102,9 +78,18 @@ public class DevConsole : MonoBehaviour {
 		File.Delete(configPath);
 		Execute(persistent.Split('\n'));
 		SaveConfigFile();
+
 	}
 
 	public void Update() {
+#if UNITY_EDITOR
+		// If window is null, we've probably had a script recompile. Let's reload all the things.
+		if (window == null) {
+			SetUpInitialData();
+			InstantiateWindowObject();
+			LoadConfigFile();
+		}
+#endif
 		if (!window.open) {
 			foreach (KeyValuePair<KeyCode, string> pair in binds) {
 				if (Input.GetKeyDown(pair.Key)) {
@@ -965,6 +950,38 @@ public class DevConsole : MonoBehaviour {
 		sw.Close();
 
 		#endif
+	}
+
+	public static void LoadConfigFile() {
+		if (File.Exists(configPath)) {
+			Execute(persistent.Split('\n'));
+			// If config exists, clear binds after loading persistent file (we want the default aliases but not the keybinds)
+			binds = new Dictionary<KeyCode, string>();
+#if UNITY_EDITOR
+			binds.Add(KeyCode.F1, "ToggleConsole");
+#endif
+			// All preexisting keybinds will be reloaded from this file instead
+			Exec(configPath);
+			if (File.Exists(autoexecPath)) {
+				Exec(autoexecPath);
+			}
+		}
+	}
+
+	private void InstantiateWindowObject() {
+		window = (ConsoleWindow)new ConsoleWindow()
+			.Named("Developer Console")
+			.Resizable()
+			.Closed()
+			.Area(Screen.all.MiddleCenter(0.7f, 0.8f).Move(0.1f, 0.0f));
+		window.textWindow = initialText.ParseNewlines();
+	}
+
+	public void SetUpInitialData() {
+		autoexecPath = Application.persistentDataPath + "/autoexec.cfg";
+		classBlacklist = blacklistedClasses.ToList<string>();
+		if (!classBlacklist.Contains("InAppPurchases")) { classBlacklist.Add("InAppPurchases"); }
+		if (!classBlacklist.Contains("AdManager")) { classBlacklist.Add("AdManager"); }
 	}
 
 	public static void Quit() {

@@ -445,6 +445,7 @@ public static class ReflectionUtils {
 		get {
 			yield return "";
 			yield return ",UnityEngine";
+			yield return ",UnityEditor";
 			yield return ",Assembly-UnityScript";
 			yield return ",Assembly-CSharp";
 			yield return ",Assembly-UnityScript-firstpass";
