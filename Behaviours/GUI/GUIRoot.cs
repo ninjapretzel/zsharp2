@@ -26,6 +26,32 @@ public class GUIRoot : MonoBehaviour {
 	private static Dictionary<string, ZWindow> holdBinds = new Dictionary<string,ZWindow>();
 	private static Dictionary<string, ZWindow> registeredWindows = new Dictionary<string,ZWindow>();
 
+	private static Stack<GameObject> history = new Stack<GameObject>();
+	private static GameObject active { get { return history.Peek(); } }
+
+	public static void Push(GameObject next) { main.Pushx(next); }
+	public void Pushx(GameObject next) {
+		if (history.Count > 0) {
+			active.SetActive(false);
+		}
+		next.SetActive(true);
+		history.Push(next);
+	}
+
+	public static GameObject Pop() { return main.Popx(); }
+	public GameObject Popx() {
+		if (history.Count <= 1) { return null; }
+
+		GameObject obj = history.Pop();
+		obj.SetActive(false);
+
+		if (active != null) {
+			active.SetActive(true);
+		}
+
+		return obj;
+	}
+
 	public const int REGISTER = 0;
 	public const int BIND = 1;
 	public const int BINDHOLD = 2;
@@ -48,6 +74,10 @@ public class GUIRoot : MonoBehaviour {
 			_Remove(delayedRemove[0]);
 			delayedRemove.RemoveAt(0);
 
+		}
+
+		if (Input.GetKeyDown(KeyCode.Escape)) {
+			Popx();
 		}
 
 		while (delayedAdd.Count > 0) {

@@ -168,7 +168,13 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public void OnGUI() {
-		if(window.open) {
+		if (window == null) {
+			SetUpInitialData();
+			InstantiateWindowObject();
+			LoadConfigFile();
+		}
+
+		if (window.open) {
 			//GUI.skin = consoleSkin;
 			//GUI.skin.FontSizeFull(12, 12);
 			//GUI.skin.window.fontSize = 18;

@@ -27,7 +27,13 @@ public static class ControlStates {
 
 				double val;
 				if (double.TryParse(data, out val)) {
-					ret = (T)(object)val;
+					if (typeof(T) == typeof(int)) { ret = (T)(object)(int)val; }
+					if (typeof(T) == typeof(float)) { ret = (T)(object)(float)val; }
+					if (typeof(T) == typeof(double)) { ret = (T)(object)val; }
+					if (typeof(T) == typeof(short)) { ret = (T)(object)(short)val; }
+					if (typeof(T) == typeof(byte)) { ret = (T)(object)(byte)val; }
+					if (typeof(T) == typeof(long)) { ret = (T)(object)(long)val; }
+					
 				}
 
 			}
@@ -47,47 +53,29 @@ public static class ControlStates {
 		return default(T);
 	}
 	
-	public static float forwardAxis = 0.0f;
-	public static float lateralAxis = 0.0f;
-	public static float yawAxis = 0.0f;
-	public static float pitchAxis = 0.0f;
-	
-	public static bool forward = false;
-	public static bool back = false;
-	public static bool moveleft = false;
-	public static bool moveright = false;
-	public static bool moveup = false;
-	public static bool movedown = false;
-	
-	public static bool left = false;
-	public static bool right = false;
-	public static bool lookup = false;
-	public static bool lookdown = false;
 
-	public static bool attack = false;
-	public static bool jump = false;
-	public static bool crouch = false;
-	public static bool sprint = false;
-	public static bool voicerecord = false;
-	
-	public static bool altInput = false;
-	
-	public static bool sightHold = false;
-	public static bool sightToggle = false;
-	
-	public static bool reload = false;
-	public static bool showScores = false;
-	public static bool showChatWindow = false;
-	public static bool use = false;
-	
-	public static string rcon_password = "dickbutts";
-	public static string rcon_commands = "";
+	public static float forwardAxis { get { return Get<float>("forwardAxis"); } }
+	public static float lateralAxis { get { return Get<float>("lateralAxis"); } }
+	public static float yawAxis { get { return Get<float>("yawAxis"); } }
+	public static float pitchAxis { get { return Get<float>("pitchAxis"); } }
+	public static float zoomAxis { get { return Get<float>("zoomAxis"); } }
 
-	public static string changeToMap = "";
+	public static bool forward { get { return Get<bool>("forward"); } }
+	public static bool backward { get { return Get<bool>("backward"); } }
+	public static bool left { get { return Get<bool>("left"); } }
+	public static bool right { get { return Get<bool>("right"); } }
+	public static bool up { get { return Get<bool>("up"); } }
+	public static bool down { get { return Get<bool>("down"); } }
 
-	public static bool selectWeapon1 = false;
-	public static bool selectWeapon2 = false;
-	public static bool selectWeapon3 = false;
-	public static bool selectWeapon4 = false;
+	public static bool zoomIn { get { return Get<bool>("zoomIn"); } }
+	public static bool zoomOut { get { return Get<bool>("zoomOut"); } }
+
+	public static bool camUp { get { return Get<bool>("camUp"); } }
+	public static bool camDown { get { return Get<bool>("camDown"); } }
+	public static bool camLeft { get { return Get<bool>("camLeft"); } }
+	public static bool camRight { get { return Get<bool>("camRight"); } }
+
+	public static bool jump { get { return Get<bool>("jump"); } }
+	public static bool powerup { get { return Get<bool>("powerup"); } }
 	
 }

@@ -12,16 +12,33 @@ Alias "defaults" "Defaults"
 Bind F1 "ToggleConsole"
 Bind BackQuote "ToggleConsole"
 
-BindButton W "forward" "ControlStates.forward"
-BindButton S "back" "ControlStates.back"
-BindButton A "moveleft" "ControlStates.moveleft"
-BindButton D "moveright" "ControlStates.moveright"
-BindButton E "moveup" "ControlStates.moveup"
-BindButton Q "movedown" "ControlStates.movedown"
+Bind JoystickAxis0 "ControlStates.Set lateralAxis %value%"
+Bind JoystickAxis1 "ControlStates.Set forwardAxis %value%"
+Bind JoystickAxis2 "ControlStates.Set yawAxis %value%"
+Bind JoystickAxis3 "ControlStates.Set pitchAxis %value%"
+Bind JoystickAxis4 "ControlStates.Set zoomAxis %value%"
 
-BindButton Space "jump" "ControlStates.jump"
+BindButton W "forward" "ControlStates.Set forward"
+BindButton S "backward" "ControlStates.Set backward"
+BindButton A "left" "ControlStates.Set left"
+BindButton D "right" "ControlStates.Set right"
+BindButton E "up" "ControlStates.Set up"
+BindButton Q "down" "ControlStates.Set down"
 
-Bind MouseAxisX "ControlStates.yawAxis %value%"
-Bind MouseAxisY "ControlStates.pitchAxis %value%"
+BindButton Z "zoomIn" "ControlStates.Set zoomIn"
+BindButton X "zoomOut" "ControlStates.Set zoomOut"
 
 
+BindButton UpArrow "camUp" "ControlStates.Set camUp"
+BindButton DownArrow "camDown" "ControlStates.Set camDown"
+BindButton LeftArrow "camLeft" "ControlStates.Set camLeft"
+BindButton RightArrow "camRight" "ControlStates.Set camRight"
+
+
+Bind MouseAxisX "ControlStates.Set yawAxis %value%"
+Bind MouseAxisY "ControlStates.Set pitchAxis %value%"
+
+
+
+BindButton Space "jump" "ControlStates.Set jump"
+BindButton LeftShift "powerup" "ControlStates.Set powerup"
