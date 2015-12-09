@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -26,10 +27,14 @@ public class GUIRoot : MonoBehaviour {
 	private static Dictionary<string, ZWindow> holdBinds = new Dictionary<string,ZWindow>();
 	private static Dictionary<string, ZWindow> registeredWindows = new Dictionary<string,ZWindow>();
 
+	/// <summary> History of GameObjects that have been visited as menus. </summary>
 	private static Stack<GameObject> history = new Stack<GameObject>();
+	/// <summary> What is the current menu's GameObject </summary>
 	private static GameObject active { get { return history.Peek(); } }
 
+	/// <summary> Push a menu GameObject on the stack from static context. </summary>
 	public static void Push(GameObject next) { main.Pushx(next); }
+	/// <summary> Push a menu GameObject on the stack from a instance context </summary>
 	public void Pushx(GameObject next) {
 		if (history.Count > 0) {
 			active.SetActive(false);
@@ -38,8 +43,16 @@ public class GUIRoot : MonoBehaviour {
 		history.Push(next);
 	}
 
-	public static GameObject Pop() { return main.Popx(); }
-	public GameObject Popx() {
+	//Gay shit to call Pop() from a referenced thing
+	/// <summary> Pop a menu GameObject from static context, return nothing. </summary>
+	public static void Popz() { main.Popy(); }
+	/// <summary> Pop a menu GameObject from static context, return popped game object. </summary>
+	public static GameObject Pop() { return main.Popy(); }
+
+	/// <summary> Pop a menu GameObject from instance context, return nothing. </summary>
+	public void Popx() { Popy(); }
+	/// <summary> Pop a menu GameObject from instance context, return popped game object. </summary>
+	public GameObject Popy() {
 		if (history.Count <= 1) { return null; }
 
 		GameObject obj = history.Pop();
@@ -51,6 +64,9 @@ public class GUIRoot : MonoBehaviour {
 
 		return obj;
 	}
+
+	/// <summary> Function to run when escape key is hit. Set to null to enable default behaviour. </summary>
+	public static Action onEscape = Popz;
 
 	public const int REGISTER = 0;
 	public const int BIND = 1;
@@ -76,8 +92,10 @@ public class GUIRoot : MonoBehaviour {
 
 		}
 
+		if (onEscape == null) { onEscape = Popz; }
+
 		if (Input.GetKeyDown(KeyCode.Escape)) {
-			Popx();
+			onEscape();
 		}
 
 		while (delayedAdd.Count > 0) {

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class RectTransformUtils : ZEditorWindow {
 	
-	private static RectTransformUtils window;
+	public static RectTransformUtils window;
 
 	[MenuItem("Utilities/UGUI Rect Utils")]
 	public static void ShowWindow() {

@@ -355,9 +355,12 @@ public class QuickPlayerSettings : EditorWindow {
 				PlayerSettings.iOS.targetDevice = tempiostargetDevice;
 				break;
 			case "iOS.targetResolution":
-				iOSTargetResolution temptargetResolution;
-				EnumUtils.TryParse<iOSTargetResolution>(val, out temptargetResolution);
-				PlayerSettings.iOS.targetResolution = temptargetResolution;
+				//iOSTargetResolution temptargetResolution;
+				//EnumUtils.TryParse<iOSTargetResolution>(val, out temptargetResolution);
+				//PlayerSettings.iOS.targetResolution = temptargetResolution;
+				
+				//iOSTargetResolution is obsolete as of 5.3.0
+				//Use Screen.SetResolution(temptargetResolution);
 				break;
 			case "iOS.prerenderedIcon":
 				PlayerSettings.iOS.prerenderedIcon = Boolean.Parse(val);
@@ -469,7 +472,7 @@ public class QuickPlayerSettings : EditorWindow {
 			output += "iOS.sdkVersion," + PlayerSettings.iOS.sdkVersion + "\n";
 			output += "iOS.targetOSVersion," + PlayerSettings.iOS.targetOSVersion + "\n";
 			output += "iOS.targetDevice," + PlayerSettings.iOS.targetDevice + "\n";
-			output += "iOS.targetResolution," + PlayerSettings.iOS.targetResolution + "\n";
+			//output += "iOS.targetResolution," + PlayerSettings.iOS.targetResolution + "\n";
 			output += "iOS.prerenderedIcon," + PlayerSettings.iOS.prerenderedIcon + "\n";
 			output += "iOS.requiresPersistentWiFi," + PlayerSettings.iOS.requiresPersistentWiFi + "\n";
 			output += "iOS.statusBarStyle," + PlayerSettings.iOS.statusBarStyle + "\n";
