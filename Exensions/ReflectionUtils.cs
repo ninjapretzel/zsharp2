@@ -52,7 +52,13 @@ public static class ReflectionUtils {
 	public static bool HasMethod(this System.Object obj, string name) { return obj.GetMethod(name) != null; }
 	public static bool HasStaticMethod(this System.Type type, string name) { return type.GetMethod(name) != null; }
 	///Does this object have a void method called name?
-	public static bool HasAction(this System.Object obj, string name) { return obj.HasMethod<Void>(name); }
+	public static bool HasAction(this System.Object obj, string name) {
+		MethodInfo info = obj.GetMethod(name);
+		if (info != null) {
+			return (info.ReturnType == typeof(void));
+		}
+		return false;
+	}
 	
 	///Does this object have a method called name, that returns a value of type <T>?
 	public static bool HasMethod<T>(this System.Object obj, string name) {

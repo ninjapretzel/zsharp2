@@ -73,7 +73,7 @@ public static class UGUIz {
 		obj.layer = LAYER;
 		EventSystem es = obj.AddComponent<EventSystem>();
 		StandaloneInputModule sim = obj.AddComponent<StandaloneInputModule>();
-		TouchInputModule tim = obj.AddComponent<TouchInputModule>();
+		//TouchInputModule tim = obj.AddComponent<TouchInputModule>();
 
 		es.firstSelectedGameObject = null;
 		es.sendNavigationEvents = true;
@@ -87,7 +87,7 @@ public static class UGUIz {
 		sim.repeatDelay = .5f;
 		sim.forceModuleActive = false;
 
-		tim.forceModuleActive = false;
+		//tim.forceModuleActive = false;
 
 
 		return obj.transform;

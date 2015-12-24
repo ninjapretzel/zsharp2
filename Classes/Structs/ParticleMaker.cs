@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -23,8 +23,8 @@ public class ParticleMaker {
 			
 			p.position = position;
 			
-			p.size = size;
-			p.color = color;
+			p.startSize = size;
+			p.startColor = color;
 			p.rotation = rotation + angularVelocity * Time.time;
 			
 			return p;
@@ -54,12 +54,12 @@ public class TimedParticleMaker : ParticleMaker {
 			ParticleSystem.Particle p = base.particle;
 			
 			p.position += velocity * lifeTime;
-			p.size += sizeChange * lifeTime;
-			if (p.size < 0) { p.size = 0; }
+			p.startSize += sizeChange * lifeTime;
+			if (p.startSize < 0) { p.startSize = 0; }
 			
-			Color c = p.color;
+			Color c = p.startColor;
 			c.a = alphaOverTime.Evaluate(lifeTime);
-			p.color = c;
+			p.startColor = c;
 			
 			return p;
 		}

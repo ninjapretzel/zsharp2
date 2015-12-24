@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 
 
-public class Slider {
+public class LegacySlider {
 	public Rect baseArea;
 	
 	public Rect IN { get { return slideIn.Denormalized(); } }
@@ -40,29 +40,29 @@ public class Slider {
 	public Vector2 slideChange = Vector2.zero;
 	
 	//Constructors
-	public Slider() { baseArea = RectUtils.unit; } // unit = (0, 0, 1, 1)
-	public Slider(Rect area) { baseArea = area; }
+	public LegacySlider() { baseArea = RectUtils.unit; } // unit = (0, 0, 1, 1)
+	public LegacySlider(Rect area) { baseArea = area; }
 	//Normalized Factory
-	public static Slider Normalized(Rect area) {
+	public static LegacySlider Normalized(Rect area) {
 		Rect a = new Rect(area);
-		return new Slider(a);
+		return new LegacySlider(a);
 	}
 	
 	
-	public static Slider Up(Rect area) { return Up(area, 1); }
-	public static Slider Down(Rect area) { return Down(area, 1); }
-	public static Slider Left(Rect area) { return Left(area, 1); }
-	public static Slider Right(Rect area) { return Right(area, 1); }
+	public static LegacySlider Up(Rect area) { return Up(area, 1); }
+	public static LegacySlider Down(Rect area) { return Down(area, 1); }
+	public static LegacySlider Left(Rect area) { return Left(area, 1); }
+	public static LegacySlider Right(Rect area) { return Right(area, 1); }
 	
-	public static Slider Up(Rect area, float power) { Slider s = Normalized(area); s.SlideUp(power); return s; }
-	public static Slider Down(Rect area, float power) { Slider s = Normalized(area); s.SlideDown(power); return s; }
-	public static Slider Left(Rect area, float power) { Slider s = Normalized(area); s.SlideLeft(power); return s; }
-	public static Slider Right(Rect area, float power) { Slider s = Normalized(area); s.SlideRight(power); return s; }
+	public static LegacySlider Up(Rect area, float power) { LegacySlider s = Normalized(area); s.SlideUp(power); return s; }
+	public static LegacySlider Down(Rect area, float power) { LegacySlider s = Normalized(area); s.SlideDown(power); return s; }
+	public static LegacySlider Left(Rect area, float power) { LegacySlider s = Normalized(area); s.SlideLeft(power); return s; }
+	public static LegacySlider Right(Rect area, float power) { LegacySlider s = Normalized(area); s.LegacySlideright(power); return s; }
 	
-	public static Slider Up(Rect area, float power, float dampening) { Slider s = Normalized(area); s.SlideUp(power); s.dampening = dampening; return s; }
-	public static Slider Down(Rect area, float power, float dampening) { Slider s = Normalized(area); s.SlideDown(power); s.dampening = dampening; return s; }
-	public static Slider Left(Rect area, float power, float dampening) { Slider s = Normalized(area); s.SlideLeft(power); s.dampening = dampening; return s; }
-	public static Slider Right(Rect area, float power, float dampening) { Slider s = Normalized(area); s.SlideRight(power); s.dampening = dampening; return s; }
+	public static LegacySlider Up(Rect area, float power, float dampening) { LegacySlider s = Normalized(area); s.SlideUp(power); s.dampening = dampening; return s; }
+	public static LegacySlider Down(Rect area, float power, float dampening) { LegacySlider s = Normalized(area); s.SlideDown(power); s.dampening = dampening; return s; }
+	public static LegacySlider Left(Rect area, float power, float dampening) { LegacySlider s = Normalized(area); s.SlideLeft(power); s.dampening = dampening; return s; }
+	public static LegacySlider Right(Rect area, float power, float dampening) { LegacySlider s = Normalized(area); s.LegacySlideright(power); s.dampening = dampening; return s; }
 	
 	
 	public void Update() { Update(Time.deltaTime); }
@@ -83,7 +83,7 @@ public class Slider {
 		if (direction == Cardinal.Up) { SlideUp(power); }
 		else if (direction == Cardinal.Down) { SlideDown(power); }
 		else if (direction == Cardinal.Left) { SlideLeft(power); }
-		else if (direction == Cardinal.Right) { SlideRight(power); }
+		else if (direction == Cardinal.Right) { LegacySlideright(power); }
 	}
 	
 	public void Slide(Vector2 v) { Slide(v.x, v.y); }
@@ -94,12 +94,12 @@ public class Slider {
 	}
 	
 	public void SlideLeft(float f) { Slide(-f, 0f); }
-	public void SlideRight(float f) { Slide(f, 0f); }
+	public void LegacySlideright(float f) { Slide(f, 0f); }
 	public void SlideUp(float f) { Slide(0f, -f); }
 	public void SlideDown(float f) { Slide(0f, f); }
 	
 	public void SlideLeft() { SlideLeft(1); }
-	public void SlideRight() { SlideRight(1); }
+	public void LegacySlideright() { LegacySlideright(1); }
 	public void SlideUp() { SlideUp(1); }
 	public void SlideDown() { SlideDown(1); }
 	

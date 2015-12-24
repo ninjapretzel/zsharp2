@@ -54,28 +54,28 @@ public static class ControlStates {
 	}
 	
 
-	public static float forwardAxis { get { return Get<float>("forwardAxis"); } }
-	public static float lateralAxis { get { return Get<float>("lateralAxis"); } }
-	public static float yawAxis { get { return Get<float>("yawAxis"); } }
-	public static float pitchAxis { get { return Get<float>("pitchAxis"); } }
-	public static float zoomAxis { get { return Get<float>("zoomAxis"); } }
+	public static float forwardAxis { get { return Get<float>("forwardAxis"); } set { Set("forwardAxis", value.ToString()); } }
+	public static float lateralAxis { get { return Get<float>("lateralAxis"); } set { Set("lateralAxis", value.ToString()); } }
+	public static float yawAxis { get { return Get<float>("yawAxis"); } set { Set("yawAxis", value.ToString()); } }
+	public static float pitchAxis { get { return Get<float>("pitchAxis"); } set { Set("pitchAxis", value.ToString()); } }
+	public static float zoomAxis { get { return Get<float>("zoomAxis"); } set { Set("zoomAxis", value.ToString()); } }
 
-	public static bool forward { get { return Get<bool>("forward"); } }
-	public static bool backward { get { return Get<bool>("backward"); } }
-	public static bool left { get { return Get<bool>("left"); } }
-	public static bool right { get { return Get<bool>("right"); } }
-	public static bool up { get { return Get<bool>("up"); } }
-	public static bool down { get { return Get<bool>("down"); } }
+	public static bool forward { get { return Get<bool>("forward"); } set { Set("forward", value.ToString()); } }
+	public static bool backward { get { return Get<bool>("backward"); } set { Set("backward", value.ToString()); } }
+	public static bool left { get { return Get<bool>("left"); } set { Set("left", value.ToString()); } }
+	public static bool right { get { return Get<bool>("right"); } set { Set("right", value.ToString()); } }
+	public static bool up { get { return Get<bool>("up"); } set { Set("up", value.ToString()); } }
+	public static bool down { get { return Get<bool>("down"); } set { Set("down", value.ToString()); } }
 
-	public static bool zoomIn { get { return Get<bool>("zoomIn"); } }
-	public static bool zoomOut { get { return Get<bool>("zoomOut"); } }
+	public static bool zoomIn { get { return Get<bool>("zoomIn"); } set { Set("zoomIn", value.ToString()); } }
+	public static bool zoomOut { get { return Get<bool>("zoomOut"); } set { Set("zoomOut", value.ToString()); } }
 
-	public static bool camUp { get { return Get<bool>("camUp"); } }
-	public static bool camDown { get { return Get<bool>("camDown"); } }
-	public static bool camLeft { get { return Get<bool>("camLeft"); } }
-	public static bool camRight { get { return Get<bool>("camRight"); } }
+	public static bool camUp { get { return Get<bool>("camUp"); } set { Set("camUp", value.ToString()); } }
+	public static bool camDown { get { return Get<bool>("camDown"); } set { Set("camDown", value.ToString()); } }
+	public static bool camLeft { get { return Get<bool>("camLeft"); } set { Set("camLeft", value.ToString()); } }
+	public static bool camRight { get { return Get<bool>("camRight"); } set { Set("camRight", value.ToString()); } }
 
-	public static bool jump { get { return Get<bool>("jump"); } }
-	public static bool powerup { get { return Get<bool>("powerup"); } }
+	public static bool jump { get { return Get<bool>("jump"); } set { Set("jump", value.ToString()); } }
+	public static bool powerup { get { return Get<bool>("powerup"); } set { Set("powerup", value.ToString()); } }
 	
 }

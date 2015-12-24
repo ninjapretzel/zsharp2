@@ -31,7 +31,7 @@ public class UGUIzTextField : MonoBehaviour {
 
 	void Start() {
 		input = GetComponent<InputField>();
-		input.onValueChange.AddListener(OnEdit);
+		input.onValueChanged.AddListener(OnEdit);
 
 		string targetName = invokeOnSend.UpToLast('.');
 		string targetThing = invokeOnSend.FromLast('.');

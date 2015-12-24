@@ -65,6 +65,30 @@ public class GUIRoot : MonoBehaviour {
 		return obj;
 	}
 
+	public void PopTo(GameObject target) {
+		while (history.Contains(target) && active != target) {
+			Pop();
+		}
+	}
+
+	/// <summary> Switch to a given menu GameObject from instance context, return nothing. </summary>
+	public void Switchx(GameObject obj) {
+		Pop();
+		Push(obj);
+	}
+
+	/// <summary> Switch to a given menu GameObject from instance context, return popped game object. </summary>
+	public GameObject Switch(GameObject obj) {
+		var popped = Pop();
+		Push(obj);
+		return popped;
+	}
+	
+	/// <summary> Switch to a given menu GameObject from static context, return popped game object. </summary>
+	public static GameObject Switchz(GameObject obj) {
+		return main.Switch(obj);
+	}
+
 	/// <summary> Function to run when escape key is hit. Set to null to enable default behaviour. </summary>
 	public static Action onEscape = Popz;
 

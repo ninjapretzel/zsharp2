@@ -32,6 +32,7 @@ public class MusicPlayer : MonoBehaviour {
 	public SongInfo[] trackSets;
 
 	public string activeSet;
+	public bool playOnStart = false;
 	
 	public int curIndex;
 	public bool shuffle = true;
@@ -51,6 +52,7 @@ public class MusicPlayer : MonoBehaviour {
 			return;
 		}
 		main = this;
+		DontDestroyOnLoad(gameObject);
 		
 		foreach (SongInfo s in trackSets) {
 			foreach (AudioClip clip in s.songs) {
@@ -58,8 +60,16 @@ public class MusicPlayer : MonoBehaviour {
 			}
 		}
 		fadein = true;
-		DontDestroyOnLoad(gameObject);
 		
+		if (playOnStart) {
+			string set = activeSet;
+			activeSet = "";
+			Switch(set);
+
+		} else {
+			activeSet = "";
+		}
+
 	}
 	
 	void Update() {

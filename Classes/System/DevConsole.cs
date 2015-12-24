@@ -158,6 +158,7 @@ public class DevConsole : MonoBehaviour {
 			}
 		} else {
 			Screen.lockCursor = false;
+			Cursor.visible = true;
 		}
 
 	}
@@ -1007,6 +1008,10 @@ public class DevConsole : MonoBehaviour {
 			}
 		}
 		return ret;
+	}
+
+	public static bool IsBoundTo(KeyCode key, string command) {
+		return binds.ContainsKey(key) && binds[key].Equals(command, System.StringComparison.InvariantCultureIgnoreCase);
 	}
 
 	public class CheatAttribute : System.Attribute {
