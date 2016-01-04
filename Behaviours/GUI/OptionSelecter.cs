@@ -21,6 +21,8 @@ public class OptionSelecter : MonoBehaviour {
 	Text display;
 	Text label;
 	
+	string last;
+
 	void Start() {
 		if (Application.isPlaying) {
 			label = transform.Find("Label").GetComponent<Text>();
@@ -52,8 +54,18 @@ public class OptionSelecter : MonoBehaviour {
 
 			if (label != null) { label.text = gameObject.name; }
 			if (display != null) { display.text = defaultOption; }
+		} else {
+			//Debug.Log(settingName + " : " + Settings.instance[settingName]);
+
+			string setting = Settings.instance[settingName].stringVal;
+			if (setting != last) {
+				display.text = setting;
+			}
+			last = setting;
+
 
 		}
+
 	}
 	
 

@@ -59,6 +59,9 @@ public partial class Settings : JsonObject {
 		});
 
 		//Soft particles can't be changed... RIP.
+		//They suck anyway, so nothing of value was lost...
+
+		//ReflectionSize is pulled from 'AppliesReflectionProbeSettings'
 
 		Register("RealtimeReflection", (s) => {
 			QualitySettings.realtimeReflectionProbes = (s == "ON");
@@ -68,7 +71,7 @@ public partial class Settings : JsonObject {
 			QualitySettings.billboardsFaceCameraPosition = (s == "ON");
 		});
 
-		string[] camToggles = { "Bloom", "AmbientOcclusion", "DepthOfField", "Scanlines" };
+		string[] camToggles = { "Bloom", "AmbientOcclusion", "DepthOfField", "Scanlines", "ScreenSpaceReflections" };
 		foreach (string str in camToggles) {
 			//Debug.Log("Registering " + str);
 			string ztr = str;
@@ -128,6 +131,7 @@ public partial class Settings : JsonObject {
 		if (PlayerPrefs.HasKey(key)) {
 			string prefs = PlayerPrefs.GetString(key);
 			JsonObject pobj = Json.Parse(prefs) as JsonObject;
+			Debug.Log("Loaded Saved Settings");
 			jobj.Set(pobj);
 		}
 

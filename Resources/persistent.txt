@@ -12,12 +12,6 @@ Alias "defaults" "Defaults"
 Bind F1 "ToggleConsole"
 Bind BackQuote "ToggleConsole"
 
-Bind JoystickAxis0 "ControlStates.Set lateralAxis %value%"
-Bind JoystickAxis1 "ControlStates.Set forwardAxis %value%"
-Bind JoystickAxis2 "ControlStates.Set yawAxis %value%"
-Bind JoystickAxis3 "ControlStates.Set pitchAxis %value%"
-Bind JoystickAxis4 "ControlStates.Set zoomAxis %value%"
-
 BindButton W "forward" "ControlStates.Set forward"
 BindButton S "backward" "ControlStates.Set backward"
 BindButton A "left" "ControlStates.Set left"
@@ -28,17 +22,15 @@ BindButton Q "down" "ControlStates.Set down"
 BindButton Z "zoomIn" "ControlStates.Set zoomIn"
 BindButton X "zoomOut" "ControlStates.Set zoomOut"
 
-
 BindButton UpArrow "camUp" "ControlStates.Set camUp"
 BindButton DownArrow "camDown" "ControlStates.Set camDown"
 BindButton LeftArrow "camLeft" "ControlStates.Set camLeft"
 BindButton RightArrow "camRight" "ControlStates.Set camRight"
 
-
-Bind MouseAxisX "ControlStates.Set yawAxis %value%"
-Bind MouseAxisY "ControlStates.Set pitchAxis %value%"
-
-
+Bind MouseAxisX+ "ControlStates.Set yawAxis %value%"
+Bind MouseAxisX- "ControlStates.Set yawAxis %nvalue%"
+Bind MouseAxisY+ "ControlStates.Set pitchAxis %value%"
+Bind MouseAxisY- "ControlStates.Set pitchAxis %nvalue%"
 
 BindButton Space "jump" "ControlStates.Set jump"
 BindButton LeftShift "powerup" "ControlStates.Set powerup"

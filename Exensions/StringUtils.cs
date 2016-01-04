@@ -34,6 +34,14 @@ public static class StringUtils {
 		}
 		return str.ToString();
 	}
+
+	public static bool ContainsAny(this string str, IEnumerable<string> col) {
+		foreach (string s in col) {
+			if (str.Contains(s)) { return true; }
+		}
+		return false;
+
+	}
 	
 	///<summary>
 	///Changes camel cased strings into uncamel cased strings for beautification
@@ -244,6 +252,7 @@ public static class StringUtils {
 		return (neg ? "-" : "") +  Mathf.Round(val * 1000f) / 1000f + notationValue;
 	}
 
+	
 
 	public static string ShortStringD(this double d, int places = 3) {
 		if (d == double.NaN) { return "NaN"; }

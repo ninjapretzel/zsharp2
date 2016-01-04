@@ -31,17 +31,48 @@ public class TransformMacros : Editor {
 		Undo.IncrementCurrentGroup();
 	}
 
+	[MenuItem("Macros/Instantiate Prefab &p")]
+	public static void DumpPrefabInfo() {
+
+		var prefab = PrefabUtility.GetPrefabParent(Selection.activeGameObject);
+		
+		string log = "Selected: " + Selection.activeGameObject;
+		
+		if (prefab != null) {
+			log += "\nPrefab: " + prefab;
+			//GameObject copy = GameObject.Instantiate(Selection.activeGameObject);
+			//copy.name = "DICKS LOL";
+			//PrefabUtility.ReplacePrefab(copy, prefab, ReplacePrefabOptions.ConnectToPrefab);
+
+			var made = PrefabUtility.InstantiatePrefab(prefab);
+			log += "\nMade: " + made;
+
+			GameObject asGO = made as GameObject;
+			Transform asTF = made as Transform;
+
+			log += "\nAs GameObject: " + asGO;
+			log += "\nAs Transform: " + asTF;
+
+		} else {
+			log += "Prefab not found";
+		}
+		Debug.Log(log);
+
+	}
+
 	[MenuItem("Macros/Duplicate &d")]
 	public static void Duplicate() {
 		//int group = Undo.GetCurrentGroup();
 		
 		List<GameObject> copies = new List<GameObject>();
 		foreach (Transform t in Selection.transforms) {
-			Transform tcopy = Instantiate(t, t.position, t.rotation) as Transform;
-			tcopy.SetParent(t.parent);
-			tcopy.gameObject.name = t.gameObject.name;
-			copies.Add(tcopy.gameObject);
-			Undo.RegisterCreatedObjectUndo(tcopy.gameObject, "Duplicate");
+			
+			Transform tcopy = t.ZDuplicate();
+			if (t != null) {
+				copies.Add(tcopy.gameObject);
+				Undo.RegisterCreatedObjectUndo(tcopy.gameObject, "Duplicate");
+			}
+			
 		}
 
 		Selection.objects = copies.ToArray();
@@ -55,6 +86,7 @@ public class TransformMacros : Editor {
 		Undo.RecordObject(sel, "Toggle Active State");
 		sel.SetActive(!sel.activeSelf);
 	}
+
 
 	
 	public static void FixParentRotation(Transform target) {

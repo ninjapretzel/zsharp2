@@ -13,7 +13,6 @@ public class DevConsole : MonoBehaviour {
 	public bool runDefaultsOnStartup = false;
 #endif
 	public string initialText = "";
-	public GUISkin consoleSkin;
 	public static Color color = Color.white;
 	public static bool cheats = false;
 	public static string echoBuffer = "";
@@ -62,11 +61,7 @@ public class DevConsole : MonoBehaviour {
 		if (File.Exists(configPath)) {
 			LoadConfigFile();
 		} else {
-			binds = new Dictionary<KeyCode, string>();
-			aliases = new Dictionary<string, string>();
-			axisMappings = new Dictionary<string, string>();
-			Execute(persistent.Split('\n'));
-			SaveConfigFile();
+			Defaults();
 		}
 
 	}
@@ -75,7 +70,9 @@ public class DevConsole : MonoBehaviour {
 		binds = new Dictionary<KeyCode, string>();
 		aliases = new Dictionary<string, string>();
 		axisMappings = new Dictionary<string, string>();
-		File.Delete(configPath);
+		if (File.Exists(configPath)) {
+			File.Delete(configPath);
+		}
 		Execute(persistent.Split('\n'));
 		SaveConfigFile();
 
@@ -102,16 +99,15 @@ public class DevConsole : MonoBehaviour {
 							Execute('-' + cmd.Substring(1));
 						}
 					}
-
 				}
 			}
 			foreach (KeyValuePair<string, string> pair in axisMappings) {
 				if (pair.Key[pair.Key.Length - 1] == '-') {
 					string axis = pair.Key.Substring(0, pair.Key.Length - 1);
 					if (pair.Value.Contains("%value%") || pair.Value.Contains("%nvalue%")) {
-						if (Input.GetAxisRaw(axis) < 0) {
-							Execute(pair.Value.Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
-						} else {
+						if (Input.GetAxisRaw(axis) <= 0) {
+							Execute(pair.Value.Replace("%value%", (-Input.GetAxisRaw(axis)).ToString()).Replace("%nvalue%", (Input.GetAxisRaw(axis)).ToString()));
+						} else if (!axisMappings.ContainsKey(pair.Key.Substring(0, pair.Key.Length - 1) + "+")) {
 							Execute(pair.Value.Replace("%value%", "0").Replace("%nvalue%", "0"));
 						}
 					} else {
@@ -132,9 +128,9 @@ public class DevConsole : MonoBehaviour {
 				} else if (pair.Key[pair.Key.Length - 1] == '+') {
 					string axis = pair.Key.Substring(0, pair.Key.Length - 1);
 					if (pair.Value.Contains("%value%") || pair.Value.Contains("%nvalue%")) {
-						if (Input.GetAxisRaw(axis) > 0) {
+						if (Input.GetAxisRaw(axis) >= 0) {
 							Execute(pair.Value.Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
-						} else {
+						} else if (!axisMappings.ContainsKey(pair.Key.Substring(0, pair.Key.Length - 1) + "-")) {
 							Execute(pair.Value.Replace("%value%", "0").Replace("%nvalue%", "0"));
 						}
 					} else {
@@ -176,12 +172,7 @@ public class DevConsole : MonoBehaviour {
 		}
 
 		if (window.open) {
-			//GUI.skin = consoleSkin;
-			//GUI.skin.FontSizeFull(12, 12);
-			//GUI.skin.window.fontSize = 18;
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_MAC
-			//consoleWindowRect = new Rect(Mathf.Min(Mathf.Max(consoleWindowRect.x, -1 * consoleWindowRect.width + 10), Screen.width - 10), Mathf.Min(Mathf.Max(consoleWindowRect.y, -1 * GUI.skin.window.fontSize + 10), Screen.height - 10), consoleWindowRect.width, consoleWindowRect.height);
-			//consoleWindowRect = GUI.Window(1, consoleWindowRect, ConsoleWindow, "Developer Console");
 			window.Draw();
 #endif
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
@@ -675,6 +666,27 @@ public class DevConsole : MonoBehaviour {
 	public static void ToggleConsole() {
 		window.open = !window.open;
 		window.textField = "";
+		if (window.open) {
+			foreach (KeyValuePair<KeyCode, string> bind in binds) {
+				string[] cmds = bind.Value.SplitUnlessInContainer(';', '\"', System.StringSplitOptions.RemoveEmptyEntries);
+				foreach (string cmd in cmds) {
+					if (cmd[0] == '+') {
+						Execute('-' + cmd.Substring(1));
+					}
+				}
+			}
+			foreach (KeyValuePair<string, string> mapping in axisMappings) {
+				if (mapping.Value.Contains("%value%")) {
+					Execute(mapping.Value.Replace("%value%", "0"));
+				}
+				string[] cmds = mapping.Value.SplitUnlessInContainer(';', '\"', System.StringSplitOptions.RemoveEmptyEntries);
+				foreach (string cmd in cmds) {
+					if (cmd[0] == '+') {
+						Execute('-' + cmd.Substring(1));
+					}
+				}
+			}
+		}
 
 	}
 
@@ -787,7 +799,16 @@ public class DevConsole : MonoBehaviour {
 					if (axisMappings.ContainsKey(parameters[0])) {
 						Echo(parameters[0] + " is " + axisMappings[parameters[0]]);
 					} else {
-						Echo(parameters[0] + " is not a valid KeyCode or the axis is not bound!");
+						try {
+							string tryme = parameters[0];
+							if (tryme[tryme.Length - 1] == '+' || tryme[tryme.Length - 1] == '-') {
+								tryme = tryme.Substring(0, tryme.Length - 1);
+							}
+							Input.GetAxisRaw(tryme);
+							Echo(parameters[0] + " is unbound");
+						} catch(System.ArgumentException) {
+							Echo(parameters[0] + " is not a valid KeyCode or the axis is not bound!");
+						}
 					}
 					break;
 				}
@@ -844,7 +865,7 @@ public class DevConsole : MonoBehaviour {
 					axisMappings[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
 				}
 				axisMappings[name] = axisMappings[name].Substring(1);
-			} catch (UnityException) {
+			} catch (System.ArgumentException) {
 				Echo(name + " is not a valid KeyCode or axis!");
 				return;
 			}
@@ -903,7 +924,7 @@ public class DevConsole : MonoBehaviour {
 			if (axisMappings.ContainsKey(name)) {
 				axisMappings.Remove(name);
 			} else {
-				Echo(name + " is not a valid KeyCode or the axis is not bound!");
+				Echo(name + " is not a valid KeyCode or axis!");
 			}
 		}
 	}
@@ -962,8 +983,9 @@ public class DevConsole : MonoBehaviour {
 	public static void LoadConfigFile() {
 		if (File.Exists(configPath)) {
 			Execute(persistent.Split('\n'));
-			// If config exists, clear binds after loading persistent file (we want the default aliases but not the keybinds)
+			// If config exists, clear binds after loading persistent file (we want the default aliases but not the binds)
 			binds = new Dictionary<KeyCode, string>();
+			axisMappings = new Dictionary<string, string>();
 #if UNITY_EDITOR
 			binds.Add(KeyCode.F1, "ToggleConsole");
 #endif
@@ -1010,8 +1032,22 @@ public class DevConsole : MonoBehaviour {
 		return ret;
 	}
 
+	public static List<string> GetAxesByCommand(string command) {
+		List<string> ret = new List<string>();
+		foreach (KeyValuePair<string, string> kvp in axisMappings) {
+			if (command == kvp.Value) {
+				ret.Add(kvp.Key);
+			}
+		}
+		return ret;
+	}
+
 	public static bool IsBoundTo(KeyCode key, string command) {
-		return binds.ContainsKey(key) && binds[key].Equals(command, System.StringComparison.InvariantCultureIgnoreCase);
+		return binds.ContainsKey(key) && binds[key] == command;
+	}
+
+	public static bool IsBoundTo(string axis, string command) {
+		return axisMappings.ContainsKey(axis) && axisMappings[axis] == command;
 	}
 
 	public class CheatAttribute : System.Attribute {

@@ -18,6 +18,8 @@ public class GUIRoot : MonoBehaviour {
 	}
 
 	public static GUIRoot main;
+
+	public static Action pause;
 	
 	public static List<ZWindow> windows = new List<ZWindow>();
 	static List<WindowInfo> delayedAdd = new List<WindowInfo>();
@@ -272,8 +274,13 @@ public class GUIRoot : MonoBehaviour {
 			}
 		}
 #endif
-		
 
+	}
+
+	public static void TogglePause() {
+		if (pause != null) {
+			pause();
+		}
 	}
 	
 	

@@ -27,9 +27,79 @@ public static class ZEditorExtensions {
 	}
 	//*/
 	
-	
-	
 }
+	
+public static class ZEditorHelpers {
+
+	public static GameObject SpawnPrefab(GameObject prefabObject) { return SpawnPrefab(prefabObject.transform).gameObject; }
+	public static GameObject SpawnPrefab(GameObject prefabObject, Transform destination) { return SpawnPrefab(prefabObject.transform, destination).gameObject; }
+	public static GameObject SpawnPrefab(GameObject prefabObject, Vector3 position, Quaternion rotation) { return SpawnPrefab(prefabObject.transform, position, rotation).gameObject; }
+
+	public static Transform SpawnPrefab(Transform prefabTransform) { return SpawnPrefab(prefabTransform, Vector3.zero, Quaternion.identity); }
+	public static Transform SpawnPrefab(Transform prefabTransform, Transform destination) { return SpawnPrefab(prefabTransform, destination.position, destination.rotation); }
+	public static Transform SpawnPrefab(Transform prefabTransform, Vector3 position, Quaternion rotation) {
+		var prefabParent = PrefabUtility.GetPrefabParent(prefabTransform.gameObject);
+		var made = PrefabUtility.InstantiatePrefab(prefabParent);
+		Component ccopy = made as Component;
+		GameObject gcopy = made as GameObject;
+		Transform tcopy = null;
+		if (gcopy != null) {
+			tcopy = gcopy.transform;
+		} else if (ccopy != null) {
+			tcopy = ccopy.transform;
+		} else {
+			tcopy = made as Transform;
+		}
+
+		tcopy.position = position;
+		tcopy.rotation = rotation;
+
+		return tcopy;
+	}
+
+	public static Transform ZDuplicate(this Transform t, Transform reference = null) {
+		if (reference == null) { reference = t.parent; }
+
+		Transform tcopy = null;
+
+		var prefabParent = PrefabUtility.GetPrefabParent(t.gameObject);
+		var prefabObject = PrefabUtility.GetPrefabObject(t.gameObject);
+		//var prefabRoot = PrefabUtility.FindPrefabRoot(t.gameObject);
+
+		if (prefabParent != null) {
+			tcopy = SpawnPrefab(t, t);
+
+			if (tcopy == null) {
+				Debug.LogWarning("Could not duplicate " + t.gameObject.name + ", Prefab was not a GameObject or Transform");
+				return null;
+			}
+
+			tcopy.SetParent(reference);
+			tcopy.localScale = t.localScale;
+
+
+			if (t.childCount > 0) {
+				for (int i = 0; i < t.childCount; i++) {
+					Transform child = t.GetChild(i);
+					//var childRoot = PrefabUtility.FindPrefabRoot(child.gameObject);
+					var childPrefab = PrefabUtility.GetPrefabObject(child.gameObject);
+					if (childPrefab != prefabObject) {
+						ZDuplicate(child, tcopy);
+
+					}
+				}
+			}
+
+		} else {
+			tcopy = Editor.Instantiate(t, t.position, t.rotation) as Transform;
+			tcopy.SetParent(reference);
+			tcopy.gameObject.name = t.gameObject.name;
+		}
+
+		return tcopy;
+	}
+}
+	
 
 public class ZEditorWindow : EditorWindow {
 	
