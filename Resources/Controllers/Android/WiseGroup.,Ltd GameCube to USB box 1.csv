@@ -1,0 +1,20 @@
+#unity identifier,control name
+JoystickButton15,A Button
+JoystickButton16,B Button
+JoystickButton17,X Button
+JoystickButton18,Y Button
+JoystickButton19,Left Trigger Button
+JoystickAxis0-,Control Stick Left
+JoystickAxis0+,Control Stick Right
+JoystickAxis1-,Control Stick Up
+JoystickAxis1+,Control Stick Down
+JoystickAxis2-,C Stick Left
+JoystickAxis2+,C Stick Right
+JoystickAxis3-,C Stick Down
+JoystickAxis3+,C Stick Up
+JoystickAxis4-,DPad Left
+JoystickAxis4+,DPad Right
+JoystickAxis5-,DPad Up
+JoystickAxis5+,DPad Down
+JoystickAxis8+,Right Trigger
+JoystickAxis9+,Left Trigger

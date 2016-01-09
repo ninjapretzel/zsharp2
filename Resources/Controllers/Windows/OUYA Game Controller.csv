@@ -1,0 +1,26 @@
+#unity identifier,control name
+JoystickButton0,O Button
+JoystickButton1,U Button
+JoystickButton2,Y Button
+JoystickButton3,A Button
+JoystickButton4,Left Bumper
+JoystickButton5,Right Bumper
+JoystickButton6,Left Stick Button
+JoystickButton7,Right Stick Button
+JoystickButton8,DPad Up
+JoystickButton9,DPad Down
+JoystickButton10,DPad Left
+JoystickButton11,DPad Right
+JoystickButton12,Left Trigger Button
+JoystickButton13,Right Trigger Button
+JoystickButton14,Menu Button
+JoystickAxis0-,Left Stick Left
+JoystickAxis0+,Left Stick Right
+JoystickAxis1-,Left Stick Up
+JoystickAxis1+,Left Stick Down
+JoystickAxis2+,Left Trigger
+JoystickAxis3-,Right Stick Left
+JoystickAxis3+,Right Stick Right
+JoystickAxis4-,Right Stick Up
+JoystickAxis4+,Right Stick Down
+JoystickAxis5+,Right Trigger
