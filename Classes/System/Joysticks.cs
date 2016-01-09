@@ -99,6 +99,7 @@ public class Joysticks : MonoBehaviour {
 	/// <param name="control">The control to get the name for, must be of format "JoystickXAxisY[+/-]" or "JoystickXButtonY".</param>
 	/// <returns>The name of <paramref name="control"/> corresponding to the detected controller number <c>X</c>, or <paramref name="control"/> if one is not provided.</returns>
 	public static string GetControlName(string control) {
+		if (control.Length < 8) { return control; }
 		int joystickNum = 0;
 		if (!int.TryParse(control[8].ToString(), out joystickNum)) {
 			return control;
