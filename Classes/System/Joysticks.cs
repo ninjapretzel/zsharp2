@@ -18,8 +18,14 @@ public class Joysticks : MonoBehaviour {
 	public const string blacklistedName = "IGNORE";
 #if UNITY_STANDALONE_WIN
 	public const string platformFolder = "Windows";
+#elif UNITY_STANDALONE_OSX
+	public const string platformFolder = "OSX";
+#elif UNITY_STANDALONE_LINUX
+	public const string platformFolder = "Linux";
 #elif UNITY_ANDROID
 	public const string platformFolder = "Android";
+#else
+	public const string platformFolder = "";
 #endif
 
 	public static Joysticks instance;
