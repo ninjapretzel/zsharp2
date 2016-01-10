@@ -718,7 +718,7 @@ public class DevConsole : MonoBehaviour {
 
 	public static void BindButton(string key, string thing, string location) {
 		AliasButton(thing, location);
-		Bind(key, "+"+thing);
+		Bind(key, "+" + thing);
 	}
 
 	public static void Alias(string st) {
@@ -933,6 +933,11 @@ public class DevConsole : MonoBehaviour {
 		if (binds.ContainsKey(key)) {
 			binds.Remove(key);
 		}
+	}
+
+	public static void UnbindAll() {
+		binds = new Dictionary<KeyCode, string>();
+		axisMappings = new Dictionary<string, string>();
 	}
 
 	public static void Exec(string path) {

@@ -40,14 +40,18 @@ public class Joysticks : MonoBehaviour {
 	private static List<string> joystickNames = new List<string>(8);
 	private static List<Dictionary<string, string>> controlNames = new List<Dictionary<string, string>>(8);
 
-	public void Awake() {
+	public virtual void Awake() {
 		if (instance != null) {
 			Destroy(this);
 			return;
 		}
 		instance = this;
 		joystickNames = Input.GetJoystickNames().ToList();
-		foreach (string name in joystickNames) {
+		for (int i = 0; i < joystickNames.Count; ++i) {
+			string name = joystickNames[i];
+			if (OnJoystickConnected != null) {
+				OnJoystickConnected(i + 1, name);
+			}
 			controlNames.Add(LoadControlNamesForJoystick(name));
 		}
 	}
@@ -58,7 +62,7 @@ public class Joysticks : MonoBehaviour {
 	/// when a joystick is disconnected, and OnJoystickReconnected when a joystick is
 	/// reconnected.
 	/// </summary>
-	public void Update() {
+	public virtual void Update() {
 		string[] names = Input.GetJoystickNames();
 		if (names.Length > joystickNames.Count) {
 			// The length of GetJoystickNames is only ever incremented if changed.
@@ -190,6 +194,7 @@ public class Joysticks : MonoBehaviour {
 	/// <param name="name">Name of the joystick to load control names for.</param>
 	private static Dictionary<string, string> LoadControlNamesForJoystick(string name) {
 		Dictionary<string, string> controlMap = null;
+		name = name.RemoveAll(':');
 		string path = "Controllers/" + platformFolder + "/" + name;
 		TextAsset ta = Resources.Load<TextAsset>(path);
 		if (ta != null) {
