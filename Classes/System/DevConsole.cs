@@ -794,7 +794,7 @@ public class DevConsole : MonoBehaviour {
 			case 1: {
 				KeyCode targetKeyCode;
 				try {
-					targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), parameters[0]);
+					targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), parameters[0], true);
 				} catch (System.ArgumentException) {
 					if (axisMappings.ContainsKey(parameters[0])) {
 						Echo(parameters[0] + " is " + axisMappings[parameters[0]]);
@@ -807,7 +807,7 @@ public class DevConsole : MonoBehaviour {
 							Input.GetAxisRaw(tryme);
 							Echo(parameters[0] + " is unbound");
 						} catch(System.ArgumentException) {
-							Echo(parameters[0] + " is not a valid KeyCode or the axis is not bound!");
+							Echo(parameters[0] + " is not a valid KeyCode or axis!");
 						}
 					}
 					break;
@@ -846,7 +846,7 @@ public class DevConsole : MonoBehaviour {
 	public static void Bind(string name, string cmds) {
 		KeyCode targetKeyCode;
 		try {
-			targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), name); // Will throw exception if KeyCode doesn't exist
+			targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), name, true); // Will throw exception if KeyCode doesn't exist
 			Bind(targetKeyCode, cmds);
 		} catch (System.ArgumentException) {
 			try {
@@ -896,11 +896,11 @@ public class DevConsole : MonoBehaviour {
 		KeyCode pollMe;
 		string name = surface.SplitUnlessInContainer(' ', '\"')[0];
 		try {
-			pollMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
+			pollMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name, true);
 		} catch (System.ArgumentException) {
 			try {
 				Echo(name + " is " + Input.GetAxisRaw(name));
-			} catch (UnityException) {
+			} catch (System.ArgumentException) {
 				Echo(name + " is not a valid KeyCode or axis!");
 			}
 			return;
@@ -918,12 +918,17 @@ public class DevConsole : MonoBehaviour {
 		KeyCode unbindMe;
 		string name = st.SplitUnlessInContainer(' ', '\"')[0];
 		try {
-			unbindMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name);
+			unbindMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name, true);
 			Unbind(unbindMe);
 		} catch (System.ArgumentException) {
-			if (axisMappings.ContainsKey(name)) {
-				axisMappings.Remove(name);
-			} else {
+			try {
+				Input.GetAxisRaw(st); // Will throw exception if invalid
+				if (axisMappings.ContainsKey(name)) {
+					axisMappings.Remove(name);
+				} else {
+					Echo(name + " is not bound.");
+				}
+			} catch (System.ArgumentException) {
 				Echo(name + " is not a valid KeyCode or axis!");
 			}
 		}
@@ -932,6 +937,8 @@ public class DevConsole : MonoBehaviour {
 	public static void Unbind(KeyCode key) {
 		if (binds.ContainsKey(key)) {
 			binds.Remove(key);
+		} else {
+			Echo(key + " is not bound.");
 		}
 	}
 
@@ -951,7 +958,7 @@ public class DevConsole : MonoBehaviour {
 				if (File.Exists(Application.dataPath + "/" + path)) {
 					sr = File.OpenText(Application.dataPath + "/" + path);
 				} else {
-					Echo("Unable to find script file to execute "+path);
+					Echo("Unable to find script file to execute " + path);
 					return;
 				}
 			}
