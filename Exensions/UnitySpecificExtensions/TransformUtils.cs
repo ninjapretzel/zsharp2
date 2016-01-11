@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -110,6 +110,7 @@ public static class TransformUtils {
 		
 	}
 	
+	/// <summary> Returns an array of all of the first-level children of a given transform. </summary>
 	public static Transform[] GetChildren(this Transform t) {
 		int num = t.childCount;
 		Transform[] list = new Transform[num];

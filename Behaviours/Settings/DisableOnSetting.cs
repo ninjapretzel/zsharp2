@@ -1,27 +1,44 @@
 using UnityEngine;
+using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
 public class DisableOnSetting : MonoBehaviour {
-	public string setting = "showParticles";
+	[Tooltip("What setting is checked?")]
+	public string setting = "Particles";
+
+	[Tooltip("Set to false to disable on given settings.")]
+	public bool enableOnSettings = false;
+
+	[Tooltip("What settings will enable/disable objects or behaviours?")]
+	public string[] settings = { "low", "medium", "high" };
 	
-	public List<string> toDisable = new List<string>();
+	//public List<string> toDisable = new List<string>();
 	
-	public bool invert = false;
-	public bool lastEnabled = false;
+	[Tooltip("Behaviours (on the same object) to enable/disable")]
+	public List<Behaviour> toDisable = new List<Behaviour>();
+	[Tooltip("Objects (should be children) to enable/disable")]
+	public List<GameObject> toDisableObjects = new List<GameObject>();
+	
+	private bool lastEnabled = false;
 	
 	public bool isEnabled { 
 		get { 
-			/*bool e = Settings.custom[setting] == 1;
-			if (invert) { e = !e; }
-			return e;*/
-			return true;
+			string set = Settings.instance[setting].stringVal.ToLower();;
+			if (settings.Contains(set)) {
+				return enableOnSettings;
+			}
+			return !enableOnSettings;
 		} 
 	}
 	
 	void Start() {
-		if (!isEnabled) { Disable(); }
-		
+		if (!isEnabled) { Disable(); } else { Enable(); }
+		lastEnabled = isEnabled;
+		for (int i = 0; i < settings.Length; i++) {
+			settings[i] = settings[i].ToLower();
+		}
 	}
 	
 	void Update() {
@@ -37,9 +54,20 @@ public class DisableOnSetting : MonoBehaviour {
 		lastEnabled = isEnabled;
 	}
 	
-	void Enable() { SetBehavioursEnabled(true); }
-	void Disable() { SetBehavioursEnabled(false); }
+	void Enable() { SetEnabled(true); }
+	void Disable() { SetEnabled(false); }
 	
+	void SetEnabled(bool b) {
+		foreach (Behaviour beh in toDisable) {
+			beh.enabled = b;
+		}
+
+		foreach (GameObject gob in toDisableObjects) {
+			gob.SetActive(b);
+		}
+	}
+
+	/*
 	void SetBehavioursEnabled(bool b) {
 		foreach (string type in toDisable) {
 			Component c = GetComponent(type) as Component;
@@ -62,6 +90,7 @@ public class DisableOnSetting : MonoBehaviour {
 		}
 		
 	}
+	//*/
 	
 	
 	

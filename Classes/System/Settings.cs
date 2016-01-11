@@ -144,6 +144,9 @@ public partial class Settings : JsonObject {
 		//Debug.Log("Done: " + instance.PrettyPrint());	
 	}
 
+	public static void Set(string key, float value) { instance[key] = value; }
+	public static void Set(string key, string value) { instance[key] = value; }
+
 	public Settings() : base() {
 		qualityLevel = 3;
 		musicVolume = 1;
@@ -187,6 +190,10 @@ public partial class Settings : JsonObject {
 	public Color color { get { return this.Get<Color>("color"); } set { Apply("color", value); } }
 
 
+
+	public Color GetHexColor(string name) {
+		return Colors.ToColorFromHex(this[name].stringVal);
+	}
 }
 #else 
 public partial class Settings {

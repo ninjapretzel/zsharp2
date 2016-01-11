@@ -117,6 +117,13 @@ public class DuplicateTextureRemoval : ZEditorWindow {
 					if (Button("4. Delete duplicate textures", buttonWidth)) {
 						DeleteDuplicateTextures();
 					}
+
+					Space(spacing);
+
+					if (Button("5. Restore textures to non read/write.")) {
+						RestoreTextures();
+					}
+
 				} EndVertical();
 
 				BeginVertical("box"); {
@@ -193,6 +200,28 @@ public class DuplicateTextureRemoval : ZEditorWindow {
 	
 	void OnDestroy() { }
 	
+	void RestoreTextures() {
+		texGUIDs = AssetDatabase.FindAssets("t:texture2D");
+		excludeArray = excludes.Split(',');
+
+		List<string> keepGUIDs = new List<string>();
+
+		foreach (string guid in texGUIDs) {
+			string path = AssetDatabase.GUIDToAssetPath(guid);
+
+			TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
+			if (importer != null) {
+				importer.isReadable = false;
+				importer.textureFormat = TextureImporterFormat.ARGB32;
+				Log("Resetting " + path);
+				AssetDatabase.WriteImportSettingsIfDirty(path);
+				//EditorUtility.SetDirty(importer);
+			}
+
+		}
+		AssetDatabase.Refresh();
+	}
+
 	void LoadTextures() {
 
 		texGUIDs = AssetDatabase.FindAssets("t:texture2D");

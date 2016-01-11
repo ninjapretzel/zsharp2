@@ -8,8 +8,12 @@ public class FirstPage : MonoBehaviour {
 
 	void Start() {
 		foreach (Transform t in transform.GetChildren()) {
+			//Awake Object...
+			t.gameObject.SetActive(true);
+			//Sleep Object...
 			t.gameObject.SetActive(false);
 		}
+		
 		GUIRoot.Push(target);
 	}
 

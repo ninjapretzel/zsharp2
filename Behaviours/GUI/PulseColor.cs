@@ -27,6 +27,7 @@ public class PulseColor : MonoBehaviour {
 		if (image != null) { color1 = image.color; }
 		if (text != null) { color1 = text.color; }
 		if (rend != null) { color1 = rend.material.color; }
+		if (color1 == Color.white) { color2 = Color.gray; }
 	}
 
 	

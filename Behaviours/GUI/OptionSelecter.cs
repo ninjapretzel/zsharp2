@@ -58,7 +58,10 @@ public class OptionSelecter : MonoBehaviour {
 			//Debug.Log(settingName + " : " + Settings.instance[settingName]);
 
 			string setting = Settings.instance[settingName].stringVal;
+
 			if (setting != last) {
+				currentIndex = options.IndexOf(setting);
+				if (currentIndex == -1) { currentIndex = 0; }
 				display.text = setting;
 			}
 			last = setting;
