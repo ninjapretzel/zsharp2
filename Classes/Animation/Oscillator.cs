@@ -1,17 +1,33 @@
 using UnityEngine;
 using System.Collections;
 
+/// <summary> Modes of Oscillation for the Oscillator class.</summary>
 public enum OscillatorMode { Cos, Sin, Line, Square }
 
+/// <summary> Oscilates a value over time. </summary>
 [System.Serializable]
 public class Oscillator {
+	/// <summary> Mode of Oscillation between minVal and maxVal </summary>
+	[Tooltip("Mode of Oscillation between minVal and maxVal")]
 	public OscillatorMode mode = OscillatorMode.Cos;
+
+	[Tooltip("Time of oscillation")]
+	/// <summary> Time of oscillation </summary>
 	public float maxTime = 1.0f;
-	public float curTime = 0.0f;
+
+	/// <summary> Current time in oscillation</summary>
+	[System.NonSerialized] public float curTime;
+
+	/// <summary> Value at curTime == 0 </summary>
+	[Tooltip("Value at curTime == 0")]
 	public float minVal = 0.0f;
+	/// <summary> Value at curTime == maxTime </summary>
+	[Tooltip("Value at curTime == maxTime")]
 	public float maxVal = 1.0f;
-	
+
+	/// <summary> Current value of the oscillator </summary>
 	public float value { get; private set; }
+	/// <summary> Direction (up/down) </summary>
 	private bool up = false;
 	
 	public Oscillator() {
@@ -33,7 +49,7 @@ public class Oscillator {
 		curTime = start;
 	}
 	
-	
+	/// <summary> Update the oscillator and get the next value. </summary>
 	public float Update() {
 		if (up) {
 			curTime += Time.deltaTime;

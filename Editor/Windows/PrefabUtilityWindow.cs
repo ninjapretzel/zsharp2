@@ -23,7 +23,7 @@ public class PrefabUtilityWindow : ZEditorWindow {
 	void OnGUI() { 
 		BeginVertical("box"); {
 			Label("Replace Selection with Prefab instances");
-			prefabObject = EditorGUILayout.ObjectField("Prefab to Replace with", prefabObject, typeof(Transform)) as Transform;
+			prefabObject = EditorGUILayout.ObjectField("Prefab to Replace with", prefabObject, typeof(Transform), false) as Transform;
 
 			Button("Replace Selection", ReplaceSelection);
 		} EndVertical();

@@ -204,7 +204,7 @@ public class DuplicateTextureRemoval : ZEditorWindow {
 		texGUIDs = AssetDatabase.FindAssets("t:texture2D");
 		excludeArray = excludes.Split(',');
 
-		List<string> keepGUIDs = new List<string>();
+		//List<string> keepGUIDs = new List<string>();
 
 		foreach (string guid in texGUIDs) {
 			string path = AssetDatabase.GUIDToAssetPath(guid);
