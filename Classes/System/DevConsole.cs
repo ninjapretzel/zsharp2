@@ -79,6 +79,8 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	public void Update() {
+
+
 #if UNITY_EDITOR
 		// If window is null, we've probably had a script recompile. Let's reload all the things.
 		if (window == null) {
@@ -87,6 +89,11 @@ public class DevConsole : MonoBehaviour {
 			LoadConfigFile();
 		}
 #endif
+		
+		//Move inputs to the next frame.
+		ControlStates.NextFrame();
+
+
 		if (!window.open) {
 			foreach (KeyValuePair<KeyCode, string> pair in binds) {
 				if (Input.GetKeyDown(pair.Key)) {

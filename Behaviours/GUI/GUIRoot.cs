@@ -69,7 +69,7 @@ public class GUIRoot : MonoBehaviour {
 
 	//Gay shit to call Pop() from a referenced thing
 	/// <summary> Pop a menu GameObject from static context, return nothing. </summary>
-	public static void Popz() { main.Popy(); }
+	public static void PopStatic() { main.Popy(); }
 	/// <summary> Pop a menu GameObject from static context, return popped game object. </summary>
 	public static GameObject Pop() { return main.Popy(); }
 
@@ -114,7 +114,7 @@ public class GUIRoot : MonoBehaviour {
 	}
 
 	/// <summary> Function to run when escape key is hit. Set to null to enable default behaviour. </summary>
-	public static Action onEscape = Popz;
+	public static Action onEscape = PopStatic;
 
 	public const int REGISTER = 0;
 	public const int BIND = 1;
@@ -140,7 +140,7 @@ public class GUIRoot : MonoBehaviour {
 
 		}
 
-		if (onEscape == null) { onEscape = Popz; }
+		if (onEscape == null) { onEscape = PopStatic; }
 
 		if (Input.GetKeyDown(KeyCode.Escape)) {
 			onEscape();
