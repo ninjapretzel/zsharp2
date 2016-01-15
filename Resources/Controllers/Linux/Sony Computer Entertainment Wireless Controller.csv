@@ -1,0 +1,31 @@
+#unity identifier,control name
+JoystickButton0,Square
+JoystickButton1,Cross
+JoystickButton2,Circle
+JoystickButton3,Triangle
+JoystickButton4,L1
+JoystickButton5,R1
+JoystickButton6,IGNORE
+JoystickButton7,IGNORE
+JoystickButton8,Share Button
+JoystickButton9,Options Button
+JoystickButton10,Left Stick Button
+JoystickButton11,Right Stick Button
+JoystickButton12,Playstation Button
+JoystickButton13,Touchpad Button
+JoystickAxis0-,Left Stick Left
+JoystickAxis0+,Left Stick Right
+JoystickAxis1-,Left Stick Up
+JoystickAxis1+,Left Stick Down
+JoystickAxis2-,Right Stick Left
+JoystickAxis2+,Right Stick Right
+JoystickAxis3+,Left Trigger
+JoystickAxis4+,Right Trigger
+JoystickAxis5-,Right Stick Up
+JoystickAxis5+,Right Stick Down
+JoystickAxis6-,DPad Left
+JoystickAxis6+,DPad Right
+JoystickAxis7-,DPad Up
+JoystickAxis7+,DPad Down
+JoystickAxis9+,Touchpad X
+JoystickAxis10+,Touchpad Y
