@@ -3,15 +3,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-///Struct for 'quadruple precision' float, focusing more on exponent space than significants
+///<summary>Struct for 'quadruple precision' float, focusing more on exponent space than significants.
 ///Intended for numbers in 'clicker' games that want to go really, really high.
 ///Uses a long for exponent, and double for 'significants'.
 ///
-///Anything with an exponent in the range of a long is valid
-///The number is 'normalized' to be in the range [1.0000, 10.0) after any operation
+///Anything with an exponent in the range of a long is valid.
+///The number is 'normalized' to be in the range [1.0000, 10.0) after any operation.
 ///
 ///
-///Not fully implemented yet...
+///Not fully implemented yet...</summary>
 
 public struct quad {
 	

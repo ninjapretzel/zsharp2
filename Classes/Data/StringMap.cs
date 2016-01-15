@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary> Extension on Dictionary(string, string) with operators and custom Behaviour. 
+/// NonExistant entries are treated as empty strings. </summary>
 public class StringMap : Dictionary<string, string> {
-	
+
+	/// <summary> Indexer treats non-existant entries as empty strings. </summary>
 	public new string this[string key] {
 		get { 
 			if (ContainsKey(key)) { return ((Dictionary<string, string>)this)[key]; }
@@ -16,26 +19,30 @@ public class StringMap : Dictionary<string, string> {
 		}
 		
 	}
-	
-	public static StringMap operator +(StringMap a, StringMap b) {
+	/// <summary> can + any IEnumerable(KeyValuePair(object, object)), using ToString() to add keys and values</summary>
+	public static StringMap operator +(StringMap a, IEnumerable<KeyValuePair<object, object>> b) {
 		StringMap c = a.Clone();
-		foreach (string key in b.Keys) {
-			if (!c.ContainsKey(key)) { c[key] = b[key]; }
+		foreach (var pair in b) {
+			string key = pair.Key.ToString();
+			if (!c.ContainsKey(key)) { c[key] = pair.Value.ToString(); }
 		}
 		return c;
 	}
 	
 	public StringMap() : base() { }
-	public StringMap(string s) : base() { LoadFromString(s); }
-	
+	public StringMap(string s, char delim = ',' ) : base() { LoadFromString(s, delim); }
+
+	/// <summary> Clones this object, making a new StringMap with the same data. </summary>
 	public StringMap Clone() {
-		StringMap m = new StringMap();
-		foreach (string key in Keys) { m[key] = this[key]; }
-		return m;
+		StringMap copy = new StringMap();
+		foreach (var pair in this) { copy[pair.Key] = pair.Value; }
+		return copy;
 	}
-	
+
+	/// <summary> Get a string representation of this object as a CSV, with a default delimeter of ',' </summary>
 	public override string ToString() { return ToString(','); }
-	public string ToString(char delim) {
+	/// <summary> Get a string representation of this object as a CSV, with the given delimeter character. </summary>
+	public string ToString(char delim = ',') {
 		StringBuilder str = new StringBuilder("");
 		int i = 0;
 		foreach (string key in Keys) {
@@ -44,9 +51,9 @@ public class StringMap : Dictionary<string, string> {
 		}
 		return str.ToString();
 	}
-	
-	public void LoadFromCSV(string csv) { LoadFromString(csv, ','); }
-	public void LoadFromCSV(string csv, char delim) {
+
+	/// <summary> Clear the map and load a CSV into this map with a given delimeter character. </summary>
+	public void LoadFromCSV(string csv, char delim = ',') {
 		Clear();
 		string[] lines = csv.ConvertNewlines().Split('\n');
 		for (int i = 0; i < lines.Length; i++) {
@@ -54,23 +61,24 @@ public class StringMap : Dictionary<string, string> {
 			LoadLine(lines[i], delim);
 		}
 	}
-	
-	public void LoadFromString(string s) { LoadFromString(s, ','); }
-	public void LoadFromString(string s, char delim) {
+
+	/// <summary> Clear the map and load a string into the mapping. </summary>
+	public void LoadFromString(string s, char delim = ',') {
 		Clear();
 		LoadLine(s, delim);
 	}
-	
-	public void LoadLine(string s, char delim) {
-		//Debug.Log(s);
+
+	/// <summary> Add pairs of elements in a string (should be one line) to the mapping. </summary>
+	public void LoadLine(string s, char delim = ',' ) {
 		string[] strs = s.Split(delim);
 		for (int i = 0; i+1 < strs.Length; i += 2) {
 			this[strs[i]] = strs[i+1];
 		}
 	}
-	
-	public static StringMap CreateFromLine(string s) { return CreateFromLine(s, ','); }
-	public static StringMap CreateFromLine(string s, char delim) {
+
+
+	[System.Obsolete("Just use the constructor....")]
+	public static StringMap CreateFromLine(string s, char delim = ',') {
 		StringMap map = new StringMap();
 		map.LoadFromString(s, delim);
 		return map;

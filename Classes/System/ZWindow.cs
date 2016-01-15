@@ -3,13 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 
-
-
+/// <summary> Unity Legacy GUI Window </summary>
 public class ZWindow {
 
+	/// <summary> Title of window </summary>
 	public string name;
+	/// <summary> Area on screen of window </summary>
 	public Rect area;
-	public int padding = 0;
+
+	/// <summary> Skin of window. Stores to _skin, and creates an invisible version of the skin as well. </summary>
 	public GUISkin skin { get { return _skin; } 
 		set {
 			_skin = value;
@@ -24,52 +26,85 @@ public class ZWindow {
 			}
 		}
 	}
-		
+
+	/// <summary> Cached skin </summary>
 	GUISkin _skin;
+	/// <summary> Cached invisible skin </summary>
 	GUISkin _invisibleSkin;
+
+	/// <summary> Cache of skins mapped to their 'invisible' versions. </summary>
 	static Dictionary<GUISkin, GUISkin> skinCache = new Dictionary<GUISkin, GUISkin>();
-	
+
+	/// <summary> Is the window currently open? </summary>
 	public bool open;
+	/// <summary> Is the background 'invisible' ? </summary>
 	public bool invisibleBackground;
+
+	/// <summary> Can this window be moved with a drag? </summary>
 	public bool dragable;
+	/// <summary> Does the window background eat clicks? </summary>
 	public bool eatClicks;
-	
+
+	/// <summary> Is the close button of this window visible? </summary>
 	public bool hasCloseButton;
+	/// <summary> Is the minimize button of this winow visible? </summary>
 	public bool hasMiniButton;
+	/// <summary> Can this window be resized? </summary>
 	public bool resizable;
-	
+
+	/// <summary> Minimum size of window </summary>
 	public Vector2 minSize;
+	/// <summary> Maximum size of window </summary>
 	public Vector2 maxSize;
-	
+
+	/// <summary> Internal window id </summary>
 	private int id;
+	/// <summary> window ID counter </summary>
 	public static int next_id = 10000;
 
+	/// <summary> ID of last focused window </summary>
 	public static int lastFocused = 0;
+
+	/// <summary> Size of close button </summary>
 	public float closeButtonSize = 18;
+	/// <summary> Size of resize control </summary>
 	public float resizeAreaSize = 18;
-	
+
+	/// <summary> Is this given window the last one focused? </summary>
 	public bool focused { get { return lastFocused == id; } }
 
-	
+	/// <summary> Wraps through to area.x </summary>
 	public float x { get { return area.x; } set { area.x = value; } }
+	/// <summary> Wraps through to area.y </summary>
 	public float y { get { return area.y; } set { area.y = value; } }
+	/// <summary> Wraps through to area.width </summary>
 	public float width { get { return area.width; } set { area.width = value; } }
-	public float height { get { return area.height; } set { area.height = value; } } 
-	
+	/// <summary> Wraps through to area.height </summary>
+	public float height { get { return area.height; } set { area.height = value; } }
+
+	/// <summary> Point on window of last click-down on resize control </summary>
 	static Vector3 resizeClickPoint;
+	/// <summary> Base size of last window being resized </summary>
 	static Vector3 resizeBaseSize;
+	/// <summary> What window is currently being resized? </summary>
 	static ZWindow resizing = null;
+	/// <summary> Style of resize control </summary>
 	static GUIStyle resizeStyle;
 
+	/// <summary> Color of close buttons </summary>
 	static Color closeButtonColor = new Color(.75f, 0, 0);
-	
+
+	/// <summary> Was this window opened or closed last frame? Used to have callbacks happen on the frame a window is closed or opened </summary>
 	bool lastOpenedState = false;
-	
+
+	/// <summary> Blank GUISkin </summary>
 	public GUISkin blank { get { return Resources.Load<GUISkin>("blank"); } }
+	/// <summary> Area of the screen the window can be dragged inside of </summary>
 	public Rect draggableArea {
 		get { return new Rect(0, 0 ,1000, 20); }
 	}
-	
+
+	/// <summary> Area of the window to show the close button. Upper-Right corner. </summary>
 	public Rect closeButtonArea {
 		get {
 			float size = closeButtonSize;
@@ -77,7 +112,8 @@ public class ZWindow {
 			return new Rect(width - size - 1, 1, size, size); 
 		}
 	}
-	
+
+	/// <summary> Area of the window to show the resize control. Bottom-Right corner. </summary>
 	public Rect resizeArea {
 		get {
 			float size = resizeAreaSize;
@@ -85,7 +121,8 @@ public class ZWindow {
 			return new Rect(width - size - 1,height - size - 1, size, size);
 		}
 	}
-	
+
+	/// <summary> Area on Screen to show the resize control. Adjusted for screen coords, rather than local coords.  </summary>
 	public Rect screenResizeArea {
 		get {
 			Rect r = resizeArea;
@@ -94,19 +131,28 @@ public class ZWindow {
 			return r;
 		}
 	}
-	
-	
+
+	/// <summary> Constructor </summary>
 	public ZWindow() { Init(); }
-	
+
+	/// <summary> Chain method to set area of window </summary>
 	public ZWindow Area(Rect r) { area = r; return this; }
+
+	/// <summary> Chain method to set title of window </summary>
 	public ZWindow Named(string n) { name = n; return this; }
+	/// <summary> Chain method to set title of window </summary>
 	public ZWindow Titled(string n) { name = n; return this; }
+	/// <summary> Chain method to change skin of window </summary>
 	public ZWindow Skinned(GUISkin s) { skin = s; return this; }
+	/// <summary> Chain method to change skin of window by name </summary>
 	public ZWindow Skinned(string s) { skin = Resources.Load<GUISkin>(s); return this; }
-	
+
+	/// <summary> Chain method to set background visible </summary>
 	public ZWindow VisibleBackground() { invisibleBackground = false; return this; }
+	/// <summary> Chain method to set background invisible </summary>
 	public ZWindow InvisibleBackground() { invisibleBackground = true; return this; }
-	
+
+	/// <summary> Chain method to completely lock window in place </summary>
 	public ZWindow Locked() {
 		dragable = false;
 		resizable = false;
@@ -114,7 +160,8 @@ public class ZWindow {
 		hasMiniButton = false;
 		return this;
 	}
-	
+
+	/// <summary> Chain method to completely free window for user to move </summary>
 	public ZWindow Unlocked() {
 		dragable = true;
 		resizable = true;
@@ -122,24 +169,34 @@ public class ZWindow {
 		hasMiniButton = true;
 		return this;
 	}
-	
+
+	/// <summary> Chain method to make window dragable </summary>
 	public ZWindow Dragable() { dragable = true; return this; }
+	/// <summary> Chain method to make window undragable </summary>
 	public ZWindow Undragable() { dragable = false; return this; }
-	
+
+	/// <summary> Chain method to make window resizable </summary>
 	public ZWindow Resizable() { resizable = true; return this; }
+	/// <summary> Chain method to make window unresizable </summary>
 	public ZWindow Unresizable() { resizable = false; return this; }
-	
+
+	/// <summary> Chain method to make window closable </summary>
 	public ZWindow Closable() { hasCloseButton = true; return this; }
+	/// <summary> Chain method to make window unclosable </summary>
 	public ZWindow Unclosable() { hasCloseButton = false; return this; }
-	
+
+	/// <summary> Chain method to make window minimizable </summary>
 	public ZWindow Minimizable() { hasMiniButton = true; return this; }
+	/// <summary> Chain method to make window unminimizable </summary>
 	public ZWindow Unminimizable() { hasMiniButton = false; return this; }
-	
+
+	/// <summary> Chain method to open window, and force OnOpen() callback </summary>
 	public ZWindow Opened() { open = true; lastOpenedState = true; return this; }
+	/// <summary> Chain method to close window, and force OnClose() callback </summary>
 	public ZWindow Closed() { open = false; lastOpenedState = false; return this; }
-	
-	
-	
+
+
+	/// <summary> Initialization logic for windows </summary>
 	void Init() {
 		id = next_id++;
 		area = Screen.MiddleCenter(.5f, .5f);
@@ -161,12 +218,14 @@ public class ZWindow {
 		maxSize = new Vector2(Screen.width, Screen.height);
 		
 	}
-	
+
+	/// <summary> Center the window. </summary>
 	public void Center() {
 		area.x = (Screen.width - area.width)/2f;
 		area.y = (Screen.height - area.height)/2f;
 	}
-	
+
+	/// <summary> Set the skin to the active GUISkin </summary>
 	void SetSkin() {
 		GUI.skin = skin;
 		
@@ -175,14 +234,16 @@ public class ZWindow {
 		}
 		
 	}
-	
+
+	/// <summary> Called before any drawing to ensure OnOpen() and OnClose() callbacks happen only once. </summary>
 	public void Predraw() {
 		if (open && !lastOpenedState) { OnOpen(); }
 		if (!open && lastOpenedState) { OnClose(); }
 		
 		lastOpenedState = open;
 	}
-	
+
+	/// <summary> Draw the window via GUI.Window, and apply any drags. </summary>
 	public virtual void Draw() {
 		Predraw();
 		
@@ -194,16 +255,13 @@ public class ZWindow {
 			
 		
 	}
-	
-	
+
+	/// <summary> Function passed into GUI.Window to draw any window. </summary>
 	public void DrawWindow(int windowID) {
-		//SetSkin();
-		
 		if ((GUIEvent.button == 0) && (GUIEvent.clickDown)) {
 			lastFocused = id;
 		}
 		
-
 		Window();
 		
 		if (hasCloseButton) {
@@ -226,9 +284,9 @@ public class ZWindow {
 		
 		if (GUIEvent.clickDown && eatClicks) { GUIEvent.Use(); }
 		Bound();
-		//SetSkin();
 	}
-	
+
+	/// <summary> Resizing logic </summary>
 	public void Resize() {
 		if (!open) { return; }
 		if (resizing == null || resizing == this) {
@@ -267,18 +325,26 @@ public class ZWindow {
 	}
 	
 	#region Virtual functions
+	/// <summary> Called by GUIRoot on Update </summary>
 	public virtual void Update() { }
+	/// <summary> Called by GUIRoot on LateUpdate </summary>
 	public virtual void LateUpdate() { }
+
+	/// <summary> Insert custom window drawing logic </summary>
 	public virtual void Window() { }
+	/// <summary> Insert any logic that happens when the window is closed. </summary>
 	public virtual void OnClose() { }
+	/// <summary> Insert any logic that happens when the window is opened. </summary>
 	public virtual void OnOpen() { }
 	
 	#endregion
-	
 
+	/// <summary> Focus this window </summary>
 	public void Focus() { GUI.FocusWindow(id); lastFocused = id; }
+	/// <summary> Unfocus all windows </summary>
 	public void Unfocus() { GUI.FocusWindow(-1); lastFocused = -1; }
 
+	/// <summary> Prevent this window from going off the screen. </summary>
 	public void Bound() {
 		if (x < -width+60) { x = -width+60; }
 		if (y < 0) { y = 0; }
@@ -286,7 +352,9 @@ public class ZWindow {
 		if (y > Screen.height - 20) { y = Screen.height - 20; }
 	}
 
+	/// <summary> Get the area on the screen that this window exists inside of </summary>
 	public Rect GetScreenRect(Rect r) { return GetScreenRect(r, Vector2.zero); }
+	/// <summary> Get the area on the screen that this window exists inside of, shifted by an offset </summary>
 	public Rect GetScreenRect(Rect r, Vector2 offset) { return r.Shift(area.UpperLeft() + offset); }
 	
 	#region GUI Extensions

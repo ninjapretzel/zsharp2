@@ -5,15 +5,19 @@ using System.Collections.Generic;
 public class ZBehaviour : MonoBehaviour {
 	
 	#region Other stuff
-	
+	/// <summary> Call a method via Unity's messaging system. </summary>
 	public void SendMSG(string msg) { SendMessage(msg, SendMessageOptions.DontRequireReceiver); }
+	/// <summary> Call a method via Uinity's messaging system, with a given parameter. </summary>
 	public void SendMSG(string msg, System.Object val) { SendMessage(msg, val, SendMessageOptions.DontRequireReceiver); }
-	
+
+	/// <summary> Broadcast a message to this object and all children via Unity's messaging system. </summary>
 	public void Broadcast(string msg) { BroadcastMessage(msg, SendMessageOptions.DontRequireReceiver); }
+	/// <summary> Broadcast a message to this object and all children via Unity's messaging system, with a given parameter.</summary>
 	public void Broadcast(string msg, System.Object val) { BroadcastMessage(msg, val, SendMessageOptions.DontRequireReceiver); }
-	
-	
+
+	/// <summary> Wrap to Debug.Log </summary>
 	public void Log(string msg) { Debug.Log("" + this + ": " + msg); }
+	/// <summary> Wrap to Debug.LogWarning </summary>
 	public void LogWarning(string msg) { Debug.LogWarning("" + this + ": " + msg); }
 	
 	#endregion

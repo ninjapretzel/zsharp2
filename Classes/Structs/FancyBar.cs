@@ -2,36 +2,53 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+///<summary> Fancy version of Bar. Uses Unity's Legacy GUI</summary>
 public class FancyBar {
 
+	///<summary> Default noise texture </summary>
 	public static Texture2D _noise { get { return Resources.Load<Texture2D>("noise"); } }
-	public static Texture2D _bar { get { return Resources.Load<Texture2D>("bar"); } } 
+	///<summary> Default bar gradient texture </summary>
+	public static Texture2D _bar { get { return Resources.Load<Texture2D>("bar"); } }
 
-
+	///<summary> Primary noise pattern </summary>
 	public Texture2D noiseA;
+	///<summary> Secondary noise pattern </summary>
 	public Texture2D noiseB;
+	///<summary> Bar gradient pattern </summary>
 	public Texture2D bar;
 
+	///<summary> Scale of Time.time on animation </summary>
 	public float timeScale = 1f;
+	///<summary> Offset from time position </summary>
 	public float timeOffset = 0;
+	///<summary> Padding of edges </summary>
 	public float padding = 2.0f;
+	///<summary> Hue Shift for primary noise pattern </summary>
 	public float hueShiftA = .1f;
+	///<summary> Hue Shift for secondary noise pattern </summary>
 	public float hueShiftB = .1f;
 
+	///<summary> Display bar left-to-right / right-to-left </summary>
 	public bool leftToRight = true;
 
+	///<summary> How dark is the background of the bar compared to the foreground? </summary>
 	public float darkening = .5f;
+	///<summary> Transparency of each layer </summary>
 	public float alpha = .25f;
 
+	///<summary> Scaling/repeat for primary noise texture </summary>
 	public Rect scaleA = new Rect(-.1f, .3f, .1f, .1f);
+	///<summary> Scaling/repeat for secondary noise texture </summary>
 	public Rect scaleB = new Rect(-.2f, .6f, .2f, .2f);
-
+	
+	///<summary> Default constructor </summary>
 	public FancyBar() {
 		bar = _bar;
 		noiseA = _noise;
 		noiseB = _noise;
 	}
 
+	///<summary> Constructor that takes Texutres </summary>
 	public FancyBar(Texture2D back, Texture2D nA, Texture2D nB) {
 		bar = back;
 		noiseA = nA;
@@ -41,16 +58,15 @@ public class FancyBar {
 #if XtoJSON
 	public FancyBar(JsonObject data) {
 		Json.ReflectInto(data, this);
-		noiseA = Resources.Load<Texture2D>(data.GetString("noiseA"));
-		noiseB = Resources.Load<Texture2D>(data.GetString("noiseB"));
-		bar = Resources.Load<Texture2D>(data.GetString("bar"));
-		scaleA = GetRect(data["scaleA"] as JsonObject);
-		scaleB = GetRect(data["scaleB"] as JsonObject);
-
-		
+		noiseA = Resources.Load<Texture2D>(data.Get<string>("noiseA"));
+		noiseB = Resources.Load<Texture2D>(data.Get<string>("noiseB"));
+		bar = Resources.Load<Texture2D>(data.Get<string>("bar"));
+		scaleA = GetRect(data.Get<JsonObject>("scaleA"));
+		scaleB = GetRect(data.Get<JsonObject>("scaleB"));
 	}
 
-	public static Rect GetRect(JsonObject obj) {
+	///<summary> Get a Rectangle from a JsonObject </summary>
+	static Rect GetRect(JsonObject obj) {
 		Rect r = new Rect();
 		r.x = obj.Extract<float>("x", 0);
 		r.y = obj.Extract<float>("y", 0);
@@ -61,6 +77,7 @@ public class FancyBar {
 
 #endif
 
+	///<summary> Copy values from a source Object </summary>
 	public FancyBar(FancyBar s) { 
 		bar = s.bar;
 		noiseA = s.noiseA;
@@ -80,9 +97,10 @@ public class FancyBar {
 		scaleA = s.scaleA;
 		scaleB = s.scaleB;
 	}
-
+	///<summary> Clone this FancyBar </summary>
 	public FancyBar Clone() { return new FancyBar(this); }
 
+	///<summary> Draw this FancyBar in a given position on the screen, with a given fill.</summary>
 	public void Draw(Rect pos, float fill) {
 		float time = Time.time + timeOffset;
 		fill = fill.Clamp01();

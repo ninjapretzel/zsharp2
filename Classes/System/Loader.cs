@@ -2,19 +2,26 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
+/// <summary> Class to handle Scene Folders and create objects into a given 'folder'. </summary>
 public static class Loader {
-	
+
+	/// <summary> All active Scene 'Folder' roots </summary>
 	static Dictionary<string, Transform> roots = new Dictionary<string,Transform>();
 
-	public static Transform Forge(this Transform t) { 
-		return Forge(t, Vector3.zero, Quaternion.identity, "Root"); 
+	const string DEFAULT_ROOT = "Root";
+
+	/// <summary> Instantiate an object and stick it under the given root. </summary>
+	public static Transform Forge(this Transform t, string root = DEFAULT_ROOT) {
+		return Forge(t, Vector3.zero, Quaternion.identity, root); 
+	}
+	
+	/// <summary> Instantiate an object at a position and stick it under the given root. </summary>
+	public static Transform Forge(this Transform t, Vector3 pos, string root = DEFAULT_ROOT) {
+		return Forge(t, pos, Quaternion.identity, root);
 	}
 
-	public static Transform Forge(this Transform t, Vector3 pos) {
-		return Forge(t, pos, Quaternion.identity, "Root");
-	}
-
-	public static Transform Forge(this Transform t, Vector3 pos, Quaternion rot, string root = "Root") {
+	/// <summary> Instantiate an object at a position and rotation, and stick it under the given root. </summary>
+	public static Transform Forge(this Transform t, Vector3 pos, Quaternion rot, string root = DEFAULT_ROOT) {
 		Transform made = GameObject.Instantiate(t, pos, rot) as Transform;
 		Transform r;
 		if (roots.ContainsKey(root) && roots[root] != null) {

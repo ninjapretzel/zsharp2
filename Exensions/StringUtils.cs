@@ -315,7 +315,7 @@ public static class StringUtils {
 	public static List<string> ParseStringList(this string s, char delim) { return s.Split(delim).ToList(); }
 	
 	public static StringMap ParseStringMap(this string s) { return s.ParseStringMap(','); }
-	public static StringMap ParseStringMap(this string s, char delim) { return StringMap.CreateFromLine(s, delim); }
+	public static StringMap ParseStringMap(this string s, char delim) { return new StringMap(s, delim); }
 	
 	
 	//Parse a date from a string

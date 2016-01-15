@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 
 
-/**
-DDesks and DTables are best buddies.
-
-*/
+/// <summary> Desk class, using doubles instead of floats. </summary>
 public class DDesk : Dictionary<string, DTable> {
 	
 	

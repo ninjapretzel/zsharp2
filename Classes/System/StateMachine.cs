@@ -206,24 +206,36 @@ public class State<T> {
 	#endregion
 	
 	#region GUILayoutStuff
-	
+	/// <summary> Wraps the GUILayout method with the same name and parameters </summary>
 	public static void Label(string s, params GUILayoutOption[] options) { GUILayout.Label(s, options); }
+	/// <summary> Wraps the GUILayout method with the same name and parameters </summary>
 	public static void Label(Texture s, params GUILayoutOption[] options) { GUILayout.Label(s, options); }
+	/// <summary> Wraps the GUILayout method with the same name and parameters </summary>
 	public static void Label(GUIContent s, params GUILayoutOption[] options) { GUILayout.Label(s, options); }
+	/// <summary> Wraps the GUILayout Label with only ExpandWidth(false) as the options with the same content parameter </summary>
 	public static void FixedLabel(string s) { Label(s, ExpandWidth(false)); }
+	/// <summary> Wraps the GUILayout Label with only ExpandWidth(false) as the options with the same content parameter </summary>
 	public static void FixedLabel(Texture s) { Label(s, ExpandWidth(false)); }
+	/// <summary> Wraps the GUILayout Label with only ExpandWidth(false) as the options with the same content parameter </summary>
 	public static void FixedLabel(GUIContent s) { Label(s, ExpandWidth(false)); }
 	
+	/// <summary> Wraps the GUI method with the same name and parameters </summary>
 	public static void Label(Rect r, string s) { GUI.Label(r, s); }
+	/// <summary> Wraps the GUI method with the same name and parameters </summary>
 	public static void Label(Rect r, Texture s) { GUI.Label(r, s); }
+	/// <summary> Wraps the GUI method with the same name and parameters </summary>
 	public static void Label(Rect r, GUIContent s) { GUI.Label(r, s); }
 	
 	public static void IconLabel(Texture s, float size) { Label(s, ExpandWidth(false), ExpandHeight(false), MaxHeight(size), MaxWidth(size), MinHeight(size), MinWidth(size)); }
-	
-	
+
+	/// <summary> Wraps the GUILayout method with the same name and parameters </summary>
 	public static void Box(string s, params GUILayoutOption[] options) { GUILayout.Box(s, options); }
+	/// <summary> Wraps the GUILayout method with the same name and parameters </summary>
 	public static void Box(Texture s, params GUILayoutOption[] options) { GUILayout.Box(s, options); }
+	/// <summary> Wraps the GUILayout method with the same name and parameters </summary>
 	public static void Box(GUIContent s, params GUILayoutOption[] options) { GUILayout.Box(s, options); }
+
+
 	public static void FixedBox(string s) { Box(s, ExpandWidth(false)); }
 	public static void FixedBox(Texture s) { Box(s, ExpandWidth(false)); }
 	public static void FixedBox(GUIContent s) { Box(s, ExpandWidth(false)); }

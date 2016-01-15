@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
-public class V3 {
+/// <summary> Self made Vector3 class. Simply here to illustrate what underlies Unity's implementation... </summary>
+public struct V3 {
 	public float x;
 	public float y;
 	public float z;
@@ -18,7 +19,6 @@ public class V3 {
 	public static V3 forward { get { return new V3(0, 0, 1); } }
 	public static V3 backward { get { return new V3(0, 0, -1); } }
 	
-	public V3() { x = 0; y = 0; z = 0; }
 	public V3(float f) { x = f; y = f; z = f; }
 	public V3(float a, float b, float c) { x = a; y = b; z = c; }
 	public V3(V3 v) { x = v.x; y = v.y; z = v.z; }
