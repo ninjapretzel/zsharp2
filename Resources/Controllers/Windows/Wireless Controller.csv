@@ -1,33 +1,33 @@
 #unity identifier,control name. Controller has same name thru Bluetooth as wired (can't tell them apart), but axes are different. Axis 8 is DPad up/down on Bluetooth.
-JoystickButton0,Square
-JoystickButton1,Cross
-JoystickButton2,Circle
-JoystickButton3,Triangle
-JoystickButton4,L1
-JoystickButton5,R1
-JoystickButton6,IGNORE
-JoystickButton7,IGNORE
-JoystickButton8,Share Button
-JoystickButton9,Options Button
-JoystickButton10,Left Stick Button
-JoystickButton11,Right Stick Button
-JoystickButton12,Playstation Button
-JoystickButton13,Touchpad Button
-JoystickAxis0-,Left Stick Left
-JoystickAxis0+,Left Stick Right
-JoystickAxis1-,Left Stick Up
-JoystickAxis1+,Left Stick Down
-JoystickAxis2-,Right Stick Left
-JoystickAxis2+,Right Stick Right
-JoystickAxis3-,Left Trigger Up
-JoystickAxis3+,Left Trigger Down
-JoystickAxis4-,Right Trigger Up
-JoystickAxis4+,Right Trigger Down
-JoystickAxis5-,Right Stick Up
-JoystickAxis5+,Right Stick Down
-JoystickAxis6-,DPad Left
-JoystickAxis6+,DPad Right
-JoystickAxis7-,DPad Down
-JoystickAxis7+,DPad Up
-JoystickAxis8-,Wireless DPad Down
-JoystickAxis8+,Wireless DPad Up
+Button0,Square
+Button1,Cross
+Button2,Circle
+Button3,Triangle
+Button4,L1
+Button5,R1
+Button6,IGNORE
+Button7,IGNORE
+Button8,Share Button
+Button9,Options Button
+Button10,Left Stick Button
+Button11,Right Stick Button
+Button12,Playstation Button
+Button13,Touchpad Button
+Axis0-,Left Stick Left
+Axis0+,Left Stick Right
+Axis1-,Left Stick Up
+Axis1+,Left Stick Down
+Axis2-,Right Stick Left
+Axis2+,Right Stick Right
+Axis3-,Left Trigger Up
+Axis3+,Left Trigger Down
+Axis4-,Right Trigger Up
+Axis4+,Right Trigger Down
+Axis5-,Right Stick Up
+Axis5+,Right Stick Down
+Axis6-,DPad Left
+Axis6+,DPad Right
+Axis7-,DPad Down
+Axis7+,DPad Up
+Axis8-,Wireless DPad Down
+Axis8+,Wireless DPad Up

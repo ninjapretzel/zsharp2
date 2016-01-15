@@ -108,21 +108,20 @@ public class Joysticks : MonoBehaviour {
 		if (!int.TryParse(control[8].ToString(), out joystickNum)) {
 			return control;
 		}
-		control = control.Substring(0, 8) + control.Substring(9);
-		return GetControlName(joystickNum, control);
+		return GetControlName(joystickNum, control.Substring(9));
 	}
 
 	/// <summary>
 	/// Gets the name for a specified axis.
 	/// </summary>
 	/// <param name="joystickNum">The number assigned to the joystick, between 1 and 8.</param>
-	/// <param name="control">The control to get the name for, must be of format "JoystickAxisX[+/-]" or "JoystickButtonX".</param>
+	/// <param name="control">The control to get the name for, must be of format "AxisX[+/-]" or "ButtonX".</param>
 	/// <returns>The name of <paramref name="control"/> corresponding to the detected controller number <paramref name="joystickNum"/>, or <paramref name="control"/> if one is not provided.</returns>
 	public static string GetControlName(int joystickNum, string control) {
 		if (controlNames.Count >= joystickNum && controlNames[joystickNum - 1] != null && controlNames[joystickNum - 1].ContainsKey(control)) {
 			return controlNames[joystickNum - 1][control];
 		}
-		return control.Substring(0, 8) + joystickNum.ToString() + control.Substring(8);
+		return "Joystick" + joystickNum.ToString() + control;
 	}
 
 	/// <summary>
@@ -131,6 +130,7 @@ public class Joysticks : MonoBehaviour {
 	/// <param name="button">The button to get the name for. Must refer to a specific joystick <c>X</c>.</param>
 	/// <returns>The name of <paramref name="button"/> corresponding to the detected controller number <c>X</c>, or <paramref name="button"/> if one is not provided.</returns>
 	public static string GetButtonName(KeyCode button) {
+		if (button < KeyCode.Joystick1Button0) { return button.ToString(); }
 		return GetControlName(button.ToString());
 	}
 
@@ -141,10 +141,11 @@ public class Joysticks : MonoBehaviour {
 	/// <param name="joystickNum">The number assigned to the joystick, between 1 and 8.</param>
 	/// <returns>The name of <paramref name="button"/> corresponding to the detected controller number <paramref name="joystickNum"/>, or <paramref name="button"/> if one is not provided.</returns>
 	public static string GetButtonName(int joystickNum, KeyCode button) {
+		if (button < KeyCode.JoystickButton0) { return button.ToString(); }
 		if (button > KeyCode.JoystickButton19) {
 			button -= 20 * joystickNum;
 		}
-		return GetControlName(joystickNum, button.ToString());
+		return GetControlName(joystickNum, button.ToString().Substring(8));
 	}
 
 	/// <summary>

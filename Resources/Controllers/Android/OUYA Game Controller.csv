@@ -1,26 +1,26 @@
 #unity identifier,control name
-JoystickButton0,O Button
-JoystickButton1,U Button
-JoystickButton13,Y Button
-JoystickButton2,A Button
-JoystickButton3,Left Bumper
-JoystickButton14,Right Bumper
-JoystickButton4,Left Stick Button
-JoystickButton5,Right Stick Button
-JoystickButton6,DPad Up
-JoystickButton7,DPad Down
-JoystickButton11,DPad Left
-JoystickButton10,DPad Right
-JoystickButton12,Left Trigger Button
-JoystickButton8,Right Trigger Button
-JoystickButton9,Menu Button
-JoystickAxis0-,Left Stick Left
-JoystickAxis0+,Left Stick Right
-JoystickAxis1-,Left Stick Up
-JoystickAxis1+,Left Stick Down
-JoystickAxis13+,Left Trigger
-JoystickAxis2-,Right Stick Left
-JoystickAxis2+,Right Stick Right
-JoystickAxis3-,Right Stick Up
-JoystickAxis3+,Right Stick Down
-JoystickAxis14+,Right Trigger
+Button0,O Button
+Button1,U Button
+Button13,Y Button
+Button2,A Button
+Button3,Left Bumper
+Button14,Right Bumper
+Button4,Left Stick Button
+Button5,Right Stick Button
+Button6,DPad Up
+Button7,DPad Down
+Button11,DPad Left
+Button10,DPad Right
+Button12,Left Trigger Button
+Button8,Right Trigger Button
+Button9,Menu Button
+Axis0-,Left Stick Left
+Axis0+,Left Stick Right
+Axis1-,Left Stick Up
+Axis1+,Left Stick Down
+Axis13+,Left Trigger
+Axis2-,Right Stick Left
+Axis2+,Right Stick Right
+Axis3-,Right Stick Up
+Axis3+,Right Stick Down
+Axis14+,Right Trigger

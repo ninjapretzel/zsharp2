@@ -1,31 +1,31 @@
 #unity identifier,control name
-JoystickButton0,Square
-JoystickButton1,Cross
-JoystickButton2,Triangle
-JoystickButton3,L1
-JoystickButton4,IGNORE
-JoystickButton5,IGNORE
-JoystickButton6,Share Button
-JoystickButton7,Options Button
-JoystickButton8,Touchpad Button
-JoystickButton10,Right Stick Button
-JoystickButton11,Left Stick Button
-JoystickButton12,Playstation Button
-JoystickButton13,Circle
-JoystickButton14,R1
-JoystickAxis0-,Left Stick Left
-JoystickAxis0+,Left Stick Right
-JoystickAxis1-,Left Stick Up
-JoystickAxis1+,Left Stick Down
-JoystickAxis2-,Left Trigger Down
-JoystickAxis2+,Left Trigger Up
-JoystickAxis3-,Right Trigger Up
-JoystickAxis3+,Right Trigger Down
-JoystickAxis4-,DPad Left
-JoystickAxis4+,DPad Right
-JoystickAxis5-,DPad Up
-JoystickAxis5+,DPad Down
-JoystickAxis13-,Right Stick Left
-JoystickAxis13+,Right Stick Right
-JoystickAxis14-,Right Stick Up
-JoystickAxis14+,Right Stick Down
+Button0,Square
+Button1,Cross
+Button2,Triangle
+Button3,L1
+Button4,IGNORE
+Button5,IGNORE
+Button6,Share Button
+Button7,Options Button
+Button8,Touchpad Button
+Button10,Right Stick Button
+Button11,Left Stick Button
+Button12,Playstation Button
+Button13,Circle
+Button14,R1
+Axis0-,Left Stick Left
+Axis0+,Left Stick Right
+Axis1-,Left Stick Up
+Axis1+,Left Stick Down
+Axis2-,Left Trigger Down
+Axis2+,Left Trigger Up
+Axis3-,Right Trigger Up
+Axis3+,Right Trigger Down
+Axis4-,DPad Left
+Axis4+,DPad Right
+Axis5-,DPad Up
+Axis5+,DPad Down
+Axis13-,Right Stick Left
+Axis13+,Right Stick Right
+Axis14-,Right Stick Up
+Axis14+,Right Stick Down

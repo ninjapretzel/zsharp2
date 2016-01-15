@@ -1,25 +1,25 @@
 #unity identifier,control name
-JoystickButton0,Triangle
-JoystickButton1,Circle
-JoystickButton2,Cross
-JoystickButton3,Square
-JoystickButton4,L2
-JoystickButton5,R2
-JoystickButton6,L1
-JoystickButton7,R1
-JoystickButton8,Select
-JoystickButton9,Left Stick Button
-JoystickButton10,Right Stick Button
-JoystickButton11,Start
-JoystickButton12,DPad Up
-JoystickButton13,DPad Right
-JoystickButton14,DPad Down
-JoystickButton15,DPad Left
-JoystickAxis0-,Left Stick Left
-JoystickAxis0+,Left Stick Right
-JoystickAxis1-,Left Stick Up
-JoystickAxis1+,Left Stick Down
-JoystickAxis2-,Right Stick Left
-JoystickAxis2+,Right Stick Right
-JoystickAxis3-,Right Stick Up
-JoystickAxis3+,Right Stick Down
+Button0,Triangle
+Button1,Circle
+Button2,Cross
+Button3,Square
+Button4,L2
+Button5,R2
+Button6,L1
+Button7,R1
+Button8,Select
+Button9,Left Stick Button
+Button10,Right Stick Button
+Button11,Start
+Button12,DPad Up
+Button13,DPad Right
+Button14,DPad Down
+Button15,DPad Left
+Axis0-,Left Stick Left
+Axis0+,Left Stick Right
+Axis1-,Left Stick Up
+Axis1+,Left Stick Down
+Axis2-,Right Stick Left
+Axis2+,Right Stick Right
+Axis3-,Right Stick Up
+Axis3+,Right Stick Down

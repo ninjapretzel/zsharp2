@@ -1,27 +1,27 @@
 #unity identifier,control name
-JoystickButton0,A Button
-JoystickButton1,B Button
-JoystickButton2,X Button
-JoystickButton3,Y Button
-JoystickButton4,Left Trigger Button
-JoystickButton5,Right Trigger Button
-JoystickButton6,Z Button
-JoystickButton7,Start Button
-JoystickButton8,DPad Left
-JoystickButton9,DPad Right
-JoystickButton10,DPad Down
-JoystickButton11,DPad Up
-JoystickAxis0-,Control Stick Left
-JoystickAxis0+,Control Stick Right
-JoystickAxis1-,Control Stick Up
-JoystickAxis1+,Control Stick Down
-JoystickAxis2-,C Stick Left
-JoystickAxis2+,C Stick Right
-JoystickAxis3-,C Stick Down
-JoystickAxis3+,C Stick Up
-JoystickAxis4+,Right Trigger
-JoystickAxis5+,Left Trigger
-JoystickAxis6-,DPad Left
-JoystickAxis6+,DPad Right
-JoystickAxis7-,DPad Down
-JoystickAxis7+,DPad Up
+Button0,A Button
+Button1,B Button
+Button2,X Button
+Button3,Y Button
+Button4,Left Trigger Button
+Button5,Right Trigger Button
+Button6,Z Button
+Button7,Start Button
+Button8,DPad Left
+Button9,DPad Right
+Button10,DPad Down
+Button11,DPad Up
+Axis0-,Control Stick Left
+Axis0+,Control Stick Right
+Axis1-,Control Stick Up
+Axis1+,Control Stick Down
+Axis2-,C Stick Left
+Axis2+,C Stick Right
+Axis3-,C Stick Down
+Axis3+,C Stick Up
+Axis4+,Right Trigger
+Axis5+,Left Trigger
+Axis6-,DPad Left
+Axis6+,DPad Right
+Axis7-,DPad Down
+Axis7+,DPad Up

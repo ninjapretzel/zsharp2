@@ -1,10 +1,10 @@
 #unity identifier,control name
-JoystickButton15,A Button
-JoystickButton16,C-Down
-JoystickButton17,C-Right
-JoystickButton18,B Button
-JoystickButton19,C-Left
-JoystickAxis0-,Control Stick Left
-JoystickAxis0+,Control Stick Right
-JoystickAxis1-,Control Stick Up
-JoystickAxis1+,Control Stick Down
+Button15,A Button
+Button16,C-Down
+Button17,C-Right
+Button18,B Button
+Button19,C-Left
+Axis0-,Control Stick Left
+Axis0+,Control Stick Right
+Axis1-,Control Stick Up
+Axis1+,Control Stick Down
