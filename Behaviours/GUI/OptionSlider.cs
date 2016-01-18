@@ -27,13 +27,28 @@ public class OptionSlider : MonoBehaviour {
 	Text label;
 	Slider slider;
 	
+#if XtoJSON
+	public static float Get(string setting) {
+		return Settings.instance.Get<float>(setting);
+	}
+	public static void Set(string setting, float value) {
+		Settings.instance.Apply(setting, value);
+	}
+#else
+	public static float Get(string setting) {
+		return 0.0f;
+	}
+	public static void Set(string setting, float value) {
+
+	}
+#endif
 
 	void Start() {
 		slider = GetComponent<Slider>();
 		label = transform.Find("Label").GetComponent<Text>();
 		
 		slider.onValueChanged.AddListener(Set);
-		slider.value = Settings.instance.Get<float>(settingName);
+		slider.value = Get(settingName);
 		//Set(slider.value);
 	}
 	
@@ -41,10 +56,10 @@ public class OptionSlider : MonoBehaviour {
 		
 	}
 
-	void Set(float val) {
-		Settings.instance.Apply(settingName, val);
+	void Set(float value) {
+		Set(settingName, value);
 		if (label != null) {
-			label.text = prefix + string.Format(code, val * multiplier) + suffix;
+			label.text = prefix + string.Format(code, value * multiplier) + suffix;
 			
 		}
 	}
