@@ -5,6 +5,23 @@ using System.Linq;
 using System;
 
 public static class VectorUtils {
+
+	public static float Nearest(float f, float value) {
+		int m = (int)(f / value);
+		float frac = (f % value) / value;
+		
+		float floor = m * value;
+		float ceil = (m+1) * value;
+		return (frac < .5f) ? floor : ceil;
+	}
+
+	public static Quaternion Round(this Quaternion qt, float amt = 90f) {
+		Vector3 euler = qt.eulerAngles;
+		
+		euler = new Vector3(Nearest(euler.x, amt), Nearest(euler.y, amt), Nearest(euler.z, amt));
+
+		return Quaternion.Euler(euler);
+	}
 	
 	
 	//returns a Vector2 at a 45 degree angle rotated by 90 degrees i times.

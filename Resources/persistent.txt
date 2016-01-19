@@ -22,6 +22,7 @@ BindButton Q "down" "ControlStates.Set down"
 BindButton Z "zoomIn" "ControlStates.Set zoomIn"
 BindButton X "zoomOut" "ControlStates.Set zoomOut"
 
+
 BindButton UpArrow "camUp" "ControlStates.Set camUp"
 BindButton DownArrow "camDown" "ControlStates.Set camDown"
 BindButton LeftArrow "camLeft" "ControlStates.Set camLeft"
@@ -31,6 +32,8 @@ Bind MouseAxisX+ "ControlStates.Set yawAxis %value%"
 Bind MouseAxisX- "ControlStates.Set yawAxis %nvalue%"
 Bind MouseAxisY+ "ControlStates.Set pitchAxis %value%"
 Bind MouseAxisY- "ControlStates.Set pitchAxis %nvalue%"
+Bind MouseWheel+ "ControlStates.Set zoomAxis %value%"
+Bind MouseWheel- "ControlStates.Set zoomAxis %nvalue%"
 
 BindButton Space "jump" "ControlStates.Set jump"
 BindButton LeftShift "powerup" "ControlStates.Set powerup"
