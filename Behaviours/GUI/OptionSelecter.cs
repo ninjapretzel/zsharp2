@@ -17,18 +17,34 @@ public class OptionSelecter : MonoBehaviour {
 	public string currentOption { get { return options[currentIndex]; } }
 	public List<string> options = new List<string>(new string[] {"LOW", "MEDIUM", "HIGH", "ULTRA"});
 
-	public static Settings sets { get { return Settings.instance; } }
 	Text display;
 	Text label;
 	
 	string last;
+
+	public static Settings sets { get { return Settings.instance; } }
+#if XtoJSON
+	public static string Get(string setting) {
+		return sets[setting].stringVal;
+	}
+	public static void Set(string setting, string value) {
+		Settings.instance.Apply(setting, value);
+	}
+#else
+	public static string Get(string setting) {
+		return "";
+	}
+	public static void Set(string setting, string value) {
+		
+	}
+#endif
 
 	void Start() {
 		if (Application.isPlaying) {
 			label = transform.Find("Label").GetComponent<Text>();
 			label.text = gameObject.name;
 			display = transform.Find("Display").GetComponent<Text>();
-			string current = sets.Get<string>(settingName);
+			string current = Get(settingName);
 			if (current == null || current == "") {
 				current = defaultOption;
 			}
@@ -57,7 +73,7 @@ public class OptionSelecter : MonoBehaviour {
 		} else {
 			//Debug.Log(settingName + " : " + Settings.instance[settingName]);
 
-			string setting = Settings.instance[settingName].stringVal;
+			string setting = Get(settingName);
 
 			if (setting != last) {
 				currentIndex = options.IndexOf(setting);
@@ -86,7 +102,7 @@ public class OptionSelecter : MonoBehaviour {
 	}
 
 	public void Set() {
-		Settings.instance.Apply(settingName, currentOption);
+		Set(settingName, currentOption);
 		//Debug.Log(settingName + " set to " + currentOption);
 		display.text = currentOption;
 		

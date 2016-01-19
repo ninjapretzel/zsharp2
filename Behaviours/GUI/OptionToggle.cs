@@ -8,11 +8,29 @@ public class OptionToggle : MonoBehaviour {
 	
 	Toggle toggle;
 
+#if XtoJSON
+	public static bool Get(string setting) {
+		return Settings.instance.Get<bool>(setting);
+	}
+
+	public static void Set(string setting, bool value) {
+		Settings.instance.Apply(setting, value);
+	}
+#else
+	public static bool Get(string setting) {
+		return false;
+	}
+
+	public static void Set(string setting, bool value) {
+
+	}
+#endif
+
 	void Start() {
 		toggle = GetComponent<Toggle>();
 		toggle.onValueChanged.AddListener(Set);
 
-		toggle.isOn = Settings.instance.Get<bool>(settingName);
+		toggle.isOn = Get(settingName);
 
 	}
 	
@@ -20,8 +38,8 @@ public class OptionToggle : MonoBehaviour {
 		
 	}
 
-	void Set(bool val) {
-		Settings.instance.Apply(settingName, val);
+	void Set(bool value) {
+		Set(settingName, value);
 	}
 	
 }
