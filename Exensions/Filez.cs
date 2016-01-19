@@ -19,19 +19,9 @@ public static class Filez {
 	/// <param name="filename">File path to write to </param>
 	/// <param name="content">byte[] to write</param>
 	public static void WriteGzipBytes(string filename, byte[] content) {
-		string temp = Path.GetTempFileName();
-		File.WriteAllBytes(temp, content);
-
-		byte[] b;
-		using (FileStream f = new FileStream(temp, FileMode.Open)) {
-			b = new byte[f.Length];
-			f.Read(b, 0, (int)f.Length);
-		}
-
-
 		using (FileStream f2 = new FileStream(filename, FileMode.Create))
 		using (GZipStream gz = new GZipStream(f2, CompressionMode.Compress, false)) {
-			gz.Write(b, 0, b.Length);
+			gz.Write(content, 0, content.Length);
 		}
 
 	}
@@ -62,6 +52,7 @@ public static class Filez {
 				} while (count > 0);
 				return memory.ToArray();
 			}
+
 		}
 
 	}
