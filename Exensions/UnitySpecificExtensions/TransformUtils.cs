@@ -5,30 +5,38 @@ using System.Collections.Generic;
 public static class TransformUtils {
 	
 	///<summary>
-	///Copys all transform information from other and its children into t. 
-	///If objects do not exist in other, but exist in t, they do not change their local positions.
+	///Copys all transform information from source and its children into dest. 
+	///If objects do not exist in source, but exist in dest, they do not change their local positions.
 	///</summary>
-	public static void CopyLocalPositionsFrom(this Transform t, Transform other) {
-		Transform[] theses = t.GetComponentsInChildren<Transform>();
-		foreach (Transform thing in theses) {
-			string path = thing.GetRelativePath(t);
-			Transform found = other.Find(path);
+	public static void CopyLocalPositionsFrom(this Component dest, Component source) {
+		Transform[] targets = dest.GetComponentsInChildren<Transform>();
+		foreach (Transform target in targets) {
+			string path = target.GetRelativePath(dest);
+			Transform found = source.transform.Find(path);
 			if (found != null) {
-				thing.localPosition = found.localPosition;
-				thing.localRotation = found.localRotation;
+				target.localPosition = found.localPosition;
+				target.localRotation = found.localRotation;
 			}
 		}
 		
 	}
 	
+	/// <summary> Removes all children from a given component </summary>
+	/// <param name="c">Object to remove all children from underneath</param>
+	public static void DeleteAllChildren(this Component c) { 
+		foreach (var child in c.transform.GetChildren()) {
+			GameObject.Destroy(child.gameObject);
+		}
+	}
+
 	///<summary>
 	///Get the relative path from someParent to t.
 	///If someParent is not a parent of t (or is null), then it gets the path from the scene root
 	///</summary>
-	public static string GetRelativePath(this Transform t, Transform someParent = null) {
+	public static string GetRelativePath(this Component t, Component someParent = null) {
 		if (t == null) { return ""; }
-		if (t.parent == null || t.parent == someParent) { return t.gameObject.name; }
-		return GetRelativePath(t.parent, someParent) + "/" + t.gameObject.name;
+		if (t.transform.parent == null || t.transform.parent == someParent) { return t.gameObject.name; }
+		return GetRelativePath(t.transform.parent, someParent) + "/" + t.gameObject.name;
 	}
 		
 	
@@ -44,7 +52,7 @@ public static class TransformUtils {
 	}
 	
 	
-	public static void SortChildrenByName(this Transform root) {
+	public static void SortChildrenByName(this Component root) {
 		Dictionary<string, List<Transform>> children = new Dictionary<string, List<Transform>>();
 		List<string> nameList = new List<string>();
 		
@@ -111,11 +119,11 @@ public static class TransformUtils {
 	}
 	
 	/// <summary> Returns an array of all of the first-level children of a given transform. </summary>
-	public static Transform[] GetChildren(this Transform t) {
-		int num = t.childCount;
+	public static Transform[] GetChildren(this Component t) {
+		int num = t.transform.childCount;
 		Transform[] list = new Transform[num];
 		for (int i = 0; i < num; i++) {
-			list[i] = t.GetChild(i);
+			list[i] = t.transform.GetChild(i);
 		}
 		return list;
 	}

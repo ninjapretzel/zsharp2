@@ -15,6 +15,16 @@ public static class VectorUtils {
 		return (frac < .5f) ? floor : ceil;
 	}
 
+	public static Vector2 Round(this Vector2 v, float amt = 1f) {
+		return new Vector2(Nearest(v.x, amt), Nearest(v.y, amt));
+	}
+	public static Vector3 Round(this Vector3 v, float amt = 1f) {
+		return new Vector3(Nearest(v.x, amt), Nearest(v.y, amt), Nearest(v.z, amt));
+	}
+	public static Vector4 Round(this Vector4 v, float amt = 1f) {
+		return new Vector4(Nearest(v.x, amt), Nearest(v.y, amt), Nearest(v.z, amt), Nearest(v.w, amt));
+	}
+
 	public static Quaternion Round(this Quaternion qt, float amt = 90f) {
 		Vector3 euler = qt.eulerAngles;
 		

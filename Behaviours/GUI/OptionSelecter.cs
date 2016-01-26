@@ -77,7 +77,8 @@ public class OptionSelecter : MonoBehaviour {
 
 			if (setting != last) {
 				currentIndex = options.IndexOf(setting);
-				if (currentIndex == -1) { currentIndex = 0; }
+				//Debug.Log(settingName + " Updated to " + setting + ":" + currentIndex);
+				if (currentIndex <= -1) { currentIndex = 0; }
 				display.text = setting;
 			}
 			last = setting;

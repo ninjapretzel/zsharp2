@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+[System.Serializable]
 public class UGUIGrid {
 	/// <summary> Width of the grid. Zero/Negative means infinite.  </summary>
 	public int itemsWide;
@@ -14,10 +15,10 @@ public class UGUIGrid {
 	public float vpadding;
 
 	const float DEFAULT_SIZE = 64;
-	/// <summary> Height of each element in the grid. Zero/Negative means calculate based off of parent. </summary>
-	public float height = DEFAULT_SIZE;
 	/// <summary> Width of each element in the grid. Zero/Negative means calculate based off of parent. </summary>
 	public float width = DEFAULT_SIZE;
+	/// <summary> Height of each element in the grid. Zero/Negative means calculate based off of parent. </summary>
+	public float height = DEFAULT_SIZE;
 
 	/// <summary> Object that the grid exists within, if the objects contained are to resize with the parent. </summary>
 	public RectTransform parent = null;
@@ -104,6 +105,42 @@ public class UGUIGrid {
 		return new Vector2(xoff, yoff);
 	}
 
+
+	/// <summary> Sets up some component on this grid. </summary>
+	/// <param name="obj">object to set up </param>
+	/// <param name="x"> x coordinate </param>
+	/// <param name="y"> y coordinate </param>
+	public void SetUp(Component obj, int x, int y) {
+		var ge = obj.Require<UGUIGridElement>();
+		ge.grid = this;
+		ge.x = x;
+		ge.y = y;
+	}
+
+	/// <summary> Resets the size of the grid object to ZERO, and allow it to auto set its size on the next frame. </summary>
+	public void ResetSize() {
+		parent.offsetMin = Vector2.zero;
+		parent.offsetMax = Vector2.zero;
+	}
+
+	/// <summary> Remove all objects that are under the grid. </summary>
+	public void Clear() {
+		parent.DeleteAllChildren();
+		ResetSize();
+	}
+
+	/// <summary> Grows the grid to hold this object if it is larger than the grid </summary>
+	/// <param name="rt"></param>
+	public void Grow(RectTransform rt) {
+		if (rt.offsetMin.y < parent.offsetMin.y) {
+			parent.offsetMin = new Vector2(0, rt.offsetMin.y);
+		}
+
+		if (rt.offsetMax.y > parent.offsetMax.x) {
+			parent.offsetMax = new Vector2(rt.offsetMax.x, 0);
+		}
+	}
+	
 }
 
 
@@ -119,8 +156,9 @@ public class UGUIGridElement : MonoBehaviour {
 	void Update() {
 		if (lastWidth != Screen.width || lastHeight != Screen.height) { 
 			//Pre-Align.
-			grid.parent.offsetMin = Vector2.zero;
-			grid.parent.offsetMax = Vector2.zero;
+			grid.ResetSize();
+		} else {
+			grid.Grow(transform as RectTransform);
 		}
 	}
 
@@ -146,13 +184,6 @@ public class UGUIGridElement : MonoBehaviour {
 		rt.offsetMin = grid.OffsetMin(x, y);
 		rt.offsetMax = grid.OffsetMax(x, y);
 
-		if (rt.offsetMin.y < grid.parent.offsetMin.y) { 
-			grid.parent.offsetMin = new Vector2(0, rt.offsetMin.y);
-		}
-
-		if (rt.offsetMax.y > grid.parent.offsetMax.x) {
-			grid.parent.offsetMax = new Vector2(rt.offsetMax.x, 0);
-		}
 
 	}
 

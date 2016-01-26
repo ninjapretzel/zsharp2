@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 using In = UnityEngine.Input;
 
-// Enum definitions with names matching axes as defined in DefaultProjectSettings/InputManager.asset
+/// <summary Enum definitions with names matching axes as defined in DefaultProjectSettings/InputManager.asset </summary>
 public enum AxisCode : int {
 	Joystick1Axis0 = 0,
 	Joystick1Axis1 = 1,
@@ -60,8 +60,8 @@ public enum AxisCode : int {
 	MouseWheel = 52
 }
 
-///This is a static class that wraps all of Unity's internal Input static class'
-///Then provides some additional extra features
+///<summary>This is a static class that wraps all of Unity's internal Input static class'
+///Then provides some additional extra features</summary>
 public static class Input {
 	
 	#region Basics_Provided_By_UNITY

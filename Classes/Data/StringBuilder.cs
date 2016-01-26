@@ -19,6 +19,9 @@ public class StringBuilder {
 	/// <summary> Implicit conversion to string type </summary>
 	public static implicit operator string(StringBuilder m) { return m.ToString(); }
 
+	/// <summary> Implicit conversion from string type </summary>
+	public static implicit operator StringBuilder(string s) { return new StringBuilder(s); }
+
 	/// <summary> Operator for + bool. The original type had a number of overloads for Append, so operators reflect that. Modifies the StringBuilder and returns itself, just like the Append call. </summary>
 	public static StringBuilder operator + (StringBuilder a, bool b) { return a.Append(b); }
 	/// <summary> Operator for + byte. The original type had a number of overloads for Append, so operators reflect that. Modifies the StringBuilder and returns itself, just like the Append call. </summary>
