@@ -1,0 +1,37 @@
+#unity identifier,control name
+Axis0-,Left Stick Left
+Axis0+,Left Stick Right
+Axis1-,Left Stick Up
+Axis1+,Left Stick Down
+Axis2-,Right Stick Left
+Axis2+,Right Stick Right
+Axis3-,Right Stick Up
+Axis3+,Right Stick Down
+Axis4-,DPad Left
+Axis4+,IGNORE
+Axis5-,IGNORE
+Axis5+,IGNORE
+Axis6+,L2
+Axis7+,R2
+Axis11+,IGNORE
+Axis12+,IGNORE
+Axis19+,DPad Up
+Axis20+,DPad Right
+Axis21+,DPad Down
+Axis23+,L1
+Axis24+,R1
+Axis25+,Triangle
+Axis26+,Circle
+Axis27+,Cross
+Button0,IGNORE
+Button1,IGNORE
+Button2,Square
+Button3,IGNORE
+Button4,IGNORE
+Button5,IGNORE
+Button6,IGNORE
+Button7,IGNORE
+Button8,Left Stick Button
+Button9,Right Stick Button
+Button10,Start
+Button11,Select
