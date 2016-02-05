@@ -3,7 +3,7 @@ using System.Collections;
 
 using In = UnityEngine.Input;
 
-/// <summary Enum definitions with names matching axes as defined in DefaultProjectSettings/InputManager.asset </summary>
+/// <summary> Enum definitions with names matching axes as defined in DefaultProjectSettings/InputManager.asset </summary>
 public enum AxisCode : int {
 	Joystick1Axis0 = 0,
 	Joystick1Axis1 = 1,
