@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,7 @@ using System.Linq;
 using UnityEditor;
 #endif
 
-public class DevConsole : MonoBehaviour {
+public class DevConsole : MonoBehaviour, ILogHandler {
 	
 #if UNITY_EDITOR
 	public bool runDefaultsOnStartup = false;
@@ -16,6 +17,7 @@ public class DevConsole : MonoBehaviour {
 	public static Color color = Color.white;
 	public static bool cheats = false;
 	public static string echoBuffer = "";
+	public static int debug = 0;
 	[Inaccessible] public string[] blacklistedClasses;
 	[Inaccessible] public static List<string> classBlacklist = new List<string>();
 
@@ -23,6 +25,7 @@ public class DevConsole : MonoBehaviour {
 	private static Rect consoleWindowRect = new Rect(0.0f, 0.0f, Screen.width, Screen.height * 0.5f);
 #endif
 
+	public static Action<Exception, object> OnException;
 	public static bool consoleUp { get { return window.open; } }
 	private static Dictionary<string, string> aliases = new Dictionary<string, string>();
 	private static Dictionary<KeyCode, string> binds = new Dictionary<KeyCode, string>();
@@ -39,7 +42,7 @@ public class DevConsole : MonoBehaviour {
 			}
 			return per;
 
-		} 
+		}
 	}
 	public static string autoexecPath;
 
@@ -47,6 +50,12 @@ public class DevConsole : MonoBehaviour {
 
 	public void Awake() {
 		SetUpInitialData();
+		Application.logMessageReceived += LogCallback;
+
+	}
+
+	public void OnDestroy() {
+		Application.logMessageReceived -= LogCallback;
 
 	}
 
@@ -100,7 +109,7 @@ public class DevConsole : MonoBehaviour {
 					Execute(pair.Value);
 				}
 				if (Input.GetKeyUp(pair.Key)) {
-					string[] cmds = pair.Value.SplitUnlessInContainer(';', '\"', System.StringSplitOptions.RemoveEmptyEntries);
+					string[] cmds = pair.Value.SplitUnlessInContainer(';', '\"', StringSplitOptions.RemoveEmptyEntries);
 					foreach (string cmd in cmds) {
 						if (cmd[0] == '+') {
 							Execute('-' + cmd.Substring(1));
@@ -205,7 +214,7 @@ public class DevConsole : MonoBehaviour {
 			try {
 				// Execute the current line
 				Execute(window.textField);
-			} catch (System.Exception e) {
+			} catch (Exception e) {
 				Debug.LogError("Internal error executing console command:\n" + e);
 			}
 			window.previousCommands.Add(window.textField);
@@ -290,7 +299,7 @@ public class DevConsole : MonoBehaviour {
 			string targetMemberName = null;
 			// Separate class specification from member call
 			int indexOfDot = command.LastIndexOf('.');
-			System.Type targetClass = null;
+			Type targetClass = null;
 			if (indexOfDot > 0) {
 				targetClassName = command.Substring(0, indexOfDot);
 				if (classBlacklist.Contains(targetClassName)) {
@@ -303,7 +312,7 @@ public class DevConsole : MonoBehaviour {
 				}
 				targetMemberName = command.Substring(indexOfDot+1);
 				foreach (string assembly in ReflectionUtils.assemblies) {
-					targetClass = System.Type.GetType(targetClassName + assembly);
+					targetClass = Type.GetType(targetClassName + assembly);
 					if (targetClass != null) {
 						break;
 					}
@@ -341,7 +350,7 @@ public class DevConsole : MonoBehaviour {
 
 	// Attempt to locate the member as a field, and deal with it based on the given parameters
 	// Returns: boolean indicating whether the command was handled here
-	public static bool CallField(System.Type targetClass, string varName, string parameters) {
+	public static bool CallField(Type targetClass, string varName, string parameters) {
 		// Attempt to find the field
 		FieldInfo targetVar = targetClass.GetField(varName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 		object targetInstance = null;
@@ -414,7 +423,7 @@ public class DevConsole : MonoBehaviour {
 
 	// Attempt to locate the member as a property, and deal with it based on the given parameters
 	// Returns: boolean indicating whether the command was handled here
-	public static bool CallProperty(System.Type targetClass, string propertyName, string parameters) {
+	public static bool CallProperty(Type targetClass, string propertyName, string parameters) {
 		// Attempt to find the property
 		PropertyInfo targetProperty = targetClass.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 		object targetInstance = null;
@@ -495,7 +504,7 @@ public class DevConsole : MonoBehaviour {
 	// If neither of those things work, or no parameters are given, try to call a parameterless version of methodName. If none is found, either
 	// methodName has no overload matching parameters given or methodName does not exist.
 	// Returns: boolean indicating whether or not the command was handled here (true, if a method with the correct name was found, regardless of other failures).
-	public static bool CallMethod(System.Type targetClass, string methodName, string parameters) {
+	public static bool CallMethod(Type targetClass, string methodName, string parameters) {
 		MethodInfo[] targetMethods = targetClass.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy);
 		MethodInfo[] targetInstancedMethods = new MethodInfo[0];
 		object main = GetMainOfClass(targetClass);
@@ -514,7 +523,7 @@ public class DevConsole : MonoBehaviour {
 				}
 			}
 			// Try to find a static method matching name with one string parameter
-			MethodInfo targetMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new System.Type[] { typeof(string) }, null);
+			MethodInfo targetMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
 			if (targetMethod != null && IsAccessible(targetMethod)) {
 				if (IsCheat(targetMethod) && !cheats) {
 					PrintCheatMessage(targetMethod.Name);
@@ -525,7 +534,7 @@ public class DevConsole : MonoBehaviour {
 			}
 			// Try to find a method matching name with one string parameter if a main object to invoke on exists
 			if (main != null) {
-				MethodInfo targetInstancedMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new System.Type[] { typeof(string) }, null);
+				MethodInfo targetInstancedMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
 				if (targetInstancedMethod != null && IsAccessible(targetInstancedMethod)) {
 					if (IsCheat(targetInstancedMethod) && !cheats) {
 						PrintCheatMessage(targetInstancedMethod.Name);
@@ -537,7 +546,7 @@ public class DevConsole : MonoBehaviour {
 			}
 		}
 		// Try to find a static parameterless method matching name
-		MethodInfo targetParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new System.Type[] { }, null);
+		MethodInfo targetParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { }, null);
 		if (targetParameterlessMethod != null && IsAccessible(targetParameterlessMethod)) {
 			if (IsCheat(targetParameterlessMethod) && !cheats) {
 				PrintCheatMessage(targetParameterlessMethod.Name);
@@ -548,7 +557,7 @@ public class DevConsole : MonoBehaviour {
 		}
 		// Try to find a parameterless method matching name if a main object to invoke on exists
 		if (main != null) {
-			MethodInfo targetInstancedParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new System.Type[] { }, null);
+			MethodInfo targetInstancedParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { }, null);
 			if (targetInstancedParameterlessMethod != null && IsAccessible(targetInstancedParameterlessMethod)) {
 				if (IsCheat(targetInstancedParameterlessMethod) && !cheats) {
 					PrintCheatMessage(targetInstancedParameterlessMethod.Name);
@@ -626,7 +635,7 @@ public class DevConsole : MonoBehaviour {
 	}
 
 	// Returns: object reference to a "public static main" object of the same type as the class provided, if it exists within the class provided.
-	public static object GetMainOfClass(System.Type targetClass) {
+	public static object GetMainOfClass(Type targetClass) {
 		FieldInfo mainField = targetClass.GetField("main", BindingFlags.Public | BindingFlags.Static);
 		if (mainField != null && mainField.FieldType.IsAssignableFrom(targetClass) && IsAccessible(mainField)) {
 			return mainField.GetValue(null);
@@ -645,24 +654,24 @@ public class DevConsole : MonoBehaviour {
 	// Returns: boolean, true if member is not marked Inaccessible
 	public static bool IsAccessible(MemberInfo member) {
 #if UNITY_DEBUG || UNITY_EDITOR
-		if (System.Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) != null) {
+		if (Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked inaccessible and cannot be accessed normally!");
 		}
 		return true;
 #else
-		return System.Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) == null;
+		return Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) == null;
 #endif
 	}
 
 	// Returns: boolean, true if member is marked cheat. Changing any property, field, or calling any method marked cheat through the console must trigger appropriate responses.
 	public static bool IsCheat(MemberInfo member) {
 #if UNITY_DEBUG
-		if (System.Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null) {
+		if (Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked a cheat and cannot be accessed normally without cheats!");
 		}
 		return false;
 #else
-		return System.Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null;
+		return Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null;
 #endif
 	}
 
@@ -675,7 +684,7 @@ public class DevConsole : MonoBehaviour {
 		window.textField = "";
 		if (window.open) {
 			foreach (KeyValuePair<KeyCode, string> bind in binds) {
-				string[] cmds = bind.Value.SplitUnlessInContainer(';', '\"', System.StringSplitOptions.RemoveEmptyEntries);
+				string[] cmds = bind.Value.SplitUnlessInContainer(';', '\"', StringSplitOptions.RemoveEmptyEntries);
 				foreach (string cmd in cmds) {
 					if (cmd[0] == '+') {
 						Execute('-' + cmd.Substring(1));
@@ -686,7 +695,7 @@ public class DevConsole : MonoBehaviour {
 				if (mapping.Value.Contains("%value%")) {
 					Execute(mapping.Value.Replace("%value%", "0"));
 				}
-				string[] cmds = mapping.Value.SplitUnlessInContainer(';', '\"', System.StringSplitOptions.RemoveEmptyEntries);
+				string[] cmds = mapping.Value.SplitUnlessInContainer(';', '\"', StringSplitOptions.RemoveEmptyEntries);
 				foreach (string cmd in cmds) {
 					if (cmd[0] == '+') {
 						Execute('-' + cmd.Substring(1));
@@ -746,7 +755,7 @@ public class DevConsole : MonoBehaviour {
 			default: {
 				bool containsQuote = (st.IndexOf('\"') >= 0);
 				if (!containsQuote) {
-					System.Text.StringBuilder rest = new System.Text.StringBuilder();
+					StringBuilder rest = new StringBuilder();
 					for (int i = 1; i < parameters.Length; ++i) {
 						rest.Append(' ' + parameters[i]);
 					}
@@ -801,8 +810,8 @@ public class DevConsole : MonoBehaviour {
 			case 1: {
 				KeyCode targetKeyCode;
 				try {
-					targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), parameters[0], true);
-				} catch (System.ArgumentException) {
+					targetKeyCode = (KeyCode)Enum.Parse(typeof(KeyCode), parameters[0], true);
+				} catch (ArgumentException) {
 					if (axisMappings.ContainsKey(parameters[0])) {
 						Echo(parameters[0] + " is " + axisMappings[parameters[0]]);
 					} else {
@@ -813,7 +822,7 @@ public class DevConsole : MonoBehaviour {
 							}
 							Input.GetAxisRaw(tryme);
 							Echo(parameters[0] + " is unbound");
-						} catch(System.ArgumentException) {
+						} catch(ArgumentException) {
 							Echo(parameters[0] + " is not a valid KeyCode or axis!");
 						}
 					}
@@ -829,7 +838,7 @@ public class DevConsole : MonoBehaviour {
 			default: {
 				bool containsQuote = (st.IndexOf('\"') >= 0);
 				if (!containsQuote) {
-					System.Text.StringBuilder rest = new System.Text.StringBuilder();
+					StringBuilder rest = new StringBuilder();
 					for (int i = 1; i < parameters.Length; ++i) {
 						rest.Append(' ' + parameters[i]);
 					}
@@ -853,9 +862,9 @@ public class DevConsole : MonoBehaviour {
 	public static void Bind(string name, string cmds) {
 		KeyCode targetKeyCode;
 		try {
-			targetKeyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), name, true); // Will throw exception if KeyCode doesn't exist
+			targetKeyCode = (KeyCode)Enum.Parse(typeof(KeyCode), name, true); // Will throw exception if KeyCode doesn't exist
 			Bind(targetKeyCode, cmds);
-		} catch (System.ArgumentException) {
+		} catch (ArgumentException) {
 			try {
 				if (name[name.Length - 1] == '-' || name[name.Length - 1] == '+') {
 					Input.GetAxisRaw(name.Substring(0, name.Length - 1)); // Will throw exception if axis doesn't exist
@@ -872,7 +881,7 @@ public class DevConsole : MonoBehaviour {
 					axisMappings[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
 				}
 				axisMappings[name] = axisMappings[name].Substring(1);
-			} catch (System.ArgumentException) {
+			} catch (ArgumentException) {
 				Echo(name + " is not a valid KeyCode or axis!");
 				return;
 			}
@@ -903,11 +912,11 @@ public class DevConsole : MonoBehaviour {
 		KeyCode pollMe;
 		string name = surface.SplitUnlessInContainer(' ', '\"')[0];
 		try {
-			pollMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name, true);
-		} catch (System.ArgumentException) {
+			pollMe = (KeyCode)Enum.Parse(typeof(KeyCode), name, true);
+		} catch (ArgumentException) {
 			try {
 				Echo(name + " is " + Input.GetAxisRaw(name));
-			} catch (System.ArgumentException) {
+			} catch (ArgumentException) {
 				Echo(name + " is not a valid KeyCode or axis!");
 			}
 			return;
@@ -925,9 +934,9 @@ public class DevConsole : MonoBehaviour {
 		KeyCode unbindMe;
 		string name = st.SplitUnlessInContainer(' ', '\"')[0];
 		try {
-			unbindMe = (KeyCode)System.Enum.Parse(typeof(KeyCode), name, true);
+			unbindMe = (KeyCode)Enum.Parse(typeof(KeyCode), name, true);
 			Unbind(unbindMe);
-		} catch (System.ArgumentException) {
+		} catch (ArgumentException) {
 			try {
 				Input.GetAxisRaw(st); // Will throw exception if invalid
 				if (axisMappings.ContainsKey(name)) {
@@ -935,7 +944,7 @@ public class DevConsole : MonoBehaviour {
 				} else {
 					Echo(name + " is not bound.");
 				}
-			} catch (System.ArgumentException) {
+			} catch (ArgumentException) {
 				Echo(name + " is not a valid KeyCode or axis!");
 			}
 		}
@@ -977,6 +986,30 @@ public class DevConsole : MonoBehaviour {
 
 	}
 
+	#region ILogHandler
+	public void LogException(Exception exception, UnityEngine.Object context) {
+		if (OnException != null) {
+			OnException(exception, context);
+		}
+		Debug.logger.LogException(exception, context);
+	}
+
+	public void LogFormat(LogType logType, UnityEngine.Object context, string format, params object[] args) {
+		// This will ultimately make it back into the console through LogCallback
+		Debug.logger.logHandler.LogFormat(logType, context, format, args);
+	}
+	#endregion
+
+	private void LogCallback(string logString, string stackTrace, LogType type) {
+		if (type == LogType.Exception) {
+			Echo(logString + "\n" + stackTrace);
+			return;
+		}
+		if (type == LogType.Warning && debug >= 1) { Echo("Warning: " + logString); return; }
+		if ((type == LogType.Error || type == LogType.Assert) && debug >= 1) { Echo("Error: " + logString); return; }
+		if (debug >= 2) { Echo(logString); return; }
+	}
+
 	public static void SaveConfigFile() {
 		#if !UNITY_WEBPLAYER
 		if (File.Exists(configPath)) {
@@ -1006,7 +1039,7 @@ public class DevConsole : MonoBehaviour {
 			binds = new Dictionary<KeyCode, string>();
 			axisMappings = new Dictionary<string, string>();
 #if UNITY_EDITOR
-			binds.Add(KeyCode.F1, "ToggleConsole");
+			binds.Add(KeyCode.BackQuote, "ToggleConsole");
 #endif
 			// All preexisting keybinds will be reloaded from this file instead
 			Exec(configPath);
@@ -1069,13 +1102,13 @@ public class DevConsole : MonoBehaviour {
 		return axisMappings.ContainsKey(axis) && axisMappings[axis] == command;
 	}
 
-	public class CheatAttribute : System.Attribute {
+	public class CheatAttribute : Attribute {
 
 		public CheatAttribute() { }
 
 	}
 
-	public class InaccessibleAttribute : System.Attribute {
+	public class InaccessibleAttribute : Attribute {
 
 		public InaccessibleAttribute() { }
 
@@ -1133,7 +1166,7 @@ public class ConsoleWindow : ZWindow {
 		try {
 			// Execute the current line
 			DevConsole.Execute(cmd);
-		} catch (System.Exception e) {
+		} catch (Exception e) {
 			Debug.LogError("Internal error executing console command:\n" + e);
 		}
 		previousCommands.Add(cmd);
