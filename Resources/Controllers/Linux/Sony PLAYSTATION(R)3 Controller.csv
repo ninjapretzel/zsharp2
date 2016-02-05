@@ -1,0 +1,26 @@
+#unity identifier,control name
+Axis0-,Left Stick Left
+Axis0+,Left Stick Right
+Axis1-,Left Stick Up
+Axis1+,Left Stick Down
+Axis2+,L1
+Axis3-,Right Stick Left
+Axis3+,Right Stick Right
+Axis4-,Right Stick Up
+Axis4+,Right Stick Down
+Axis5+,R1
+Axis6-,DPad Left
+Axis6+,DPad Right
+Axis7-,DPad Up
+Axis7+,DPad Down
+Button0,Cross
+Button1,Circle
+Button2,Square
+Button3,Triangle
+Button4,L1
+Button5,R1
+Button6,Select
+Button7,Start
+Button8,PlayStation Button
+Button9,Left Stick Button
+Button10,Right Stick Button
