@@ -80,7 +80,7 @@ public class MusicPlayer : MonoBehaviour {
 		
 		if (!GetComponent<AudioSource>().isPlaying) { 
 			if (shuffle) {
-				PlayRandom(false);
+				PlayRandom(true);
 			} else {
 				PlayNext();
 			}
@@ -141,7 +141,11 @@ public class MusicPlayer : MonoBehaviour {
 		if (activeSet == name) { return; }
 		songs = Music.GetArray(name);
 		activeSet = name;
-		Play(0);
+		if (shuffle) {
+			Play(Shuffle());
+		} else {
+			Play(0);
+		}
 	}
 	
 	public void Switch(string name, int track) {
@@ -164,10 +168,10 @@ public class MusicPlayer : MonoBehaviour {
 	}
 	
 	public void PlayRandom(bool avoidSame) {
-		int index = 0;
+		int index = Shuffle();
 		if (avoidSame) {
 			if (songs.Length > 1) {
-				while (index != curIndex) {
+				while (index == curIndex) {
 					index = Shuffle();
 				}
 			}
@@ -185,7 +189,7 @@ public class MusicPlayer : MonoBehaviour {
 	}	
 	
 	int Shuffle() {
-		return (int)(Random.value * songs.Length * .999999f);
+		return (int)(Random.value * songs.Length);
 	}
 	
 }

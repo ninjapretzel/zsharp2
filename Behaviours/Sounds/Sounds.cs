@@ -138,11 +138,6 @@ public class Sounds : MonoBehaviour {
 		return sounds.ContainsKey(sc) ? sounds[sc].Count > 0 : false; 
 	}
 	
-	// public static bool Load(string sc) { 
-		// AudioClip ac = Resources.Load<AudioClip>(sc);
-		// return (ac != null);
-	// }
-	
 	public static Sound Load(string sc) {
 		List<AudioClip> clips = new List<AudioClip>();
 		AudioSource overrideSource = Resources.Load<AudioSource>(sc);

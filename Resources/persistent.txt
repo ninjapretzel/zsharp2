@@ -9,7 +9,6 @@ Alias "poll" "Poll"
 Alias "AutoExec" "Exec autoexec.cfg"
 Alias "autoexec" "AutoExec"
 Alias "defaults" "Defaults"
-Bind F1 "ToggleConsole"
 Bind BackQuote "ToggleConsole"
 
 BindButton W "forward" "ControlStates.Set forward"
@@ -21,7 +20,6 @@ BindButton Q "down" "ControlStates.Set down"
 
 BindButton Z "zoomIn" "ControlStates.Set zoomIn"
 BindButton X "zoomOut" "ControlStates.Set zoomOut"
-
 
 BindButton UpArrow "camUp" "ControlStates.Set camUp"
 BindButton DownArrow "camDown" "ControlStates.Set camDown"
@@ -36,4 +34,3 @@ Bind MouseWheel+ "ControlStates.Set zoomAxis %value%"
 Bind MouseWheel- "ControlStates.Set zoomAxis %nvalue%"
 
 BindButton Space "jump" "ControlStates.Set jump"
-BindButton LeftShift "powerup" "ControlStates.Set powerup"
