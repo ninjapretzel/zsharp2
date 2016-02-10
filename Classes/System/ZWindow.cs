@@ -191,7 +191,7 @@ public class ZWindow {
 	public ZWindow Unminimizable() { hasMiniButton = false; return this; }
 
 	/// <summary> Chain method to open window, and force OnOpen() callback </summary>
-	public ZWindow Opened() { open = true; lastOpenedState = true; return this; }
+	public ZWindow Opened() { Focus(); open = true; lastOpenedState = true; return this; }
 	/// <summary> Chain method to close window, and force OnClose() callback </summary>
 	public ZWindow Closed() { open = false; lastOpenedState = false; return this; }
 

@@ -207,6 +207,35 @@ public class GUIRoot : MonoBehaviour {
 		if (!windows.Contains(window)) { windows.Add(window); }
 	}
 
+	public static ZWindow GetWindow(string key) {
+		if (registeredWindows.ContainsKey(key)) { return registeredWindows[key]; }
+		if (binds.ContainsKey(key)) { return binds[key]; }
+		if (holdBinds.ContainsKey(key)) { return holdBinds[key]; }
+		return null;
+	}
+
+	public static T Get<T>(string key) where T : ZWindow {
+		if (registeredWindows.ContainsKey(key)) { return registeredWindows[key] as T; }
+		if (binds.ContainsKey(key)) { return binds[key] as T; }
+		if (holdBinds.ContainsKey(key)) { return holdBinds[key] as T; }
+		return null;
+	}
+
+	public static void OpenWindow(string key) { 
+		if (registeredWindows.ContainsKey(key)) { registeredWindows[key].Opened(); } 
+		if (binds.ContainsKey(key)) { binds[key].Opened(); }
+	}
+
+	public static void CloseWindow(string key) { 
+		if (registeredWindows.ContainsKey(key)) { registeredWindows[key].Closed(); }
+		if (binds.ContainsKey(key)) { binds[key].Closed(); }
+	}
+
+	public static void ToggleWindow(string key) { 
+		if (registeredWindows.ContainsKey(key)) { registeredWindows[key].open = !registeredWindows[key].open; }
+		if (binds.ContainsKey(key)) { binds[key].open = !binds[key].open; } 
+	}
+
 	public static void Register(string key, ZWindow window) { delayedAdd.Add(new WindowInfo(key, window, REGISTER)); }
 	public static void BindKey(string key, ZWindow window) { delayedAdd.Add(new WindowInfo(key, window, BIND)); }
 	public static void BindHold(string key, ZWindow window) { delayedAdd.Add(new WindowInfo(key, window, BINDHOLD)); }

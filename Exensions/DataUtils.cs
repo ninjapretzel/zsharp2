@@ -8,6 +8,55 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Reflection;
 
+public static class ZEncrypt {
+	private static byte[] DEFAULT_KEY = MAKE_DEFAULT_KEY();
+	public static byte[] MAKE_DEFAULT_KEY() {
+		List<byte> d = new List<byte>();
+
+		d.Add((byte)0x89);
+		d.Add((byte)0xab);
+		d.Add((byte)0xcd);
+		d.Add((byte)0xef);
+		d.Add((byte)0xfe);
+		d.Add((byte)0xdc);
+		d.Add((byte)0xba);
+		d.Add((byte)0x98);
+
+		return d.ToArray();
+	}
+
+	public static byte[] EncryptSimple(this byte[] data, byte[] key) {
+		byte[] e = new byte[data.Length];
+
+		for (int i = 0 ; i < e.Length; i++) {
+			e[i] = (byte)(data[i] ^ key[i % key.Length]);
+		}
+
+		return e;
+	}
+
+	public static string EncodeHex(byte[] bytes) { return EncodeHex(bytes, DEFAULT_KEY); }
+	public static string EncodeHex(byte[] bytes, byte[] key = null) {
+		StringBuilder str = "";
+
+		for (int i = 0; i < bytes.Length; i++) {
+			byte b = bytes[i];
+
+			if (key != null) {
+				byte k = key[i % key.Length];
+				b = (byte)(b ^ k);
+			}
+
+			string s = b.ToHex();
+			str += s;
+
+		}
+
+		return str;
+	}
+	
+}
+
 public static class DataUtils {
 
 	#region Maximal Selectors
@@ -208,7 +257,7 @@ public static class DataUtils {
 		
 		return s;
 	}
-	
+
 	public static List<int> Permutation(int max) { return Permutation(max, max); }
 	public static List<int> Permutation(int max, int length) {
 		List<int> nums = new List<int>(max);
