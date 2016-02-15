@@ -10,8 +10,12 @@ public class ModalDialog : MonoBehaviour {
 
 	public Text mainTextBox;
 
+	private Action onEscapeBackup;
+
 	public void Start() {
 		mainTextBox.text = prompt;
+		onEscapeBackup = GUIRoot.onEscape;
+		GUIRoot.onEscape = () => { };
 
 	}
 
@@ -19,6 +23,7 @@ public class ModalDialog : MonoBehaviour {
 		if (callback != null) {
 			callback(choice);
 		}
+		GUIRoot.onEscape = onEscapeBackup;
 		Destroy(gameObject);
 
 	}
