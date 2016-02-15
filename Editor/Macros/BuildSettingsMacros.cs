@@ -51,7 +51,7 @@ public static class SceneNames {
 		if (file == null) { list = null; }
 		JsonArray arr = Json.Parse(file.text) as JsonArray;
 
-		list = arr.ToStringList();
+		list = arr.OnlyStringToList();
 		return true;
 	}
 #endif

@@ -71,6 +71,15 @@ public class ScrollableList<T> : List<T> {
 		selectedIndex = 0;
 	}
 
+	public void Draw() { DrawOptions(null); }
+	public void DrawOptions(params GUILayoutOption[] options) {
+		if (options == null) {
+			options = new GUILayoutOption[] { GUILayout.Width(200), GUILayout.Height(80) };
+		}
+		GUILayout.Box("", options);
+		Draw(GUILayoutUtility.GetLastRect());
+	}
+
 	/// <summary> Draw and handle selection in a given area on the screen. </summary>
 	public void Draw(Rect area) {
 		GUIStyle style = bodyStyle;
