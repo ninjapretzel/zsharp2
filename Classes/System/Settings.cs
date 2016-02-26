@@ -120,6 +120,7 @@ public partial class Settings : JsonObject {
 	static bool DoLoad() {
 		callbacks = new Dictionary<string,Action<string>>();
 		RegisterDefaultCallbacks();
+		Load();
 		return true;
 	}
 

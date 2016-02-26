@@ -34,12 +34,20 @@ public class AppliesPostSettings : MonoBehaviour {
 		foreach (var set in sets) {
 			set.last = set.target.enabled;
 		}
+
+		if (Settings.fxaaMode == AAMode.DLAA) {
+			fxaa.enabled = false;
+		} else {
+			fxaa.enabled = true;
+		}
+		fxaa.mode = Settings.fxaaMode;
 	}
 	
 	void Update() {
 		if (cam != null && cam.renderingPath != Settings.renderPath) {
 			cam.renderingPath = Settings.renderPath;
 		}
+
 
 		if (fxaa != null && fxaa.mode != Settings.fxaaMode) {
 			if (Settings.fxaaMode == AAMode.DLAA) {

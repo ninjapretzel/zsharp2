@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 [System.Serializable]
 public class UGUIGrid {
@@ -115,6 +116,7 @@ public class UGUIGrid {
 		ge.grid = this;
 		ge.x = x;
 		ge.y = y;
+		ge.regrow = true;
 	}
 
 	/// <summary> Resets the size of the grid object to ZERO, and allow it to auto set its size on the next frame. </summary>
@@ -152,18 +154,27 @@ public class UGUIGridElement : MonoBehaviour {
 	public UGUIGrid grid = null;
 	int lastWidth;
 	int lastHeight; 
+
+	[NonSerialized] public bool regrow = false;
+
+	void Start() {
+		lastWidth = -1;
+		lastHeight = -1;
+	}
 	
 	void Update() {
 		if (lastWidth != Screen.width || lastHeight != Screen.height) { 
 			//Pre-Align.
 			grid.ResetSize();
-		} else {
+			regrow = true;
+		} else if (regrow) {
 			grid.Grow(transform as RectTransform);
+			regrow = false;
 		}
 	}
 
 	void LateUpdate() {
-		if (lastWidth != Screen.width || lastHeight != Screen.height) { Align(); }
+		if (lastWidth != Screen.width || lastHeight != Screen.height && regrow) { Align(); }
 		
 		lastWidth = Screen.width;
 		lastHeight = Screen.height;
