@@ -236,9 +236,9 @@ public class GUIRoot : MonoBehaviour {
 		if (binds.ContainsKey(key)) { binds[key].open = !binds[key].open; } 
 	}
 
-	public static void Register(string key, ZWindow window) { delayedAdd.Add(new WindowInfo(key, window, REGISTER)); }
-	public static void BindKey(string key, ZWindow window) { delayedAdd.Add(new WindowInfo(key, window, BIND)); }
-	public static void BindHold(string key, ZWindow window) { delayedAdd.Add(new WindowInfo(key, window, BINDHOLD)); }
+	public static T Register<T>(string key, T window) where T : ZWindow { delayedAdd.Add(new WindowInfo(key, window, REGISTER)); return window; }
+	public static T BindKey<T>(string key, T window) where T : ZWindow { delayedAdd.Add(new WindowInfo(key, window, BIND)); return window; }
+	public static T BindHold<T>(string key, T window) where T : ZWindow { delayedAdd.Add(new WindowInfo(key, window, BINDHOLD)); return window; }
 	
 	public static bool HasWindow(string key) {
 		return registeredWindows.ContainsKey(key)

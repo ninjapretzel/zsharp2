@@ -126,7 +126,7 @@ public class JsonPropertyGenerator : ZEditorWindow {
 			string type = pair.Key;
 			JsonArray arr = pair.Value as JsonArray;
 			if (arr != null) {
-				string[] fields = arr.ToStringArray();
+				string[] fields = arr.OnlyStringsToArray();
 				foreach (string field in fields) {
 					if (type == "string") {
 						str += GetStringLine(field); 
