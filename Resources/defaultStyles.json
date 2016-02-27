@@ -1,0 +1,136 @@
+﻿{
+	"cascades":[
+		{
+			"nameSuffix":"Button",
+			"tagWith":"button",
+		},
+		{
+			"nameContains":"Text",
+			"tagWith":"text",
+		},
+		{
+			"nameContains":"Scroll View",
+			"tagWith":"scrollView",
+		},
+		{
+			"nameContains":"Header",
+			"tagWith":"header",
+		},
+		{
+			"nameSuffix":"Panel",
+			"tagWith":"panel",
+		},
+	],
+	
+	"text":{
+		"font":"rs",
+		"fontStyle":"Normal",
+		"fontSize":20,
+		"sizeScale":true,
+		"lineSpacing":1,
+		"richText":true,
+		"alignment":"UpperLeft",
+		"alignByGeometry":false,
+		"horizontalOverflow":"Wrap",
+		"verticalOverflow":"Overflow",
+		"bestFit":false,
+		"color":"#777777FF",
+		"material":null,
+		"raycastTarget":false
+	},
+	"header":{
+		"inherit":"text",
+		"fontSize":44,
+		"alignment":"MiddleCenter",
+		"color":"#DDDDDDFF",
+		"Text":{
+			"inherit":"text",
+			"fontSize":44,
+			"alignment":"MiddleCenter",
+			"color":"#DDDDDDFF",
+		}
+	},
+	"panel":{
+		"image":"UIBackground",
+		"color":"#FFFFFFAA",
+		"material":null,
+		"raycastTarget":true,
+		"imageType":"Sliced",
+		"fillCenter":true,
+	},
+	
+	"button":{
+		"inherit":"interactable",
+		"image":"UISprite",
+		"color":"#FFFFFFFF",
+		"material":null,
+		"raycastTarget":true,
+		"imageType":"Sliced",
+		"fillCenter":true,
+		
+		"Text":{
+			"inherit":"text",
+			"alignment":"MiddleCenter",
+		}
+	},
+	"scrollView":{
+		"horizontal":false,
+		"vertical":true,
+		
+		"movementType":"Clamped",
+		"inertia":true,
+		"decelerationRate":0.135,
+		"scrollSensitivity":150,
+		
+		"image":"UIBackground",
+		"color":"#FFFFFFFF",
+		"material":null,
+		"raycastTarget":true,
+		"imageType":"Sliced",
+		"fillCenter":true,
+		
+		"Scrollbar Horizontal":{
+			"inherit":"scrollViewScrollbar",
+		},
+		"Scrollbar Vertical":{
+			"inherit":"scrollViewScrollbar",
+		}
+		
+	},
+	"scrollViewScrollbar":{
+		"inherit":"interactable",
+		
+		"image":"UIBackground",
+		"color":"#FFFFFFFF",
+		"material":null,
+		"raycastTarget":true,
+		"imageType":"Sliced",
+		"fillCenter":true,
+		
+		
+		"Sliding Area/Handle":{
+			"image":"UISprite",
+			"color":"#FFFFFFFF",
+			"material":null,
+			"raycastTarget":true,
+			"imageType":"Sliced",
+			"fillCenter":true,
+		},
+	},
+	"interactable":{
+		"interactable":true,
+		"transition":"ColorTint",
+		"normalColor":"#DDDDDDFF",
+		"highlightedColor":"#FFFFFFFF",
+		"pressedColor":"#0056FFFF",
+		"disabledColor":"#FF000080",
+		"colorMultiplier":1,
+		"fadeDuration":0.1,
+	}
+	"inputField":{
+		"inherit":"interactable",
+		
+	}
+	
+	
+}
