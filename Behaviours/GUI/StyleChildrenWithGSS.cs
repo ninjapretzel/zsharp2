@@ -23,6 +23,8 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 			lastHeight = Screen.height;
 			lastWidth = Screen.width;
 
+		} else {
+			ProcessAllChildren();
 		}
 
 #if !UNITY_EDITOR
