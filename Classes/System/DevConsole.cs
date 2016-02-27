@@ -75,10 +75,14 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	}
 
-	public static void Defaults() {
-		binds = new Dictionary<KeyCode, string>();
-		aliases = new Dictionary<string, string>();
-		axisMappings = new Dictionary<string, string>();
+	public static void Defaults(bool resetBinds = true, bool resetAliases = true) {
+		if (resetAliases) {
+			aliases = new Dictionary<string, string>();
+		}
+		if (resetBinds) {
+			binds = new Dictionary<KeyCode, string>();
+			axisMappings = new Dictionary<string, string>();
+		}
 		if (File.Exists(configPath)) {
 			File.Delete(configPath);
 		}
