@@ -111,12 +111,13 @@ public class UGUIGrid {
 	/// <param name="obj">object to set up </param>
 	/// <param name="x"> x coordinate </param>
 	/// <param name="y"> y coordinate </param>
-	public void SetUp(Component obj, int x, int y) {
+	public UGUIGridElement SetUp(Component obj, int x, int y) {
 		var ge = obj.Require<UGUIGridElement>();
 		ge.grid = this;
 		ge.x = x;
 		ge.y = y;
 		ge.regrow = true;
+		return ge;
 	}
 
 	/// <summary> Resets the size of the grid object to ZERO, and allow it to auto set its size on the next frame. </summary>
@@ -155,6 +156,8 @@ public class UGUIGridElement : MonoBehaviour {
 	int lastWidth;
 	int lastHeight; 
 
+	bool isNew = true;
+
 	[NonSerialized] public bool regrow = false;
 
 	void Start() {
@@ -163,8 +166,9 @@ public class UGUIGridElement : MonoBehaviour {
 	}
 	
 	void Update() {
-		if (lastWidth != Screen.width || lastHeight != Screen.height) { 
+		if (lastWidth != Screen.width || lastHeight != Screen.height || isNew) { 
 			//Pre-Align.
+			isNew = false;
 			grid.ResetSize();
 			regrow = true;
 		} else if (regrow) {
