@@ -2,6 +2,29 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Linq;
+
+public class TransformByDepth : IComparer {
+	
+	int Depth(Transform t) {
+		int d = 0;
+		Transform p = t.parent;
+		while (p != null) {
+			d++;
+			p = p.parent;
+		}
+		return d;
+	}
+
+
+	public int Compare(Transform x, Transform y) {
+		return Depth(y) - Depth(x);
+	}
+	public int Compare(object x, object y) {
+		if (x is Transform && y is Transform) { return Compare(x as Transform, y as Transform); }
+		return -1;
+	}
+}
 
 [ExecuteInEditMode]
 public class StyleChildrenWithGSS : MonoBehaviour {
@@ -10,10 +33,10 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 	[NonSerialized] private int lastWidth = -1;
 	[NonSerialized] private int lastHeight = -1;
 
-	void Awake() {
+	
+	void Start() {
 		ProcessAllChildren(true);
 		
-
 	}
 
 	void Update() {
@@ -24,7 +47,9 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 			lastWidth = Screen.width;
 
 		} else {
-			ProcessAllChildren();
+			if (!Application.isPlaying) {
+				ProcessAllChildren();
+			}
 		}
 
 #if !UNITY_EDITOR
@@ -32,22 +57,34 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 			Destroy(this);	
 		}
 #endif
-
 	}
 
-	void ProcessAllChildren(bool includeInactvie = false) {
-		Transform[] children = transform.GetComponentsInChildren<Transform>(includeInactvie);
 
-		for (int i = children.Length-1; i >= 0; i--) {
+	void OnEnable() {
+		ProcessAllChildren(true);
+
+	}	
+
+	void ProcessAllChildren(bool includeInactvie = false) {
+		if (!GSS.loaded) { GSS.ReloadStyles(); }
+
+		Transform[] children = transform.GetComponentsInChildren<Transform>(includeInactvie);
+		Array.Sort(children, new TransformByDepth() );
+
+		StringBuilder log = name + "Processing " + children.Length + " objects. ";
+		log += includeInactvie ? "Included Inactives" : "Active Only";
+		for (int i = 0; i < children.Length; i++) {
 			var child = children[i];
 			foreach (var style in GSS.cascades) {
+				//log += Process(style as JsonObject, child);
 				Process(style as JsonObject, child);
 			}
 		}
 
+		Debug.Log(log);
 	}
 
-	public void Process(JsonObject style, Component c) {
+	public string Process(JsonObject style, Component c) {
 		string name = c.gameObject.name;
 		string namePrefix = style.Get<string>("namePrefix");
 		string nameSuffix = style.Get<string>("nameSuffix");
@@ -61,12 +98,13 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 
 			if (c.GetComponent<GSS>() == null) {
 				GSS.ApplyStyle(c, tagWith, styleWith);
-
+				return "\nApplied " + tagWith + ":" + styleWith + " to " + c.GetRelativePath();
 				//GSS g = c.AddComponent<GSS>();
 				//g.tagClass = tagWith;
 				//g.styleClass = styleWith;
 			}
 		}
+		return "";
 	}
 	
 

@@ -42,7 +42,7 @@ public class OptionSelecter : MonoBehaviour {
 	void Start() {
 		if (Application.isPlaying) {
 			label = transform.Find("Label").GetComponent<Text>();
-			label.text = gameObject.name;
+			label.text = gameObject.name.FromFirst("OptionSelector");
 			display = transform.Find("Display").GetComponent<Text>();
 			string current = Get(settingName);
 			if (current == null || current == "") {

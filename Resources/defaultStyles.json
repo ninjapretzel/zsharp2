@@ -1,25 +1,14 @@
 ﻿{
 	"cascades":[
-		{
-			"nameSuffix":"Button",
-			"tagWith":"button",
-		},
-		{
-			"nameContains":"Text",
-			"tagWith":"text",
-		},
-		{
-			"nameContains":"Scroll View",
-			"tagWith":"scrollView",
-		},
-		{
-			"nameContains":"Header",
-			"tagWith":"header",
-		},
-		{
-			"nameSuffix":"Panel",
-			"tagWith":"panel",
-		},
+		{ "nameSuffix":"Button",		"tagWith":"button", },
+		{ "nameContains":"Text",		"tagWith":"text", },
+		{ "nameContains":"Scroll View",	"tagWith":"scrollView", },
+		{ "nameContains":"Header",		"tagWith":"header", },
+		{ "nameSuffix":"Panel",			"tagWith":"panel", },
+		{ "nameContains":"Modal",		"tagWith":"modal", },
+		{ "nameContains":"Toggle", 		"tagWith":"toggle", },
+		{ "nameSuffix":"Slider", 		"tagWith":"slider", },
+		{ "nameSuffix":"InputField", 	"tagWith":"inputField", },
 	],
 	
 	"text":{
@@ -126,11 +115,71 @@
 		"disabledColor":"#FF000080",
 		"colorMultiplier":1,
 		"fadeDuration":0.1,
-	}
+	},
 	"inputField":{
 		"inherit":"interactable",
+		"selectionColor":"#A8CEFFC0",
+		"Placeholder":{
+			"inherit":"text",
+			"alignment":"MiddleLeft",
+			"color":"#FFFFFF75",
+			"richText":false,
+			
+		},
+		"Text":{
+			"inherit":"text",
+			"alignment":"MiddleLeft",
+			"color":"#FFFFFFFF",
+			"richText":false,
+		}
+	},
+	"toggle":{
+		"inherit":"interactable",
+		"Background":{
+			"image":"UISprite"
+		},
+		"Background/Checkmark":{
+			"image":"UICheckmark",
+		},
+		"Label":{
+			"inherit":"text",
+			"fontSize":33,
+			"bestFit":false,
+			"alignment":"MiddleLeft",
+		}
+	},
+	"slider":{
+		"inherit":"interactable",
+		"Background":{
+			"image":"UIBackground"
+		},
+		"Fill Area/Fill":{
+			"image":"UISprite"
+		},
+		"Handle Slide Area/Handle":{
+			"image":"UISprite"
+		},
 		
+		"Label":{
+			"inherit":"text",
+			"fontSize":55,
+			"alignment":"MiddleCenter",
+			
+		},
+		"Value":{
+			"inherit":"text",
+			"fontSize":33,
+			"alignment":"MiddleCenter",
+			
+		}
+	},
+	"modal":{
+		
+		"Text":{
+			"inherit":"text",
+			"fontSize":45,
+			"alignment":"MiddleCenter",
+		}
 	}
-	
 	
 }

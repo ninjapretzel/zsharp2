@@ -24,7 +24,7 @@ public class OptionSlider : MonoBehaviour {
 		}
 	}
 
-	Text label;
+	Text valLabel;
 	Slider slider;
 	
 #if XtoJSON
@@ -45,11 +45,12 @@ public class OptionSlider : MonoBehaviour {
 
 	void Start() {
 		slider = GetComponent<Slider>();
-		label = transform.Find("Label").GetComponent<Text>();
+		valLabel = transform.Find("Value").GetComponent<Text>();
 		
 		slider.onValueChanged.AddListener(Set);
 		slider.value = Get(settingName);
-		//Set(slider.value);
+		Set(slider.value);
+
 	}
 	
 	void Update() {
@@ -58,8 +59,8 @@ public class OptionSlider : MonoBehaviour {
 
 	void Set(float value) {
 		Set(settingName, value);
-		if (label != null) {
-			label.text = prefix + string.Format(code, value * multiplier) + suffix;
+		if (valLabel != null) {
+			valLabel.text = prefix + string.Format(code, value * multiplier) + suffix;
 			
 		}
 	}

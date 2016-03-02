@@ -19,30 +19,59 @@ public partial class GSS : MonoBehaviour {
 
 public partial class GSS : MonoBehaviour {
 
-	static JsonObject styles = LoadStyles();
 	[NonSerialized] private static int lastDefaultHash = 0;
 	[NonSerialized] private static int lastStyleHash = 0;
+	static JsonObject styles = LoadStyles();
+	public static bool loaded { get { return styles != null; } }
 
 	static JsonObject LoadStyles() {
+		try {
+			if (!Application.isPlaying) {
+				//Debug.Log("Reloaded styles when not playing... checking for load issues");
+					var test = Resources.Load<TextAsset>("defaultStyles");
+					//Debug.Log("success!");
+			}
+		} catch {
+			Debug.Log("GSS: Failed! Could not load stylesheets!");
+			return null;
+		}
+
+
 		string defaultStyleJson = Resources.Load<TextAsset>("defaultStyles").text;
 		lastDefaultHash = defaultStyleJson.GetHashCode();
 
 		JsonObject obj = Json.Parse(defaultStyleJson) as JsonObject;
+		JsonArray cas = obj.Get<JsonArray>("cascades");
+
 		TextAsset styleFile = Resources.Load<TextAsset>("styles");
 		if (styleFile != null) {
 			string styleJson = styleFile.text;
 			lastStyleHash = styleJson.GetHashCode();
 
 			JsonObject loadedStyles = Json.Parse(styleJson) as JsonObject;
-
 			obj.SetRecursively(loadedStyles);
+
+			JsonArray loadedCas = loadedStyles.Get<JsonArray>("cascades");
+			if (loadedCas != null) {
+				cas.AddAll(loadedCas);
+				obj["cascades"] = cas;
+			}
+				
+
 		}
 
-		//Debug.Log("Loaded Stylesheets:"+obj.PrettyPrint());
+
+
+		Debug.Log("GSS: Loaded/Reloaded Stylesheets");
 		return obj;
 	}
 
 	public static bool ReloadStyles() {
+		if (styles == null) { 
+			styles = LoadStyles();
+			return true;
+		}
+
 		string defaultStyleJson = Resources.Load<TextAsset>("defaultStyles").text;
 		bool reload = defaultStyleJson.GetHashCode() != lastDefaultHash;
 
@@ -87,7 +116,7 @@ public partial class GSS : MonoBehaviour {
 	void ApplyStyle(JsonObject style) { ApplyStyle(this, style); }
 
 	public static void ApplyStyle(Component c, string tag, string style) {
-		if (styles.ContainsKey(tag) || styles.ContainsKey(style)) {
+		if ((tag != null && styles.ContainsKey(tag)) || (style != null && styles.ContainsKey(style))) {
 			JsonObject styleObj = styles.Get<JsonObject>(style);
 			JsonObject tagObj = styles.Get<JsonObject>(tag);
 
@@ -111,20 +140,21 @@ public partial class GSS : MonoBehaviour {
 		Button btn = c.GetComponent<Button>();
 		Text txt = c.GetComponent<Text>();
 		ScrollRect scr = c.GetComponent<ScrollRect>();
+		InputField inf = c.GetComponent<InputField>();
 
 		if (img != null) { ApplyImageStyle(img, style); }
 		if (btn != null) { ApplyButtonStyle(btn, style); }
 		if (txt != null) { ApplyTextStyle(txt, style); }
 		if (scr != null) { ApplyScrollRectStyle(scr, style); }
+		if (inf != null) { ApplyInputFieldStyle(inf, style); }
 
 		foreach (var pair in style) {
-			if (pair.Value.isObject) {
-				Transform target = c.transform.Find(pair.Key);
-				if (target != null) { 
-					GSS gss = target.GetComponent<GSS>();
-					if (gss != null) { Destroy(gss); }
-					ApplyStyle(target, pair.Value as JsonObject); 
-				}
+			Transform target = c.transform.Find(pair.Key);
+			if (target != null) { 
+				GSS gss = target.GetComponent<GSS>();
+				if (gss != null) { Destroy(gss); }
+				if (pair.Value.isObject) { ApplyStyle(target, pair.Value as JsonObject); }
+				if (pair.Value.isString) { ApplyStyle(target, pair.Value.stringVal, ""); }
 			}
 		}
 
@@ -157,6 +187,12 @@ public partial class GSS : MonoBehaviour {
 		ApplySelectableStyle(scb, style);
 	}
 
+	static void ApplyInputFieldStyle(InputField inf, JsonObject style) {
+		ApplySelectableStyle(inf, style);
+		if (style.ContainsKey("selectionColor")) { inf.selectionColor = GetColor(style, "selectionColor"); }
+
+	}
+
 	static void ApplyTextStyle(Text txt, JsonObject style) {
 		if (style.ContainsKey("font")) { txt.font = Resources.Load<Font>(style.Get<string>("font")); }
 		if (style.ContainsKey("fontStyle")) { txt.fontStyle = style.Get<FontStyle>("fontStyle"); }
@@ -165,6 +201,7 @@ public partial class GSS : MonoBehaviour {
 		if (style.ContainsKey("fontSize")) { txt.fontSize = (int)(style.Get<float>("fontSize") * (scale ? scaleRatio : 1)); }
 		if (style.ContainsKey("richText")) { txt.supportRichText = style.Get<bool>("richText"); }
 		if (style.ContainsKey("alignment")) { txt.alignment = style.Get<TextAnchor>("alignment"); }
+		if (style.ContainsKey("lineSpacing")) { txt.lineSpacing = style.Get<float>("lineSpacing"); }
 		if (style.ContainsKey("alignByGeometry")) { txt.alignByGeometry = style.Get<bool>("alignByGeometry"); }
 		if (style.ContainsKey("horizontalOverflow")) { txt.horizontalOverflow = style.Get<HorizontalWrapMode>("horizontalOverflow"); }
 		if (style.ContainsKey("verticalOverflow")) { txt.verticalOverflow = style.Get<VerticalWrapMode>("verticalOverflow"); }
