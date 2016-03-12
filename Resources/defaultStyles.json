@@ -12,7 +12,10 @@
 	],
 	
 	"text":{
-		"font":"rs",
+		"font":{
+			"english":"rs",
+			"japanese":"nicokaku",
+		},
 		"fontStyle":"Normal",
 		"fontSize":20,
 		"sizeScale":true,
@@ -107,7 +110,6 @@
 		},
 	},
 	"interactable":{
-		"interactable":true,
 		"transition":"ColorTint",
 		"normalColor":"#DDDDDDFF",
 		"highlightedColor":"#FFFFFFFF",
@@ -123,7 +125,6 @@
 			"inherit":"text",
 			"alignment":"MiddleLeft",
 			"color":"#FFFFFF75",
-			"richText":false,
 			
 		},
 		"Text":{

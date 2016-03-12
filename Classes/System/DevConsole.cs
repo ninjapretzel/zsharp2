@@ -18,6 +18,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	public static bool cheats = false;
 	public static string echoBuffer = "";
 	public static int debug = 0;
+	public static bool echoAll = false;
 	[Inaccessible] public string[] blacklistedClasses;
 	[Inaccessible] public static List<string> classBlacklist = new List<string>();
 
@@ -288,6 +289,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			if (line[0] == '#') {
 				return;
 			}
+			if (echoAll) { Echo(line); }
 			// Separate command from parameters
 			int indexOfSpace = line.IndexOf(' ');
 			string command = "";
@@ -315,12 +317,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 #endif
 				}
 				targetMemberName = command.Substring(indexOfDot+1);
-				foreach (string assembly in ReflectionUtils.assemblies) {
-					targetClass = Type.GetType(targetClassName + assembly);
-					if (targetClass != null) {
-						break;
-					}
-				}
+				targetClass = ReflectionUtils.GetTypeInUnityAssemblies(targetClassName);
 			} else {
 				targetClass = typeof(DevConsole);
 				targetMemberName = command;
@@ -386,7 +383,8 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	// Returns: results of the ToString method when called on the field, or null if field is of unsupported type.
 	public static string GetFieldValue(object instance, FieldInfo fieldInfo) {
 		if (fieldInfo == null) { return null; }
-		// Only support types that can also be set by the user (see ParseParameterListIntoType)
+		if (fieldInfo.FieldType.IsEnum) { return fieldInfo.GetValue(instance).ToString(); }
+		// Only supported types that can also be set by the user (see ParseParameterListIntoType)
 		// so as not to mislead the user into thinking they can modify other types of variables
 		switch (fieldInfo.FieldType.Name) {
 			case "Vector2":
@@ -460,6 +458,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	public static string GetPropertyValue(object instance, PropertyInfo propertyInfo) {
 		if (propertyInfo == null) { return null; }
 		if (propertyInfo.GetGetMethod() == null) { return "write-only!"; }
+		if (propertyInfo.PropertyType.IsEnum) { return propertyInfo.GetValue(instance, null).ToString(); }
 		switch (propertyInfo.PropertyType.Name) {
 			case "Vector2":
 			case "Vector3":

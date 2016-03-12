@@ -7,63 +7,57 @@ using System;
 
 public partial class GSS : MonoBehaviour {
 	public string tagClass = "";
-	string curTag = "";
+	[NonSerialized] string curTag = "";
 
 	public string styleClass = "";
-	string curStyle = "";
+	[NonSerialized] string curStyle = "";
 
 }
 
 #if XtoJSON
 
-
+[ExecuteInEditMode]
 public partial class GSS : MonoBehaviour {
 
 	[NonSerialized] private static int lastDefaultHash = 0;
 	[NonSerialized] private static int lastStyleHash = 0;
 	static JsonObject styles = LoadStyles();
+
+	public static bool restyleEverything = false;
 	public static bool loaded { get { return styles != null; } }
 
 	static JsonObject LoadStyles() {
 		try {
-			if (!Application.isPlaying) {
-				//Debug.Log("Reloaded styles when not playing... checking for load issues");
-					var test = Resources.Load<TextAsset>("defaultStyles");
-					//Debug.Log("success!");
-			}
-		} catch {
-			Debug.Log("GSS: Failed! Could not load stylesheets!");
-			return null;
-		}
+			string defaultStyleJson = Resources.Load<TextAsset>("defaultStyles").text;
+			lastDefaultHash = defaultStyleJson.GetHashCode();
 
+			JsonObject obj = Json.Parse(defaultStyleJson) as JsonObject;
+			JsonArray cas = obj.Get<JsonArray>("cascades");
 
-		string defaultStyleJson = Resources.Load<TextAsset>("defaultStyles").text;
-		lastDefaultHash = defaultStyleJson.GetHashCode();
+			TextAsset styleFile = Resources.Load<TextAsset>("styles");
+			if (styleFile != null) {
+				string styleJson = styleFile.text;
+				lastStyleHash = styleJson.GetHashCode();
 
-		JsonObject obj = Json.Parse(defaultStyleJson) as JsonObject;
-		JsonArray cas = obj.Get<JsonArray>("cascades");
+				JsonObject loadedStyles = Json.Parse(styleJson) as JsonObject;
+				obj.SetRecursively(loadedStyles);
 
-		TextAsset styleFile = Resources.Load<TextAsset>("styles");
-		if (styleFile != null) {
-			string styleJson = styleFile.text;
-			lastStyleHash = styleJson.GetHashCode();
-
-			JsonObject loadedStyles = Json.Parse(styleJson) as JsonObject;
-			obj.SetRecursively(loadedStyles);
-
-			JsonArray loadedCas = loadedStyles.Get<JsonArray>("cascades");
-			if (loadedCas != null) {
-				cas.AddAll(loadedCas);
-				obj["cascades"] = cas;
-			}
+				JsonArray loadedCas = loadedStyles.Get<JsonArray>("cascades");
+				if (loadedCas != null) {
+					cas.AddAll(loadedCas);
+					obj["cascades"] = cas;
+				}
 				
 
+			}
+
+
+
+			Debug.Log("GSS: Loaded/Reloaded Stylesheets");
+			return obj;
+		} catch {
+			return null;
 		}
-
-
-
-		Debug.Log("GSS: Loaded/Reloaded Stylesheets");
-		return obj;
 	}
 
 	public static bool ReloadStyles() {
@@ -79,7 +73,7 @@ public partial class GSS : MonoBehaviour {
 		if (styleFile != null) {
 			string styleJson = styleFile.text;
 			reload |= styleJson.GetHashCode() != lastStyleHash;
-
+			
 		}
 
 		if (reload) { styles = LoadStyles(); }
@@ -101,17 +95,24 @@ public partial class GSS : MonoBehaviour {
 	}
 	
 	void Update() {
+		if (restyleEverything) {
+			curTag = "";
+			curStyle = "";
+			//Debug.Log("EVERYTHING IS GETTING RESTYLED");
+		}
 		if (styleClass != curStyle || tagClass != curTag) {
-			//Debug.Log("Updating style on " + name);
 			UpdateStyle(tagClass, styleClass);
 			curStyle = styleClass;
 			curTag = tagClass;
 		}
-
 		
 	}
 
+	void LateUpdate() {
+		restyleEverything = false;
+	}
 
+	public void UpdateStyle() { UpdateStyle(curTag, curStyle); }
 	void UpdateStyle(string tag, string style) { ApplyStyle(this, tag, style); }
 	void ApplyStyle(JsonObject style) { ApplyStyle(this, style); }
 
@@ -136,15 +137,15 @@ public partial class GSS : MonoBehaviour {
 			ApplyStyle(c, inheritedStyle);
 		}
 
+		Text txt = c.GetComponent<Text>();
 		Image img = c.GetComponent<Image>();
 		Button btn = c.GetComponent<Button>();
-		Text txt = c.GetComponent<Text>();
 		ScrollRect scr = c.GetComponent<ScrollRect>();
 		InputField inf = c.GetComponent<InputField>();
 
+		if (txt != null) { ApplyTextStyle(txt, style); }
 		if (img != null) { ApplyImageStyle(img, style); }
 		if (btn != null) { ApplyButtonStyle(btn, style); }
-		if (txt != null) { ApplyTextStyle(txt, style); }
 		if (scr != null) { ApplyScrollRectStyle(scr, style); }
 		if (inf != null) { ApplyInputFieldStyle(inf, style); }
 
@@ -194,7 +195,18 @@ public partial class GSS : MonoBehaviour {
 	}
 
 	static void ApplyTextStyle(Text txt, JsonObject style) {
-		if (style.ContainsKey("font")) { txt.font = Resources.Load<Font>(style.Get<string>("font")); }
+		if (style.ContainsKey("font")) { 
+			if (style["font"].isString) { txt.font = Resources.Load<Font>(style.Get<string>("font")); }
+			if (style["font"].isObject) {
+				//Debug.Log("Changing font style for " + Localization.language.ToString());
+				JsonObject languageFonts = style.Get<JsonObject>("font");
+				if (languageFonts.ContainsKey(Localization.language.ToString())) {
+					txt.font = Resources.Load<Font>(languageFonts.Get<string>(Localization.language.ToString() ) );
+				} else {
+					txt.font = Resources.Load<Font>(languageFonts.Get<string>("english"));
+				}
+			}
+		}
 		if (style.ContainsKey("fontStyle")) { txt.fontStyle = style.Get<FontStyle>("fontStyle"); }
 
 		bool scale = style.Extract("sizeScale", true);

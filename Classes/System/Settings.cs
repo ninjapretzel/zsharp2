@@ -107,6 +107,13 @@ public partial class Settings : JsonObject {
 			fxaaMode = Select(s, fxaaStrs, fxaaModes);
 		});
 
+
+		Register("language", (s) => {
+			//Debug.Log("Callback: language to to " + s);
+			Localization.language = (Language) Enum.Parse(typeof(Language), s);
+			GSS.restyleEverything = true;
+		});
+
 	}
 
 	/// <summary> Current active rendering path. </summary>
@@ -123,6 +130,9 @@ public partial class Settings : JsonObject {
 		Load();
 		return true;
 	}
+
+	/// <summary> Has anything changed during the last frame? (Note: This needs to be manually set to false in LateUpdate!) </summary>
+	public static bool changed = false;
 
 	/// <summary> Dictionary of callbacks to do settings change. </summary>
 	private static Dictionary<string, Action<string>> callbacks;
@@ -179,7 +189,7 @@ public partial class Settings : JsonObject {
 	public void Apply(string key, object value) {
 		JsonValue val = Json.Reflect(value);
 		this[key] = val;
-		//Debug.Log("Set " + thing + " to " + val);
+		changed = true;
 		
 		string strValue = value.ToString();
 		if (val.isString) { strValue = val.stringVal; }
@@ -215,6 +225,9 @@ public partial class Settings : JsonObject {
 
 	/// <summary> Primary ccolor of the user </summary>
 	public Color color { get { return this.Get<Color>("color"); } set { Apply("color", value); } }
+
+	/// <summary> Language the game is running in </summary>
+	public string language { get { return this.Get<string>("language"); } set { Apply("language", value.ToString()); } }
 
 
 	/// <summary> Helper function to query the settings object for a color, stored as a hex string, rather than an internal object</summary>

@@ -547,6 +547,10 @@ public static class DataUtils {
 	/// <param name="typeName">The type of the returned object</param>
 	/// <returns>The resulting object</returns>
 	public static object ParseParameterListIntoType(this string[] parameters, string typeName) {
+		Type targetType = ReflectionUtils.GetTypeInUnityAssemblies(typeName);
+		if (targetType != null && targetType.IsEnum && parameters.Length == 1) {
+			return Enum.Parse(targetType, parameters[0], true);
+		}
 		switch(typeName) {
 			case "Vector2": {
 				Vector2 targetV2;

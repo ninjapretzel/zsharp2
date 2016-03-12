@@ -148,7 +148,7 @@ public class ZTextWindow : ZEditorWindow {
 		BeginHorizontal("box"); {
 			Label(label, Width(NAME_WIDTH));
 			flags[label] = EditorGUILayout.Toggle(flags[label].boolVal, Width(CHANGE_WIDTH));
-			 t = (T)(object)EditorGUILayout.ObjectField(obj, typeof(T), Width(VALUE_WIDTH));
+			 t = (T)(object)EditorGUILayout.ObjectField(obj, typeof(T), true, Width(VALUE_WIDTH));
 		} EndHorizontal();
 		return t;
 	}

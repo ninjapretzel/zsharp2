@@ -10,6 +10,9 @@ using System.Collections.Generic;
 ///
 
 public static class ReflectionUtils {
+
+	private static Dictionary<string, Type> _cachedTypes = new Dictionary<string,Type>();
+
 	///Get the 'code' name of a type ('float' instead of 'System.Single')
 	public static string ShortName(this Type t) {
 		if (t == typeof(void)) { return "void"; }
@@ -323,7 +326,36 @@ public static class ReflectionUtils {
 			return setter.IsStatic;
 		}
 	}
-	
+
+	public static Type GetType(string typeName) {
+		if (_cachedTypes.ContainsKey(typeName)) {
+			return _cachedTypes[typeName];
+		}
+		Type type = Type.GetType(typeName);
+		_cachedTypes[typeName] = type;
+		return type;
+	}
+
+	/// <summary>
+	/// Searches all assemblies in the <c>assemblies</c> IEnumerable for a type with the
+	/// specified <paramref name="targetTypeName"/>.
+	/// </summary>
+	/// <param name="targetTypeName">The name of the <c>System.Type</c> to search for.</param>
+	/// <returns>The <c>System.Type</c> corresponding to <paramref name="targetTypeName"/>, or <c>null</c> if no such <c>Type</c> was found.</returns>
+	/// <exception cref="ArgumentNullException"><paramref name="targetTypeName"/> was <c>null</c>.</exception>
+	public static Type GetTypeInUnityAssemblies(string targetTypeName) {
+		if (targetTypeName == null) {
+			throw new ArgumentNullException();
+		}
+		foreach (string assembly in ReflectionUtils.assemblies) {
+			Type targetClass = GetType(targetTypeName + assembly);
+			if (targetClass != null) {
+				return targetClass;
+			}
+		}
+
+		return null;
+	}
 	
 	
 	public static void ListAllMembers(this Type type, bool showPrivate = false, bool showHidden = false) { Debug.Log(type.Summary(showPrivate, showHidden)); }
@@ -451,11 +483,21 @@ public static class ReflectionUtils {
 		get {
 			yield return "";
 			yield return ",UnityEngine";
+#if UNITY_EDITOR
 			yield return ",UnityEditor";
+#endif
 			yield return ",Assembly-UnityScript";
 			yield return ",Assembly-CSharp";
+#if UNITY_EDITOR
+			yield return ",Assembly-UnityScript-Editor";
+			yield return ",Assembly-CSharp-Editor";
+#endif
 			yield return ",Assembly-UnityScript-firstpass";
 			yield return ",Assembly-CSharp-firstpass";
+#if UNITY_EDITOR
+			yield return ",Assembly-UnityScript-Editor-firstpass";
+			yield return ",Assembly-CSharp-Editor-firstpass";
+#endif
 		}
 	}
 	

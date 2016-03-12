@@ -34,17 +34,19 @@ public class MusicPlayer : MonoBehaviour {
 	public string activeSet;
 	public bool playOnStart = false;
 	
-	public int curIndex;
+	int curIndex;
 	public bool shuffle = true;
 	public static MusicPlayer main;
 	
-	public bool fade = false;
-	public bool fadein = false;
-	public string fadeTo = "";
-	public float time = 0;
+	bool fade = false;
+	bool fadein = false;
+	string fadeTo = "";
+	float time = 0;
 	public float fadeTime = .5f;
 	public float volume = .6f;
 	
+
+	public bool followCamera = true;
 	
 	void Awake() {
 		if (main != null) { 
@@ -86,7 +88,7 @@ public class MusicPlayer : MonoBehaviour {
 			}
 		}
 		
-		if (Camera.main) { transform.position = Camera.main.transform.position; }
+		if (followCamera && Camera.main) { transform.position = Camera.main.transform.position; }
 	}
 	
 	public void UpdateFade() {

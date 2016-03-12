@@ -40,7 +40,11 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 	}
 
 	void Update() {
-		
+		if (GSS.restyleEverything) {
+			//Debug.Log("EVERYTHING IS GETTING RESTYLED");
+			ProcessAllChildren(true);
+		}
+
 		if (GSS.ReloadStyles() || lastWidth != Screen.width || lastHeight != Screen.height) {
 			ProcessAllChildren(true);
 			lastHeight = Screen.height;
@@ -60,6 +64,11 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 	}
 
 
+	void LateUpdate() {
+		GSS.restyleEverything = false;
+	}
+
+
 	void OnEnable() {
 		ProcessAllChildren(true);
 
@@ -71,8 +80,8 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 		Transform[] children = transform.GetComponentsInChildren<Transform>(includeInactvie);
 		Array.Sort(children, new TransformByDepth() );
 
-		StringBuilder log = name + "Processing " + children.Length + " objects. ";
-		log += includeInactvie ? "Included Inactives" : "Active Only";
+		//StringBuilder log = name + "Processing " + children.Length + " objects. ";
+		//log += includeInactvie ? "Included Inactives" : "Active Only";
 		for (int i = 0; i < children.Length; i++) {
 			var child = children[i];
 			foreach (var style in GSS.cascades) {
@@ -81,7 +90,7 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 			}
 		}
 
-		Debug.Log(log);
+		//Debug.Log(log);
 	}
 
 	public string Process(JsonObject style, Component c) {
@@ -96,12 +105,16 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 			|| (nameContains != null && nameContains != "" && name.Contains(nameContains))
 			|| (nameSuffix != null && nameSuffix != "" && name.EndsWith(nameSuffix))) {
 
-			if (c.GetComponent<GSS>() == null) {
+
+			GSS gss = c.GetComponent<GSS>();
+			if (gss == null) {
 				GSS.ApplyStyle(c, tagWith, styleWith);
 				return "\nApplied " + tagWith + ":" + styleWith + " to " + c.GetRelativePath();
 				//GSS g = c.AddComponent<GSS>();
 				//g.tagClass = tagWith;
 				//g.styleClass = styleWith;
+			} else {
+				gss.UpdateStyle();
 			}
 		}
 		return "";

@@ -3,9 +3,19 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
+
+public class DontSaveAttribute : Attribute { }
 
 public class SavesState : MonoBehaviour {
-	
+
+	private class SavedBehaviour {
+		public Type type;
+		public bool enabled;
+		public Behaviour reference;
+		public Dictionary<FieldInfo, object> fields;
+	}
+
 	public static bool restore = false;
 	public static bool reset = false;
 	public static bool save = false;
@@ -17,15 +27,17 @@ public class SavesState : MonoBehaviour {
 	[NonSerialized] private Quaternion rotation;
 	[NonSerialized] private Vector3 scale;
 	[NonSerialized] private Transform savedParent;
+	[NonSerialized] private Vector3 velocity;
+	[NonSerialized] private Vector3 angularVelocity;
 	[NonSerialized] private Vector3 initialPosition;
 	[NonSerialized] private Quaternion initialRotation;
 	[NonSerialized] private Vector3 initialScale;
 	[NonSerialized] private Transform initialSavedParent;
+	[NonSerialized] private Vector3 initialVelocity;
+	[NonSerialized] private Vector3 initialAngularVelocity;
 	// Attached Behaviours
-	[NonSerialized] private bool[] enabledBehaviours; // Behaviour.enabled is not a field, it's a property. Store it separately.
-	[NonSerialized] private bool[] initialEnabledBehaviours; // Behaviour.enabled is not a field, it's a property. Store it separately.
-	[NonSerialized] private Dictionary<Type, Dictionary<FieldInfo, System.Object>> savedBehaviours = null;
-	[NonSerialized] private Dictionary<Type, Dictionary<FieldInfo, System.Object>> initialBehaviours = null;
+	[NonSerialized] private List<SavedBehaviour> savedBehaviours = null;
+	[NonSerialized] private List<SavedBehaviour> initialBehaviours = null;
 	
 	public void Start() {
 		SaveStateInitial();
@@ -35,10 +47,11 @@ public class SavesState : MonoBehaviour {
 	public void Update() {
 		if (reset) {
 			savedBehaviours = initialBehaviours;
-			enabledBehaviours = initialEnabledBehaviours;
 			position = initialPosition;
 			rotation = initialRotation;
 			scale = initialScale;
+			velocity = initialVelocity;
+			angularVelocity = initialAngularVelocity;
 			savedParent = initialSavedParent;
 			Restore();
 		} else if(restore) {
@@ -56,14 +69,20 @@ public class SavesState : MonoBehaviour {
 	
 	public void SaveState() {
 		Behaviour[] behaviours = gameObject.GetComponents<Behaviour>();
-		enabledBehaviours = new bool[behaviours.Length - 1];
-		savedBehaviours = new Dictionary<Type, Dictionary<FieldInfo, System.Object>>();
+		savedBehaviours = new List<SavedBehaviour>();
 		// Save transform properties
-		position = transform.localPosition;
-		rotation = transform.localRotation;
-		scale = transform.localScale;
 		savedParent = transform.parent;
-		int i = 0;
+		position = transform.position;
+		rotation = transform.rotation;
+		scale = transform.localScale;
+		Rigidbody rb = GetComponent<Rigidbody>();
+		if (rb != null) {
+			velocity = rb.velocity;
+			angularVelocity = rb.angularVelocity;
+		} else {
+			velocity = Vector3.zero;
+			angularVelocity = Vector3.zero;
+		}
 		foreach(Behaviour c in behaviours) {
 			// Use reflection to get the Type of this
 			string name = c.GetType().Name;
@@ -75,15 +94,20 @@ public class SavesState : MonoBehaviour {
 			if(name != this.GetType().Name) {
 				// Get all fields in this Behaviour
 				FieldInfo[] fields = c.GetType().GetFields();
-				Dictionary<FieldInfo, System.Object> savedFields = new Dictionary<FieldInfo, System.Object>();
+				Dictionary<FieldInfo, object> savedFields = new Dictionary<FieldInfo, object>();
 				// Save them in a dictionary
 				foreach(FieldInfo f in fields) {
-					savedFields.Add(f, f.GetValue(c));
+					if (Attribute.GetCustomAttribute(f, typeof(DontSaveAttribute)) != null) { continue; }
+					object o = f.GetValue(c);
+					savedFields.Add(f, o);
 				}
-				savedBehaviours.Add(c.GetType(), savedFields);
-				// Also save the enabled state
-				enabledBehaviours[i] = c.enabled;
-				i++;
+				SavedBehaviour newSavedBehaviour = new SavedBehaviour() {
+					type = c.GetType(),
+					enabled = c.enabled,
+					reference = c,
+					fields = savedFields
+				};
+				savedBehaviours.Add(newSavedBehaviour);
 			}
 		}
 		
@@ -92,46 +116,65 @@ public class SavesState : MonoBehaviour {
 	public void SaveStateInitial() {
 		SaveState();
 		initialBehaviours = savedBehaviours;
-		initialEnabledBehaviours = enabledBehaviours;
 		initialPosition = position;
 		initialRotation = rotation;
 		initialScale = scale;
+		Rigidbody rb = GetComponent<Rigidbody>();
+		if (rb != null) {
+			initialVelocity = rb.velocity;
+			initialAngularVelocity = rb.angularVelocity;
+		} else {
+			initialVelocity = Vector3.zero;
+			initialAngularVelocity = Vector3.zero;
+		}
 		initialSavedParent = savedParent;
 		SaveState();
 	}
 	
 	public void Restore() {
 		// Restore transform properties
-		transform.localPosition = position;
-		transform.localRotation = rotation;
-		transform.localScale = scale;
 		transform.parent = savedParent;
+		transform.position = position;
+		transform.rotation = rotation;
+		transform.localScale = scale;
+		Rigidbody rb = GetComponent<Rigidbody>();
+		if (rb != null) {
+			rb.velocity = velocity;
+			rb.angularVelocity = angularVelocity;
+		}
 		// Get all Behaviours currently attached to this object
 		Behaviour[] behaviours = gameObject.GetComponents<Behaviour>();
 		foreach(Behaviour c in behaviours) {
 			string name = c.GetType().Name;
-			bool blacklisted = false;
-			foreach(string blacklistedClass in blacklist) {
-				if(name == blacklistedClass) { blacklisted = true; break; }
+			if (name == this.GetType().Name) { continue; }
+			if (blacklist.Contains<string>(name)) { continue; }
+			
+			bool handled = false;
+			foreach (SavedBehaviour b in savedBehaviours) {
+				// If they are the same type but not the same reference
+				if (b.type == c.GetType()) {
+					handled = true;
+					if (!object.ReferenceEquals(c, b.reference)) {
+						Destroy(c);
+						b.reference = gameObject.AddComponent(b.type) as Behaviour;
+					}
+					break;
+				}
 			}
-			if(blacklisted) { continue; }
-			if(name != this.GetType().Name) {
-				// Delete them all, some may have been added since the last checkpoint
-				Behaviour.Destroy(c);
+			// If this component wasn't in the list of saved behaviours, we don't want it
+			if (!handled) {
+				Destroy(c);
 			}
 		}
-		int i = 0;
-		foreach(Type type in savedBehaviours.Keys) {
-			// Add back the saved components
-			//Behaviour current = UnityEngineInternal.APIUpdaterRuntimeServices.AddComponent(gameObject, "Assets/Plugins/zsharp2/Behaviours/GameObject/SavesState.cs (126,24)", type.Name) as Behaviour;
-			Behaviour current = gameObject.AddComponent(type) as Behaviour;
-			foreach(FieldInfo field in savedBehaviours[type].Keys) {
-				// Even though "current" is a Behaviour above, setting fields of derivative classes works through reflection, fortunately
-				field.SetValue(current, savedBehaviours[type][field]);
+		foreach (SavedBehaviour b in savedBehaviours) {
+			if (b.reference == null) {
+				b.reference = gameObject.AddComponent(b.type) as Behaviour;
 			}
-			// Restore enabled state
-			current.enabled = enabledBehaviours[i];
-			i++;
+			b.reference.enabled = b.enabled;
+			foreach(KeyValuePair<FieldInfo, object> kvp in b.fields) {
+				// Fortunately, even though "current" is a Behaviour above, setting fields of derivative classes works through reflection
+				kvp.Key.SetValue(b.reference, kvp.Value);
+			}
 		}
 		
 	}

@@ -42,12 +42,13 @@ public class DisableOnSetting : MonoBehaviour {
 	}
 	
 	void Update() {
-		if (isEnabled && !lastEnabled) {
-			Enable();
-		} else if (!isEnabled && lastEnabled) {
-			Disable();
+		if (Settings.changed) {
+			if (isEnabled && !lastEnabled) {
+				Enable();
+			} else if (!isEnabled && lastEnabled) {
+				Disable();
+			}
 		}
-		
 	}
 	
 	void LateUpdate() {
