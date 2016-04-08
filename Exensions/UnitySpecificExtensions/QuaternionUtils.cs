@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,10 +30,10 @@ public static class QuaternionUtils {
 	public static byte[] GetBytes(this Quaternion q) {
 		List<byte> b = new List<byte>();
 		
-		b.Append(q.x.GetBytes());
-		b.Append(q.y.GetBytes());
-		b.Append(q.z.GetBytes());
-		b.Append(q.w.GetBytes());
+		b.AddAll(q.x.GetBytes());
+		b.AddAll(q.y.GetBytes());
+		b.AddAll(q.z.GetBytes());
+		b.AddAll(q.w.GetBytes());
 		
 		return b.ToArray();
 	}

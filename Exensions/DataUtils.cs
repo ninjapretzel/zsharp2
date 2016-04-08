@@ -8,58 +8,15 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Reflection;
 
-public static class ZEncrypt {
-	private static byte[] DEFAULT_KEY = MAKE_DEFAULT_KEY();
-	public static byte[] MAKE_DEFAULT_KEY() {
-		List<byte> d = new List<byte>();
-
-		d.Add((byte)0x89);
-		d.Add((byte)0xab);
-		d.Add((byte)0xcd);
-		d.Add((byte)0xef);
-		d.Add((byte)0xfe);
-		d.Add((byte)0xdc);
-		d.Add((byte)0xba);
-		d.Add((byte)0x98);
-
-		return d.ToArray();
-	}
-
-	public static byte[] EncryptSimple(this byte[] data, byte[] key) {
-		byte[] e = new byte[data.Length];
-
-		for (int i = 0 ; i < e.Length; i++) {
-			e[i] = (byte)(data[i] ^ key[i % key.Length]);
-		}
-
-		return e;
-	}
-
-	public static string EncodeHex(byte[] bytes) { return EncodeHex(bytes, DEFAULT_KEY); }
-	public static string EncodeHex(byte[] bytes, byte[] key = null) {
-		StringBuilder str = "";
-
-		for (int i = 0; i < bytes.Length; i++) {
-			byte b = bytes[i];
-
-			if (key != null) {
-				byte k = key[i % key.Length];
-				b = (byte)(b ^ k);
-			}
-
-			string s = b.ToHex();
-			str += s;
-
-		}
-
-		return str;
-	}
-	
-}
-
 public static class DataUtils {
 
 	#region Maximal Selectors
+	
+	/// <summary> Selectes the 'largest' element from an enumerable collection </summary>
+	/// <typeparam name="T">Type of collection </typeparam>
+	/// <param name="e">collection to enumerate</param>
+	/// <param name="selector">function turning a T into a float</param>
+	/// <returns>The object in the collection that has the largest value based on the selector</returns>
 	public static T Maximal<T>(this IEnumerable<T> e, Func<T, float> selector) {
 		T max = default(T);
 		float val = float.MinValue;
@@ -73,6 +30,12 @@ public static class DataUtils {
 
 		return max;
 	}
+	
+	/// <summary> Selectes the 'largest' element from an enumerable collection </summary>
+	/// <typeparam name="T">Type of collection </typeparam>
+	/// <param name="e">collection to enumerate</param>
+	/// <param name="selector">function turning a T into a double</param>
+	/// <returns>The object in the collection that has the largest value based on the selector</returns>
 	public static T Maximal<T>(this IEnumerable<T> e, Func<T, double> selector) {
 		T max = default(T);
 		double val = double.MinValue;
@@ -86,6 +49,12 @@ public static class DataUtils {
 
 		return max;
 	}
+	
+	/// <summary> Selectes the 'largest' element from an enumerable collection </summary>
+	/// <typeparam name="T">Type of collection </typeparam>
+	/// <param name="e">collection to enumerate</param>
+	/// <param name="selector">function turning a T into a int</param>
+	/// <returns>The object in the collection that has the largest value based on the selector</returns>
 	public static T Maximal<T>(this IEnumerable<T> e, Func<T, int> selector) {
 		T max = default(T);
 		int val = int.MinValue;
@@ -99,6 +68,12 @@ public static class DataUtils {
 
 		return max;
 	}
+	
+	/// <summary> Selectes the 'largest' element from an enumerable collection </summary>
+	/// <typeparam name="T">Type of collection </typeparam>
+	/// <param name="e">collection to enumerate</param>
+	/// <param name="selector">function turning a T into a long</param>
+	/// <returns>The object in the collection that has the largest value based on the selector</returns>
 	public static T Maximal<T>(this IEnumerable<T> e, Func<T, long> selector) {
 		T max = default(T);
 		long val = long.MinValue;
@@ -112,6 +87,12 @@ public static class DataUtils {
 
 		return max;
 	}
+	
+	/// <summary> Selectes the 'largest' element from an enumerable collection </summary>
+	/// <typeparam name="T">Type of collection </typeparam>
+	/// <param name="e">collection to enumerate</param>
+	/// <param name="selector">function turning a T into a decimal</param>
+	/// <returns>The object in the collection that has the largest value based on the selector</returns>
 	public static T Maximal<T>(this IEnumerable<T> e, Func<T, decimal> selector) {
 		T max = default(T);
 		decimal val = decimal.MinValue;
@@ -128,6 +109,12 @@ public static class DataUtils {
 	#endregion
 
 	#region Minimal Selectors
+	
+	/// <summary> Selectes the 'smallest' element from an enumerable collection </summary>
+	/// <typeparam name="T">Type of collection </typeparam>
+	/// <param name="e">collection to enumerate</param>
+	/// <param name="selector">function turning a T into a float</param>
+	/// <returns>The object in the collection that has the smallest value based on the selector</returns>
 	public static T Minimal<T>(this IEnumerable<T> e, Func<T, float> selector) {
 		T min = default(T);
 		float val = float.MaxValue;
@@ -141,6 +128,12 @@ public static class DataUtils {
 
 		return min;
 	}
+
+	/// <summary> Selectes the 'smallest' element from an enumerable collection </summary>
+	/// <typeparam name="T">Type of collection </typeparam>
+	/// <param name="e">collection to enumerate</param>
+	/// <param name="selector">function turning a T into a double</param>
+	/// <returns>The object in the collection that has the smallest value based on the selector</returns>
 	public static T Minimal<T>(this IEnumerable<T> e, Func<T, double> selector) {
 		T min = default(T);
 		double val = double.MaxValue;
@@ -154,6 +147,12 @@ public static class DataUtils {
 
 		return min;
 	}
+
+	/// <summary> Selectes the 'smallest' element from an enumerable collection </summary>
+	/// <typeparam name="T">Type of collection </typeparam>
+	/// <param name="e">collection to enumerate</param>
+	/// <param name="selector">function turning a T into a int</param>
+	/// <returns>The object in the collection that has the smallest value based on the selector</returns>
 	public static T Minimal<T>(this IEnumerable<T> e, Func<T, int> selector) {
 		T min = default(T);
 		int val = int.MaxValue;
@@ -167,6 +166,12 @@ public static class DataUtils {
 
 		return min;
 	}
+
+	/// <summary> Selectes the 'smallest' element from an enumerable collection </summary>
+	/// <typeparam name="T">Type of collection </typeparam>
+	/// <param name="e">collection to enumerate</param>
+	/// <param name="selector">function turning a T into a long</param>
+	/// <returns>The object in the collection that has the smallest value based on the selector</returns>
 	public static T Minimal<T>(this IEnumerable<T> e, Func<T, long> selector) {
 		T min = default(T);
 		long val = long.MaxValue;
@@ -180,6 +185,12 @@ public static class DataUtils {
 
 		return min;
 	}
+
+	/// <summary> Selectes the 'smallest' element from an enumerable collection </summary>
+	/// <typeparam name="T">Type of collection </typeparam>
+	/// <param name="e">collection to enumerate</param>
+	/// <param name="selector">function turning a T into a decimal</param>
+	/// <returns>The object in the collection that has the smallest value based on the selector</returns>
 	public static T Minimal<T>(this IEnumerable<T> e, Func<T, decimal> selector) {
 		T min = default(T);
 		decimal val = decimal.MaxValue;
@@ -193,47 +204,50 @@ public static class DataUtils {
 
 		return min;
 	}
-
 	#endregion
-
-	public static void LogEach<T>(this T[] array) { array.LogEach(1); }
-	public static void LogEach<T>(this T[] array, int perLine) {
-		StringBuilder str = new StringBuilder();
-		
-		for (int i = 0; i < array.Length; ++i) {
-			str.Append(array[i].ToString());
-			str.Append(", ");
-			if ((1 + i) % perLine == 0) { str.Append('\n'); }
-		}
-		Debug.Log(str.ToString());
-	}
 	
-	//Thanks, William
+	/// <summary> Quickly hashes a byte array into an int32 </summary>
+	/// <param name="data">Byte array to hash</param>
+	/// <returns>int32 hash based off of data </returns>
 	public static int SimpleHash(this byte[] data) {
 		if (data != null) {
-			int res = data.Length * data.Length * 31337;
+			int result = data.Length * data.Length * 31337;
 			for (int i = 0; i < data.Length; ++i) {
-				res ^= (data[i] << ((i % 4) * 8));
+				result ^= (data[i] << ((i % 4) * 8));
 			}
-			return res;
+			return result;
 		} else {
 			return 0;
 		}
 	}
 	
-	public static byte[] Chop(this byte[] array, int size, int start = 0) {
+	/// <summary> Chops an array into a sub-array (analogous to substring) </summary>
+	/// <typeparam name="T">Generic type</typeparam>
+	/// <param name="array">Source data to chop</param>
+	/// <param name="size">Size of sub-array</param>
+	/// <param name="start">Start position in source data</param>
+	/// <returns>Array of same type, of Length size, of elements in the source array </returns>
+	public static T[] Chop<T>(this T[] array, int size, int start = 0) {
 		if (start >= array.Length) { return null; }
 		if (size + start > array.Length) {
 			size = array.Length - start;
 		}
-		byte[] chopped = new byte[size];
+		T[] chopped = new T[size];
 		for (int i = 0; i < size; ++i) {
 			chopped[i] = array[i + start];
 		}
 		return chopped;
 	}
 	
-	
+	/// <summary> 
+	/// Converts a byte to its two character hex string.
+	/// Ex. 
+	/// 255 becomes "FF"
+	/// 200 becomes "C8"
+	/// 64 becomes "40"
+	/// </summary>
+	/// <param name="b">byte to convert</param>
+	/// <returns>Byte converted to hex string</returns>
 	public static string ToHex(this byte b) {
 		string s = "";
 		
@@ -258,8 +272,15 @@ public static class DataUtils {
 		return s;
 	}
 
-	public static List<int> Permutation(int max) { return Permutation(max, max); }
-	public static List<int> Permutation(int max, int length) {
+	/// <summary> Creates a permutation of numbers from [0...max) </summary>
+	/// <param name="max">End of range to use, not inclusive</param>
+	/// <returns>List of numbers from [0...max) shuffled into a random order </returns>
+	public static IList<int> Permutation(int max) { return Permutation(max, max); }
+	/// <summary> Creates a permutation of numbers from [0...max) that is length long</summary>
+	/// <param name="max">End of range to use, not inclusive</param>
+	/// <param name="length">Length of permutation. Should be <= max </param>
+	/// <returns>Permutation length long, of numbers from [0...max)</returns>
+	public static IList<int> Permutation(int max, int length) {
 		List<int> nums = new List<int>(max);
 		for (int i = 0; i < max; ++i) { nums.Add(i); }
 		
@@ -272,23 +293,18 @@ public static class DataUtils {
 		
 		return chosen;
 	}
+
+	/// <summary> Adds all elements from an enumerable collection into a given list.</summary>
+	/// <typeparam name="T">Generic type</typeparam>
+	/// <param name="list">List to add elements into</param>
+	/// <param name="stuff">Enumerable collection of elements to add to the list. </param>
+	public static void AddAll<T>(this IList<T> list, IEnumerable<T> stuff) { foreach (T t in stuff) { list.Add(t); } }
 	
-	public static List<T> TrimToLength<T>(this List<T> list, int length) {
-		List<T> l = new List<T>();
-		for (int i = 0; i < length; ++i) {
-			l.Add(list[i]);
-		}
-		return l;
-	}
-	
-	public static void AddAll<T>(this List<T> list, IEnumerable<T> stuff) {
-		foreach (T t in stuff) { list.Add(t); }
-	}
-	
-	public static float ToFloat(this byte[] b, int i) { return BitConverter.ToSingle(b, i); }
-	public static int ToInt(this byte[] b, int i) { return BitConverter.ToInt32(b, i); }
-	
-	 public static T DeepCopy<T>(T obj) {
+	/// <summary> Performs a deep copy on a given object.</summary>
+	/// <typeparam name="T">Generic type</typeparam>
+	/// <param name="obj">Object to deep-copy</param>
+	/// <returns>A deep copy of obj</returns>
+	public static T DeepCopy<T>(T obj) {
 		MemoryStream ms = new MemoryStream();
 		BinaryFormatter bf = new BinaryFormatter();
 		
@@ -300,41 +316,36 @@ public static class DataUtils {
 		return retval;
 	}
 	
-	public static Vector3 ToVector3(this byte[] b, int i) {
-		Vector3 v = Vector3.zero;
-		v.x = b.ToFloat(i);
-		v.y = b.ToFloat(i + 4);
-		v.z = b.ToFloat(i + 8);
-		return v;
-	}
+	/// <summary> Get the last element in a list</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to grab the last element of</param>
+	/// <returns>Last element of list</returns>
+	public static T LastElement<T>(this IList<T> list) { if (list.Count == 0) { return default(T); } return list[list.Count - 1]; }
 	
-	public static Quaternion ToQuaternion(this byte[] b, int i) {
-		Quaternion q = Quaternion.identity;
-		q.x = b.ToFloat(i);
-		q.y = b.ToFloat(i + 4);
-		q.z = b.ToFloat(i + 8);
-		q.w = b.ToFloat(i + 12);
-		return q;
-	}
+	/// <summary> Get the nth element from the end of the list </summary>
+	/// <typeparam name="T">Generic Type</typeparam> 
+	/// <param name="list">List to grab from</param>
+	/// <param name="offset">elements from the end to grab. (0 gives the last element) </param>
+	/// <returns>Element (offset) elements from the end of the list</returns>
+	public static T FromEnd<T>(this IList<T> list, int offset) { return list[list.Count - 1 - offset]; }
 	
-	//Quick stupid accessor functions
-	public static T LastElement<T>(this List<T> list) { if (list.Count == 0) { return default(T); } return list[list.Count - 1]; }
-	public static T FirstElement<T>(this List<T> list) { return list[0]; }
-	
-	//Get the nth element from the end of the list
-	public static T FromEnd<T>(this List<T> list, int offset) { return list[list.Count - 1 - offset]; }
-	
-	//Add a list to the end of this list.
-	public static void Append<T>(this List<T> list, List<T> add) { foreach (T o in add) { list.Add(o); } }
-	public static void Append<T>(this List<T> list, T[] add) { foreach (T o in add) { list.Add(o); } }
-	
-	public static int IndexOf<T>(this List<T> list, Func<T, bool> search) {
+	/// <summary> Get the first index of an element satisfying some criteria </summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to search in</param>
+	/// <param name="search">Method to check each element</param>
+	/// <returns>Index of first object that satisfies (search), or -1 if no elements do</returns>
+	public static int IndexOf<T>(this IList<T> list, Func<T, bool> search) {
 		for (int i = 0; i < list.Count; ++i) {
 			if (search(list[i])) { return i; }
 		}
 		return -1;
 	}
 	
+	/// <summary>Searches an array for the first element that satisfies a condition</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list"></param>
+	/// <param name="search"></param>
+	/// <returns></returns>
 	public static T Find<T>(this IEnumerable<T> list, Func<T, bool> search) {
 		foreach (T t in list) { 
 			if (search(t)) { return t; } 
@@ -342,30 +353,41 @@ public static class DataUtils {
 		return default(T);
 	}
 	
-	public static List<T> SortChain<T>(this List<T> list, Comparison<T> comparison) {
-		list.Sort(comparison);
-		return list;
-	}
+	/// <summary> Returns a random valid index from an IList</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to get a valid index from</param>
+	/// <returns>A random integer between [0...list.Count)</returns>
+	public static int RandomIndex<T>(this IList<T> list) { return (int)(Random.value * list.Count); }
 	
-	//Get a random valid index
-	public static int RandomIndex<T>(this List<T> list) { return (int)(Random.value * list.Count); }
+	/// <summary> Chooses a random element from a given IList</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to choose from </param>
+	/// <returns>Randomly selected element inside of list </returns>
+	public static T Choose<T>(this IList<T> list) { return list[list.RandomIndex()]; }
 	
-	//Choose a random element from the list
-	public static T Choose<T>(this List<T> list) { return list[list.RandomIndex()]; }
+	/// <summary> Chooses an element from a list, given a set of weights to use to adjust the probabilities </summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to choose from</param>
+	/// <param name="weights">List of weights to use for probabilities </param>
+	/// <returns>An element from list, randomly selected based on probabilities in weights</returns>
+	public static T Choose<T>(this IList<T> list, IList<float> weights) { return list[Random.WeightedChoose(weights)]; }
 	
-	//Choose an element from the list using weights
-	public static T Choose<T>(this List<T> list, List<float> weights) { return list[Random.WeightedChoose(weights)]; }
-	public static T Choose<T>(this List<T> list, float[] weights) { return list[Random.WeightedChoose(weights)]; }
-	
-	public static T Choose<T>(this Dictionary<T, float> table) {
+	/// <summary> Chooses a random key from an IDictionary based off of its value as a weight </summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="table">IDictionary to use as both choices and weights</param>
+	/// <returns>Randomly selected key from Table, based off of values as weights</returns>
+	public static T Choose<T>(this IDictionary<T, float> table) {
 		List<float> weights = table.Values.ToList();
 		List<T> list = table.Keys.ToList();
 		return list.Choose(weights);
 	}
 	
-	
-	public static string ListString<T>(this List<T> list) { return list.ListString<T>(','); }
-	public static string ListString<T>(this List<T> list, char delim) {
+	/// <summary> Create a comma separated string from a list</summary>
+	/// <typeparam name="T">Generic type</typeparam>
+	/// <param name="list">List of objects</param>
+	/// <returns>String holding elements of list separated by commas </returns>
+	public static string ListString<T>(this IList<T> list) { return list.ListString<T>(','); }
+	public static string ListString<T>(this IList<T> list, char delim) {
 		StringBuilder str = new StringBuilder();
 		for (int i = 0; i < list.Count; ++i) {
 			T t = list[i];
@@ -375,12 +397,15 @@ public static class DataUtils {
 		return str.ToString();
 	}
 	
-	
-	
-	//Choose 'num' elements from the list
-	public static List<T> Choose<T>(this List<T> list, int num) {
+	/// <summary> Randomly choose num elements from a list</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to choose from</param>
+	/// <param name="num">Count of elements to choose</param>
+	/// <returns>A new list, of size num, of elements randomly selected from list</returns>
+	public static IList<T> Choose<T>(this IList<T> list, int num) {
 		if (num >= list.Count) { return list.Shuffled(); }
-		List<T> stuff = list.Clone();
+		List<T> stuff = new List<T>(list);
+
 		List<T> chosen = new List<T>();
 		for (int i = 0; i < num; ++i) {
 			int index = stuff.RandomIndex();
@@ -392,25 +417,33 @@ public static class DataUtils {
 	}
 	
 	
-	
-	public static List<T> Choose<T>(this Dictionary<T, float> table, int num) {
+	/// <summary> Randomly choose num keys from a IDictionary </summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="table">IDictionary of weighted key/value pairs </param>
+	/// <param name="num">Number of elements to choose </param>
+	/// <returns>A list containing num keys from table</returns>
+	public static List<T> Choose<T>(this IDictionary<T, float> table, int num) {
 		List<float> weights = table.Values.ToList();
 		List<T> list = table.Keys.ToList();
 		return list.Choose(weights, num);
 	}
-	public static List<T> Choose<T>(this List<T> list, List<float> weights, int num) {
-		//Debug.Log(list.Count + " : " + weights.Count + " : " + num);
+
+
+	/// <summary> Weighted choose num elements from a list</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List of elements to choose from</param>
+	/// <param name="weights">List of weights in parallel with list</param>
+	/// <param name="num">Number of elements to choose</param>
+	/// <returns>List of length num of elements randomly selected from list. </returns>
+	public static List<T> Choose<T>(this IList<T> list, IList<float> weights, int num) {
 		if (num >= list.Count) { return list.Shuffled(); }
-		
-		List<T> stuff = list.Clone();
-		List<float> weightsCopy = weights.Clone();
-		
+		List<T> stuff = new List<T>(list);
+		List<float> weightsCopy = new List<float>(weights);
 		List<T> chosen = new List<T>();
 		
 		for (int i = 0; i < num; ++i) {
 			int index = Random.WeightedChoose(weightsCopy);
-			//Debug.Log(index);
-			
+
 			chosen.Add(stuff[index]);
 			stuff.RemoveAt(index);
 			weightsCopy.RemoveAt(index);
@@ -418,11 +451,13 @@ public static class DataUtils {
 		
 		return chosen;
 	}
-	
-	//Shallow Shuffle
-	//Generate a shuffled version of the list
-	public static List<T> Shuffled<T>(this List<T> list) {
-		List<T> stuff = list.Clone();
+
+	/// <summary> Quick shuffle of a list creates a new list with the elements of the given list shuffled into a random order</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to shuffle</param>
+	/// <returns>A copy of list with all of the elements in a random order </returns>
+	public static List<T> Shuffled<T>(this IList<T> list) {
+		List<T> stuff = new List<T>(list);
 		List<T> shuffled = new List<T>(list.Count);
 		for (int i = 0; i < list.Count; ++i) {
 			int index = stuff.RandomIndex();
@@ -432,85 +467,140 @@ public static class DataUtils {
 		return shuffled;
 	}
 	
-	//Swap two elements
-	public static void QSwap<T>(this List<T> list, int a, int b) {
+	/// <summary> Swaps elements in a list without checking indexes</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to swap elements in</param>
+	/// <param name="a">index of element 1</param>
+	/// <param name="b">index of element 2</param>
+	public static void Swap<T>(this IList<T> list, int a, int b) {
 		T temp = list[b];
 		list[b] = list[a];
 		list[a] = temp;
 	}
 	
-	public static void Swap<T>(this List<T> list, int a, int b) {
-		if (a >= 0 && b >= 0 && a < list.Count && b < list.Count) {
-			T temp = list[b];
-			list[b] = list[a];
-			list[a] = temp;
-		}
-	}
-	
-	//Generate a new list which has all instances of 'toRemove' removed from it.
-	//Does not mutate original list.
-	public static List<T> RemoveAll<T>(this List<T> list, T toRemove) {
+	/// <summary>Removes all elements in a list that equal a given object</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to remove elements from</param>
+	/// <param name="toRemove">Element to remove</param>
+	/// <returns>Copy of list with elements removed</returns>
+	public static List<T> RemoveAll<T>(this IList<T> list, T toRemove) {
 		List<T> l = new List<T>(list.Count);
-		for (int i = 0; i < list.Count; ++i) {
-			if (!list[i].Equals(toRemove)) {
-				l.Add(list[i]);
-			}
+		foreach (var element in list) {
+			if (!element.Equals(toRemove)) { l.Add(element); }
 		}
 		return l;
 	}
 	
-	//Generate an array of strings from a list of objects
-	public static string[] ToStringArray<T>(this List<T> list) {
+	/// <summary> Converts all elements in an IList to strings</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to convert</param>
+	/// <returns>Array of string objects, generated from elements in the list</returns>
+	public static string[] ToStringArray<T>(this IList<T> list) {
 		string[] strings = new string[list.Count];
 		for (int i = 0; i < list.Count; ++i) { strings[i] = list[i].ToString(); }
 		return strings;
 	}
-	
-	//Generate a list of strings from a list of objects
-	public static List<string> ToStringList<T>(this List<T> list) {
-		List<string> strings = new List<string>(list.Count);
-		for (int i = 0; i < list.Count; ++i) { strings.Add(list[i].ToString()); }
+
+	/// <summary>Generate a list of strings from a list of objects</summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">Enumerable to run through</param>
+	/// <returns>A List of strings generated from elements in the list</returns>
+	public static List<string> ToStringList<T>(this IEnumerable<T> list) {
+		List<string> strings = new List<string>();
+		foreach (var element in list) { strings.Add(element.ToString()); }
 		return strings;
 	}
+
+	/// <summary> Creates a shallow clone of a list. </summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to clone</param>
+	/// <returns>List containing all the same elements as the given list </returns>
+	public static List<T> Clone<T>(this List<T> list) { return new List<T>(list); }
 	
-	//Generate an array of strings from an array of objects
-	public static string[] ToStringArray<T>(this T[] list) {
-		string[] strings = new string[list.Length];
-		for (int i = 0; i < list.Length; ++i) { strings[i] = list[i].ToString(); }
-		return strings;
+	/// <summary> Calls a given function for each element in an IEnumerable </summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">IEnumerable of stuff to loop over</param>
+	/// <param name="func">Action to call on each element in list</param>
+	public static void Each<T>(this IEnumerable<T> list, Action<T> func) { foreach (T t in list) { func(t); } }
+
+	/// <summary> Calls a given function for each element in an IList, and its index </summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">IList of stuff to loop over</param>
+	/// <param name="func">Action to call on each element in the list, paired with its index</param>
+	public static void Each<T>(this IList<T> list, Action<T, int> func) {
+		int i = 0;
+		foreach (T t in list) { func(t, i++); }
 	}
-	
-	//Creates a shallow clone of a list.
-	//Another list containing all of the elements in the same order as another list
-	public static List<T> Clone<T>(this List<T> list) {
-		List<T> clone = new List<T>(list.Count);
-		for (int i = 0; i < list.Count; ++i) { clone.Add(list[i]); }
-		return clone;
+
+	/// <summary> Calls a given function for each pair in an IDictionary</summary>
+	/// <typeparam name="K">Generic type of Key</typeparam>
+	/// <typeparam name="V">Generic type of Value</typeparam>
+	/// <param name="dict">IDictionary of pairs to loop over</param>
+	/// <param name="func">Action to call on each key,value pair in the dictionary</param>
+	public static void Each<K, V>(this IDictionary<K, V> dict, Action<K, V> func) { foreach (var pair in dict) { func(pair.Key, pair.Value); } }
+
+	/// <summary> Map elements from source type to destination type</summary>
+	/// <typeparam name="SourceType">Source Generic Type</typeparam>
+	/// <typeparam name="DestType">Destination Generic Type</typeparam>
+	/// <param name="data">Collection to loop over</param>
+	/// <param name="mapper">Function to map elements from SourceType to DestType</param>
+	/// <returns>List of elements mapped from SourceType to DestType </returns>
+	public static List<DestType> Map<SourceType, DestType>(this IEnumerable<SourceType> data, Func<SourceType, DestType> mapper) {
+		List<DestType> mapped = new List<DestType>();
+		foreach (var d in data) { mapped.Add(mapper(d)); }
+		return mapped;
 	}
-	
-	//Quick stupid accessors for arrays
-	public static T LastElement<T>(this T[] list) { return list[list.Length - 1]; }
-	public static T FirstElement<T>(this T[] list) { return list[0]; }
-	
-	//Grab the nth element from the end of the list
-	public static T FromEnd<T>(this T[] list, int offset) { return list[list.Length - 1 - offset]; }
-	
-	//Get a random valid index
-	public static int RandomIndex<T>(this T[] array) { return (int)(Random.value * array.Length); }
-	
-	//Choose a random element from an array
-	public static T Choose<T>(this T[] array) { 
-		if (array == null) { return default(T); }
-		if (array.Length == 0) { return default(T); }
-		return array[array.RandomIndex()]; 
+
+	/// <summary> Filter elements from an IEnumerable based on a pass/fail filter. </summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="data">IEnumerable of elements to filter</param>
+	/// <param name="filter">Function to call to see if an element should be filtered or not</param>
+	/// <returns>List of all elements that actually pass the filter</returns>
+	public static List<T> Filter<T>(this IEnumerable<T> data, Func<T, bool> filter) {
+		List<T> passed = new List<T>();
+		foreach (var d in data) {
+			if (filter(d)) { passed.Add(d); }
+		}
+		return passed;
 	}
-	
-	//Choose an element from an array using weights
-	public static T Choose<T>(this T[] array, float[] weights) {
-		int index = (int)Mathf.Clamp(Random.WeightedChoose(weights), 0, array.Length - 1);
-		return array[index];
+
+	/// <summary>Reduce elements in an IEnumerable collection with a given function </summary>
+	/// <typeparam name="T">Generic Type of collection</typeparam>
+	/// <typeparam name="TResult">Generic Type of expected result</typeparam>
+	/// <param name="data">IEnumerable collection to loop over</param>
+	/// <param name="reducer">Function to use to 'reduce' each element in the collection </param>
+	/// <param name="startingValue">Value to begin with to reduce the first element with </param>
+	/// <returns>Entire collection reduced into one single value</returns>
+	public static TResult Reduce<T, TResult>(this IEnumerable<T> data, Func<TResult, T, TResult> reducer, TResult startingValue) {
+		var val = startingValue;
+		foreach (var d in data) {
+			val = reducer(val, d);
+		}
+		return val;
 	}
-	
+
+	#region times methods
+	/// <summary> Perform a function n times</summary>
+	/// <param name="n">Count of times to perform the function </param>
+	/// <param name="func">Function to perform </param>
+	public static void Times(this int n, Action func) { for (int i = 0; i < n; i++) { func(); } }
+
+	/// <summary> Perform a function n times, passing in a count each time </summary>
+	/// <param name="n">Count of times to perform the function </param>
+	/// <param name="func">Function to perform </param>
+	public static void Times(this int n, Action<int> func) { for (int i = 0; i < n; i++) { func(i); } }
+
+	/// <summary> Perform a function n times</summary>
+	/// <param name="n">Count of times to perform the function </param>
+	/// <param name="func">Function to perform </param>
+	public static void Times(this long n, Action func) { for (long i = 0; i < n; i++) { func(); } }
+
+	/// <summary> Perform a function n times, passing in a count each time </summary>
+	/// <param name="n">Count of times to perform the function </param>
+	/// <param name="func">Function to perform </param>
+	public static void Times(this long n, Action<long> func) { for (long i = 0; i < n; i++) { func(i); } }
+	#endregion 
+
 	
 	
 	public static string LoadTextAsset(string filename) {

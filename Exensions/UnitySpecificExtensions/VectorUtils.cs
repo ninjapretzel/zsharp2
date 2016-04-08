@@ -87,9 +87,9 @@ public static class VectorUtils {
 	
 	public static byte[] GetBytes(this Vector3 v) {
 		List<byte> b = new List<byte>();
-		b.Append(BitConverter.GetBytes(v.x));
-		b.Append(BitConverter.GetBytes(v.y));
-		b.Append(BitConverter.GetBytes(v.z));
+		b.AddAll(BitConverter.GetBytes(v.x));
+		b.AddAll(BitConverter.GetBytes(v.y));
+		b.AddAll(BitConverter.GetBytes(v.z));
 		
 		//Debug.Log("Vector3 to byte[]: " + v + " - " + b.Count);
 		

@@ -60,23 +60,10 @@ public static class Random {
 	#endregion
 	
 	#region Choosing
-	/// <summary> Takes a float array, sums up all weights, rolls a dice, and picks an index based on its weight, returns the chosen index. Assumes all values in array are positive. </summary>
-	public static int WeightedChoose(float[] weights) {
-		float total = 0;
-		int i;
-		for (i = 0; i < weights.Length; i++) { total += weights[i]; }
-		
-		float choose = value * total; 
-		float check = 0;
-		for (i = 0; i < weights.Length; i++) {
-			check += weights[i];
-			if (choose < check) { return i; }
-		}
-		return weights.Length-1;
-	}
-
-	/// <summary> Takes a float array, sums up all weights, rolls a dice, and picks an index based on its weight, returns the chosen index. Assumes all values in array are positive. </summary>
-	public static int WeightedChoose(List<float> weights) {
+	/// <summary> Takes a float IList, sums up all weights, rolls a dice, and picks an index based on its weight, returns the chosen index. Assumes all values in array are positive. </summary>
+	/// <param name="weights">IList of float values to use as weights</param>
+	/// <returns></returns>
+	public static int WeightedChoose(IList<float> weights) {
 		float total = 0;
 		int i;
 		for (i = 0; i < weights.Count; i++) { total += weights[i]; }
@@ -87,9 +74,8 @@ public static class Random {
 			check += weights[i];
 			if (choose < check) { return i; }
 		}
-		return weights.Count-1;
+		return weights.Count - 1;
 	}
-	
 	#endregion
 	
 	#region Seed Push/Pop
