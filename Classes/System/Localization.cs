@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
+using Steamworks;
 
 public enum Language {
 	english,
@@ -23,11 +24,26 @@ public static class Localization {
 		string text = Resources.Load<TextAsset>("strings").text.ConvertNewlines();
 		//JsonArray levelsArray = JsonArray.ParseCSV(text, '|');
 		_strs = JsonObject.ParseCSV(text, '|');
-		Debug.Log(_strs.PrettyPrint());
+		//Debug.Log(_strs.PrettyPrint());
+		// Use a switch here instead of parsing the enum (we don't support all those langauges yet!)
+		if (SteamManager.Initialized) {
+			switch (SteamApps.GetCurrentGameLanguage()) {
+				case "spanish": {
+					language = Language.spanish;
+					break;
+				}
+				case "english":
+				default: {
+					language = Language.english;
+					break;
+				}
+			}
+		}
 
 	}
 
 	public static string Localize(string name, params object[] args) {
+		if (name.Length == 0) { return name; }
 		if (_strs.ContainsKey(name)) {
 
 			JsonObject localized = _strs.Get<JsonObject>(name);
@@ -41,7 +57,11 @@ public static class Localization {
 #endif
 			}
 		}
+#if UNITY_EDITOR
 		return "<color=#ff00ffff>" + name + "</color>";
+#else
+		return name;
+#endif
 	}
 
 }

@@ -10,9 +10,12 @@ public class Billboard : MonoBehaviour {
 	
 	void LateUpdate() {
 		if (GetComponent<Renderer>() != null && !GetComponent<Renderer>().enabled) { return; }
-		transform.LookAt(Camera.main.transform);
-		if (flip) { transform.Rotate(0, 180, 0); }
-		zrotation += dzrotation * Time.deltaTime;
-		if (zrotation > 0) { transform.Rotate(0, 0, zrotation); }
+		
+		if (Camera.main != null) {
+			transform.LookAt(Camera.main.transform);
+			if (flip) { transform.Rotate(0, 180, 0); }
+			zrotation += dzrotation * Time.deltaTime;
+			if (zrotation > 0) { transform.Rotate(0, 0, zrotation); }
+		}
 	}
 }

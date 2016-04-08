@@ -46,7 +46,7 @@ public class MusicPlayer : MonoBehaviour {
 	public float volume = .6f;
 	
 
-	public bool followCamera = true;
+	public bool followMainCamera = true;
 	
 	void Awake() {
 		if (main != null) { 
@@ -88,7 +88,7 @@ public class MusicPlayer : MonoBehaviour {
 			}
 		}
 		
-		if (followCamera && Camera.main) { transform.position = Camera.main.transform.position; }
+		if (followMainCamera && Camera.main) { transform.position = Camera.main.transform.position; }
 	}
 	
 	public void UpdateFade() {

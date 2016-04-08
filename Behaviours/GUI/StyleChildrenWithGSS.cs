@@ -55,12 +55,7 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 				ProcessAllChildren();
 			}
 		}
-
-#if !UNITY_EDITOR
-		if (Application.isPlaying) { 
-			Destroy(this);	
-		}
-#endif
+		
 	}
 
 

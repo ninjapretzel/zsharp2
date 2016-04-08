@@ -2,7 +2,6 @@
 	"Options":{
 		"RenderingPath":["VERTEX","FORWARD","DEFERRED"],
 		"ForwardLights":["1","2","4","8","16","32","64"],
-		"Textures":["EIGHTH", "QUARTER", "HALF", "FULL"],
 		"Particles":"4step",
 		"MSAA":["1x","2x","4x","8x"],
 		"FXAA":["OFF","V1A","V1B","V2","v3"],

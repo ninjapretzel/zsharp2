@@ -17,8 +17,6 @@ public class QuickPlayerSettings : EditorWindow {
 
 	private static BuildTargetGroup currentPlatform = EditorUserBuildSettings.selectedBuildTargetGroup;
 	private static BuildTargetGroup previousCurrentPlatform = EditorUserBuildSettings.selectedBuildTargetGroup;
-	private static bool debug = false;
-	private static bool previousDebug = false;
 	private static string saveAs = "Untitled Preset";
 	
 	[MenuItem ("Edit/Project Settings/Quick Player Settings")]
@@ -83,30 +81,8 @@ public class QuickPlayerSettings : EditorWindow {
 				EditorGUILayout.BeginVertical("box"); {
 					GUILayout.Label("Additional settings", GUILayout.Width(position.width - 180));
 					currentPlatform = (BuildTargetGroup)EditorGUILayout.EnumPopup("Platform", currentPlatform);
-					debug = EditorGUILayout.Toggle("UNITY_DEBUG", debug);
 				} EditorGUILayout.EndVertical();
 			} EditorGUILayout.EndVertical();
-		}
-		
-		if(debug != previousDebug) {
-			if(debug) {
-				if(!PlayerSettings.GetScriptingDefineSymbolsForGroup(currentPlatform).Contains("UNITY_DEBUG")) {
-					if(PlayerSettings.GetScriptingDefineSymbolsForGroup(currentPlatform).Length > 0) {
-						PlayerSettings.SetScriptingDefineSymbolsForGroup(currentPlatform, PlayerSettings.GetScriptingDefineSymbolsForGroup(currentPlatform) + ";UNITY_DEBUG");
-					} else {
-						PlayerSettings.SetScriptingDefineSymbolsForGroup(currentPlatform, "UNITY_DEBUG");
-					}
-				}
-			} else {
-				if(PlayerSettings.GetScriptingDefineSymbolsForGroup(currentPlatform).Contains("UNITY_DEBUG")) {
-					PlayerSettings.SetScriptingDefineSymbolsForGroup(currentPlatform, PlayerSettings.GetScriptingDefineSymbolsForGroup(currentPlatform).Replace("UNITY_DEBUG", "").Replace(";;", ";"));
-				}
-			}
-			if(currentPreset >= 0) {
-				SavePreset(currentPreset);
-				changed = false;
-			}
-			previousDebug = debug;
 		}
 
 		if(currentPlatform != previousCurrentPlatform) {
@@ -130,8 +106,6 @@ public class QuickPlayerSettings : EditorWindow {
 				}
 			}
 		}
-		debug = PlayerSettings.GetScriptingDefineSymbolsForGroup(currentPlatform).Contains("UNITY_DEBUG");
-		previousDebug = debug;
 		scriptLoaded = true;
 
 	}
@@ -167,8 +141,6 @@ public class QuickPlayerSettings : EditorWindow {
 				settings.Remove(key);
 			}
 		}
-		debug = PlayerSettings.GetScriptingDefineSymbolsForGroup(currentPlatform).Contains("UNITY_DEBUG");
-		previousDebug = debug;
 		previousCurrentPlatform = currentPlatform;
 		changed = false;
 		

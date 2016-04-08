@@ -52,8 +52,10 @@ public partial class GSS : MonoBehaviour {
 			}
 
 
-
+#if UNITY_EDITOR
 			Debug.Log("GSS: Loaded/Reloaded Stylesheets");
+#endif
+
 			return obj;
 		} catch {
 			return null;

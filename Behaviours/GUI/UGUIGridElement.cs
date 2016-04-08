@@ -10,9 +10,9 @@ public class UGUIGrid {
 	public int itemsWide;
 	/// <summary> Height of the grid. Zero/Negative means infinite. </summary>
 	public int itemsHigh;
-	/// <summary> Pixels of padding on the left/right of the grid. </summary>
+	/// <summary> Pixels of padding on the left/right of the grid elements. </summary>
 	public float hpadding;
-	/// <summary> Pixels of padding on the top/bottom of the grid. </summary>
+	/// <summary> Pixels of padding on the top/bottom of the grid elements. </summary>
 	public float vpadding;
 
 	const float DEFAULT_SIZE = 64;
@@ -24,12 +24,18 @@ public class UGUIGrid {
 	/// <summary> Object that the grid exists within, if the objects contained are to resize with the parent. </summary>
 	public RectTransform parent = null;
 
-	public UGUIGrid() { itemsWide = 5; itemsHigh = -1; hpadding = 5; vpadding = 5; }
+	/// <summary> Standard constructor </summary>
+	public UGUIGrid() { itemsWide = 5; itemsHigh = -1; hpadding = 0; vpadding = 0; }
+	/// <summary> Constructor with elements wide/high </summary>
 	public UGUIGrid(int wide, int high) : this() { itemsWide = wide; itemsHigh = high; }
+	/// <summary> Constructor with elements wide/high and vertical and horizontal padding </summary>
 	public UGUIGrid(int wide, int high, float hp, float vp) : this(wide, high) { hpadding = hp; vpadding = vp; }
-	
+
+	/// <summary> Constructor with a parent </summary>
 	public UGUIGrid(RectTransform p) : this() { parent = p; width = -1; height = -1; }
+	/// <summary> Constructor with parent and elements wide/high </summary>
 	public UGUIGrid(RectTransform p, int wide, int high) : this(p) { itemsWide = wide; itemsHigh = high; }
+	/// <summary> Constructor with parent, elements wide/high and vertical and horizontal padding </summary>
 	public UGUIGrid(RectTransform p,int wide, int high, float hp, float vp) : this(p, wide, high) { hpadding = hp; vpadding = vp; }
 
 	/// <summary> Vector representing the Upper-Left corner in UGUI's coordinate system. </summary>
@@ -63,6 +69,11 @@ public class UGUIGrid {
 				width = DEFAULT_SIZE;
 			}
 
+			//Width based off of screen size
+			if (width > 0 && width <= 1) {
+				return Screen.width * width;
+			}
+
 			return width;
 		}
 	}
@@ -84,6 +95,10 @@ public class UGUIGrid {
 			//revert to default pixel width
 			if (height <= 0) {
 				height = DEFAULT_SIZE;
+			}
+
+			if (height > 0 && height <= 1) {
+				return Screen.height * height;
 			}
 
 			return height;
@@ -148,16 +163,22 @@ public class UGUIGrid {
 
 
 public class UGUIGridElement : MonoBehaviour {
-
+	/// <summary> X position in grid</summary>
 	public int x;
+	/// <summary> Y position in grid </summary>
 	public int y;
 
+	/// <summary> Grid that this object is contained within</summary>
 	public UGUIGrid grid = null;
+	/// <summary> Last screen width </summary>
 	int lastWidth;
+	/// <summary> Last screen height </summary>
 	int lastHeight; 
 
+	/// <summary> Was this grid element just created on the previous frame?</summary>
 	bool isNew = true;
 
+	/// <summary> Will this element cause it's parent to grow on the next frame?</summary>
 	[NonSerialized] public bool regrow = false;
 
 	void Start() {
@@ -184,6 +205,7 @@ public class UGUIGridElement : MonoBehaviour {
 		lastHeight = Screen.height;
 	}
 	
+	/// <summary> Align this object to its parent grid </summary>
 	void Align() {
 		if (grid == null) {
 			Debug.LogWarning("Grid element " + gameObject.name + " does not have a grid assigned.");

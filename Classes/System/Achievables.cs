@@ -57,14 +57,14 @@ public class Achievable {
 
 	/// <summary> Save to PlayerPrefs </summary>
 	public void SaveData() { 
-		Save();
-		PlayerPrefs.SetInt(id + "_unlocked", unlocked ? 0 : 1);
+		//Save();
+		//PlayerPrefs.SetInt(id + "_unlocked", unlocked ? 0 : 1);
 	}
 
 	/// <summary> Load from PlayerPrefs </summary>
 	public void LoadData() {
-		Load();
-		unlocked = (PlayerPrefs.GetInt(id + "_unlocked") == 1);
+		//Load();
+		//unlocked = (PlayerPrefs.GetInt(id + "_unlocked") == 1);
 	}
 	
 	/// <summary> Override this function with the proper logic for checking if the achievable has been unlocked. </summary>

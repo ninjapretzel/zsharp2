@@ -57,8 +57,12 @@ public class ZWindow {
 	/// <summary> Maximum size of window </summary>
 	public Vector2 maxSize;
 
+	/// <summary> Depth of window </summary>
+	public int depth = -100;
+
 	/// <summary> Internal window id </summary>
 	private int id;
+
 	/// <summary> window ID counter </summary>
 	public static int next_id = 10000;
 
@@ -237,6 +241,8 @@ public class ZWindow {
 
 	/// <summary> Called before any drawing to ensure OnOpen() and OnClose() callbacks happen only once. </summary>
 	public void Predraw() {
+		GUI.depth = depth;
+
 		if (open && !lastOpenedState) { OnOpen(); }
 		if (!open && lastOpenedState) { OnClose(); }
 		
@@ -258,6 +264,7 @@ public class ZWindow {
 
 	/// <summary> Function passed into GUI.Window to draw any window. </summary>
 	public void DrawWindow(int windowID) {
+		GUI.depth = depth;
 		if ((GUIEvent.button == 0) && (GUIEvent.clickDown)) {
 			lastFocused = id;
 		}

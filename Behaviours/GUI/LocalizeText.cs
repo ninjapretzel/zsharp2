@@ -17,6 +17,7 @@ public class LocalizeText : MonoBehaviour {
 		if (uiText != null) {
 			originalString = uiText.text;
 			uiText.text = Localization.Localize(originalString);
+			lastLang = Localization.language;
 		}
 		
 	}
@@ -24,12 +25,8 @@ public class LocalizeText : MonoBehaviour {
 	void Update() {
 		if (Localization.language != lastLang) {
 			uiText.text = Localization.Localize(originalString);
+			lastLang = Localization.language;
 		}
-	}
-	
-
-	void LateUpdate() {
-		lastLang = Localization.language;
 	}
 	
 	public void ChangeLanguage(string lang) {

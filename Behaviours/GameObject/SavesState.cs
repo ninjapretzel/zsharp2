@@ -29,6 +29,7 @@ public class SavesState : MonoBehaviour {
 	[NonSerialized] private Transform savedParent;
 	[NonSerialized] private Vector3 velocity;
 	[NonSerialized] private Vector3 angularVelocity;
+	[NonSerialized] private bool resetVelocity = false;
 	[NonSerialized] private Vector3 initialPosition;
 	[NonSerialized] private Quaternion initialRotation;
 	[NonSerialized] private Vector3 initialScale;
@@ -60,6 +61,17 @@ public class SavesState : MonoBehaviour {
 			SaveState();
 		}
 	}
+
+	public void FixedUpdate() {
+		if (resetVelocity) {
+			Rigidbody rb = GetComponent<Rigidbody>();
+			if (rb != null) {
+				rb.velocity = velocity;
+				rb.angularVelocity = angularVelocity;
+			}
+			resetVelocity = false;
+		}
+	}
 	
 	public void LateUpdate() {
 		restore = false;
@@ -72,8 +84,8 @@ public class SavesState : MonoBehaviour {
 		savedBehaviours = new List<SavedBehaviour>();
 		// Save transform properties
 		savedParent = transform.parent;
-		position = transform.position;
-		rotation = transform.rotation;
+		position = transform.localPosition;
+		rotation = transform.localRotation;
 		scale = transform.localScale;
 		Rigidbody rb = GetComponent<Rigidbody>();
 		if (rb != null) {
@@ -134,14 +146,10 @@ public class SavesState : MonoBehaviour {
 	public void Restore() {
 		// Restore transform properties
 		transform.parent = savedParent;
-		transform.position = position;
-		transform.rotation = rotation;
+		transform.localPosition = position;
+		transform.localRotation = rotation;
 		transform.localScale = scale;
-		Rigidbody rb = GetComponent<Rigidbody>();
-		if (rb != null) {
-			rb.velocity = velocity;
-			rb.angularVelocity = angularVelocity;
-		}
+		resetVelocity = true;
 		// Get all Behaviours currently attached to this object
 		Behaviour[] behaviours = gameObject.GetComponents<Behaviour>();
 		foreach(Behaviour c in behaviours) {

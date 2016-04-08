@@ -10,24 +10,27 @@ public class OptionSelecter : MonoBehaviour {
 
 	public string settingName = "dummySetting";
 	
-
 	public string defaultOption = "ULTRA";
 
 	public int currentIndex = 0;
 	public string currentOption { get { return options[currentIndex]; } }
 	public List<string> options = new List<string>(new string[] {"LOW", "MEDIUM", "HIGH", "ULTRA"});
 
-	Text display;
-	Text label;
+	protected Text display;
+	protected Text label;
 	
 	string last;
 
 	public static Settings sets { get { return Settings.instance; } }
 #if XtoJSON
-	public static string Get(string setting) {
-		return sets[setting].stringVal;
+	public virtual string Get(string setting) {
+		if (sets[setting].isString) {
+			return sets[setting].stringVal;
+		} 
+
+		return sets[setting].ToString();
 	}
-	public static void Set(string setting, string value) {
+	public virtual void Set(string setting, string value) {
 		Settings.instance.Apply(setting, value);
 	}
 #else
@@ -39,7 +42,7 @@ public class OptionSelecter : MonoBehaviour {
 	}
 #endif
 
-	void Start() {
+	protected virtual void Start() {
 		if (Application.isPlaying) {
 			label = transform.Find("Label").GetComponent<Text>();
 			label.text = gameObject.name.FromFirst("OptionSelector");
@@ -63,11 +66,11 @@ public class OptionSelecter : MonoBehaviour {
 		
 	}
 
-	void Update() {
-		if (!Application.isPlaying) {
-			if (label == null) { label = transform.Find("Label").GetComponent<Text>(); }
-			if (display == null) { display = transform.Find("Display").GetComponent<Text>(); }
+	protected virtual void Update() {
+		if (label == null) { label = transform.Find("Label").GetComponent<Text>(); }
+		if (display == null) { display = transform.Find("Display").GetComponent<Text>(); }
 
+		if (!Application.isPlaying) {
 			if (label != null) { label.text = gameObject.name; }
 			if (display != null) { display.text = defaultOption; }
 		} else {
@@ -104,10 +107,8 @@ public class OptionSelecter : MonoBehaviour {
 
 	public void Set() {
 		Set(settingName, currentOption);
-		//Debug.Log(settingName + " set to " + currentOption);
-		display.text = currentOption;
+		Debug.Log(settingName + " set to " + currentOption);
 		
-
-
 	}
+	
 }

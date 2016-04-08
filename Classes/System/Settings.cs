@@ -3,6 +3,7 @@ using UnityStandardAssets.ImageEffects;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 
 /// <summary>
 /// This class holds settings information for things.
@@ -40,11 +41,15 @@ public partial class Settings : JsonObject {
 	/// <summary> Registers a bunch of callbacks that change settings inside of Unity, so that when the user changes settings, the change immediately happens. </summary>
 	public static void RegisterDefaultCallbacks() {
 		//Debug.Log("Default Callbacks Added!");
+		
+		/*
+		//No Reason to have texture resolution actually, it completely breaks unity's rendering when switched at runtime in standalone...
 		string[] texResStrs = { "FULL", "HALF", "QUARTER", "EIGHTH" };
 		int[] texResInts = { 0, 1, 2, 3 };
 		Register("Textures", (s) => {
 			QualitySettings.masterTextureLimit = Select(s, texResStrs, texResInts);
 		});
+		*/
 
 		string[] aaStrs = { "1x", "2x", "4x", "8x" };
 		int[] aaInts = { 0, 2, 4, 8};
@@ -108,6 +113,19 @@ public partial class Settings : JsonObject {
 		});
 
 
+		Register("borderless", (s)=> {
+#if !UNITY_EDITOR
+			//File.WriteAllText(dataPath+"/borderlessCallback.txt", s);
+			if (s.ToLower() == "true") {
+				WindowHandler.SetBorderless(true);
+			} else {
+				WindowHandler.SetBorderless(false);
+			}
+				
+			//Debug.Log("Borderless: " + s);
+#endif
+		});
+
 		Register("language", (s) => {
 			//Debug.Log("Callback: language to to " + s);
 			Localization.language = (Language) Enum.Parse(typeof(Language), s);
@@ -139,23 +157,37 @@ public partial class Settings : JsonObject {
 	/// <summary> Register a callback to a given setting </summary>
 	public static void Register(string setting, Action<string> callback) { callbacks[setting] = callback; }
 
-	/// <summary> Save settings to a JsonObject inside of PlayerPrefs </summary>
-	public static void Save(string key = "settings") {
+	public static string dataPath { get { return Application.dataPath.PreviousDirectory(); } }
+	public static string savePath { get { return dataPath + "/save"; } } 
+
+	/// <summary> Save settings to a json file inside </summary>
+	public static void Save(string file = "settings") {
+		string saveFile = savePath + "/" + file + ".json";
 		string json = instance.ToString();
 		
-		PlayerPrefs.SetString(key, json);
+		if (!File.Exists(saveFile)) {
+			if (!Directory.Exists(savePath)) { Directory.CreateDirectory(savePath); }
+			
+		}
+		File.WriteAllText(saveFile, json);
+		//PlayerPrefs.SetString(key, json);
 	}
 
 	/// <summary> Load settings from PlayerPrefs (or, default settings if none are saved), and apply them. </summary>
-	public static void Load(string key = "settings") {
+	public static void Load(string file = "settings") {
+
 		TextAsset defaultSettingsFile = Resources.Load<TextAsset>("defaultSettings");
 		string json = defaultSettingsFile != null ? defaultSettingsFile.text : "{}";
 		JsonObject jobj = Json.Parse(json) as JsonObject;
+		string saveFile = savePath + "/" + file + ".json";
 
-		if (PlayerPrefs.HasKey(key)) {
-			string prefs = PlayerPrefs.GetString(key);
+		//if (PlayerPrefs.HasKey(key)) {
+		if (File.Exists(saveFile)) {
+			//string prefs = PlayerPrefs.GetString(key);
+			string prefs = File.ReadAllText(saveFile);
 			JsonObject pobj = Json.Parse(prefs) as JsonObject;
-			Debug.Log("Loaded Saved Settings");
+			//Debug.Log("Loaded Saved Settings");
+			
 			jobj.Set(pobj);
 		}
 
@@ -164,8 +196,9 @@ public partial class Settings : JsonObject {
 		foreach (var pair in jobj) {
 			instance.Apply(pair.Key, pair.Value);
 		}
-
-		//Debug.Log("Done: " + instance.PrettyPrint());	
+		//string s = instance.PrettyPrint();
+		//Debug.Log("Settings.Load: Done- " + s);	
+		//File.WriteAllText(dataPath +"/loadedSettings.json", s);
 	}
 
 	/// <summary> Directly set setting 'key' to 'value'. Does not call any callbacks. </summary>

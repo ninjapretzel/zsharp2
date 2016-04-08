@@ -9,12 +9,12 @@ public class OptionToggle : MonoBehaviour {
 	Toggle toggle;
 
 #if XtoJSON
-	public static bool Get(string setting) {
-		return Settings.instance.Get<bool>(setting);
+	public virtual bool Get() {
+		return Settings.instance.Get<bool>(settingName);
 	}
 
-	public static void Set(string setting, bool value) {
-		Settings.instance.Apply(setting, value);
+	public virtual void Set(bool value) {
+		Settings.instance.Apply(settingName, value);
 	}
 #else
 	public static bool Get(string setting) {
@@ -30,16 +30,9 @@ public class OptionToggle : MonoBehaviour {
 		toggle = GetComponent<Toggle>();
 		toggle.onValueChanged.AddListener(Set);
 
-		toggle.isOn = Get(settingName);
+		toggle.isOn = Get();
 
 	}
-	
-	void Update() {
-		
-	}
 
-	void Set(bool value) {
-		Set(settingName, value);
-	}
 	
 }

@@ -18,6 +18,12 @@ public static class RectUtils {
 		float height = h * Screen.height;
 		return new Rect(pos.x - .5f * width, pos.y - .5f * height, width, height);
 	}
+
+	public static Vector3 ToScreenPosition(this Transform t) {
+		Vector3 pos = Camera.main.WorldToScreenPoint(t.position);
+		pos.y = Screen.height - pos.y;
+		return pos;
+	}
 	
 	public static bool Contains(this Rect r, Touch t) { return r.Contains(t.ScreenPosition()); }
 	

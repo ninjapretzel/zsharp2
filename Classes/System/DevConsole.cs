@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,18 +10,16 @@ using UnityEditor;
 #endif
 
 public class DevConsole : MonoBehaviour, ILogHandler {
-	
-#if UNITY_EDITOR
-	public bool runDefaultsOnStartup = false;
-#endif
-	public string initialText = "";
+
+	[Inaccessible] public string initialText = "";
 	public static Color color = Color.white;
 	public static bool cheats = false;
-	public static string echoBuffer = "";
+	[Inaccessible] public static string echoBuffer = "";
 	public static int debug = 0;
-	public static bool echoAll = false;
-	[Inaccessible] public string[] blacklistedClasses;
-	[Inaccessible] public static List<string> classBlacklist = new List<string>();
+	[Inaccessible] public string[] blacklist;
+	private static List<string> classBlacklist = new List<string>();
+	[Inaccessible] private static bool _wasCheats = false;
+	public static bool wasCheats { get { return _wasCheats; } }
 
 #if (UNITY_ANDROID || UNITY_IPHONE) && !UNITY_EDITOR
 	private static Rect consoleWindowRect = new Rect(0.0f, 0.0f, Screen.width, Screen.height * 0.5f);
@@ -62,12 +61,6 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	public void Start() {
 
-#if UNITY_EDITOR
-		if (runDefaultsOnStartup) {
-			Defaults();
-		}
-#endif
-
 		if (File.Exists(configPath)) {
 			LoadConfigFile();
 		} else {
@@ -93,16 +86,15 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	}
 
 	public void Update() {
+		if (cheats) { _wasCheats = true; }
 
-
-#if UNITY_EDITOR
-		// If window is null, we've probably had a script recompile. Let's reload all the things.
+		// If window is null, we've probably had a script recompile. Or the first Update happened
+		// before the first OnGUI. Let's reload all the things.
 		if (window == null) {
 			SetUpInitialData();
 			InstantiateWindowObject();
 			LoadConfigFile();
 		}
-#endif
 		
 		//Move inputs to the next frame.
 		ControlStates.NextFrame();
@@ -194,6 +186,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 		if (window.open) {
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_MAC
+			GUI.depth = -2000000000;
 			window.Draw();
 #endif
 #if (UNITY_ANDROID || UNITY_IOS) && !UNITY_EDITOR
@@ -289,7 +282,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			if (line[0] == '#') {
 				return;
 			}
-			if (echoAll) { Echo(line); }
+			if (debug >= 3) { Echo(line); }
 			// Separate command from parameters
 			int indexOfSpace = line.IndexOf(' ');
 			string command = "";
@@ -301,6 +294,14 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 				command = line;
 				parameters = null;
 			}
+			if (IsBlacklisted(command)) {
+#if !DEVELOPMENT_BUILD && !UNITY_EDITOR
+				Echo("Unknown command: "+command);
+				return;
+#else
+				Echo("Command " + command + " is blacklisted and cannot be accessed normally!");
+#endif
+			}
 			string targetClassName = null;
 			string targetMemberName = null;
 			// Separate class specification from member call
@@ -308,14 +309,6 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			Type targetClass = null;
 			if (indexOfDot > 0) {
 				targetClassName = command.Substring(0, indexOfDot);
-				if (classBlacklist.Contains(targetClassName)) {
-#if !UNITY_DEBUG && !UNITY_EDITOR
-					Echo("Unknown command: "+command);
-					return;
-#else
-					Echo("Class "+targetClassName+" is blacklisted and cannot be accessed normally!");
-#endif
-				}
 				targetMemberName = command.Substring(indexOfDot+1);
 				targetClass = ReflectionUtils.GetTypeInUnityAssemblies(targetClassName);
 			} else {
@@ -338,7 +331,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 					}
 				} catch (TargetInvocationException e) {
 					DevConsole.Echo("Console triggered an exception in the runtime.\n" + e.ToString().Substring(108, e.ToString().IndexOf('\n') - 109));
-#if UNITY_DEBUG || UNITY_EDITOR
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
 					throw e;
 #endif
 				}
@@ -383,32 +376,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	// Returns: results of the ToString method when called on the field, or null if field is of unsupported type.
 	public static string GetFieldValue(object instance, FieldInfo fieldInfo) {
 		if (fieldInfo == null) { return null; }
-		if (fieldInfo.FieldType.IsEnum) { return fieldInfo.GetValue(instance).ToString(); }
-		// Only supported types that can also be set by the user (see ParseParameterListIntoType)
-		// so as not to mislead the user into thinking they can modify other types of variables
-		switch (fieldInfo.FieldType.Name) {
-			case "Vector2":
-			case "Vector3":
-			case "Color":
-			case "String":
-			case "Char":
-			case "Byte":
-			case "SByte":
-			case "Int16":
-			case "Int32":
-			case "Int64":
-			case "UInt16":
-			case "UInt32":
-			case "UInt64":
-			case "Single":
-			case "Double":
-			case "Boolean": {
-				return fieldInfo.GetValue(instance).ToString();
-			}
-			default: {
-				return null;
-			}
-		}
+		return ParseObjectIntoString(fieldInfo.GetValue(instance));
 	}
 
 	// Set the current value of the specified field owned by instance. If instance is null then field is static.
@@ -458,30 +426,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	public static string GetPropertyValue(object instance, PropertyInfo propertyInfo) {
 		if (propertyInfo == null) { return null; }
 		if (propertyInfo.GetGetMethod() == null) { return "write-only!"; }
-		if (propertyInfo.PropertyType.IsEnum) { return propertyInfo.GetValue(instance, null).ToString(); }
-		switch (propertyInfo.PropertyType.Name) {
-			case "Vector2":
-			case "Vector3":
-			case "Color":
-			case "String":
-			case "Char":
-			case "Byte":
-			case "SByte":
-			case "Int16":
-			case "Int32":
-			case "Int64":
-			case "UInt16":
-			case "UInt32":
-			case "UInt64":
-			case "Single":
-			case "Double":
-			case "Boolean": {
-				return propertyInfo.GetValue(instance, null).ToString();
-			}
-			default: {
-				return null;
-			}
-		}
+		return ParseObjectIntoString(propertyInfo.GetGetMethod().Invoke(instance, new object[] { }));
 	}
 
 	// Set the current value of the specified property owned by instance. If instance is null then property is static.
@@ -632,9 +577,26 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		if (targetMethod.ReturnType == typeof(void)) {
 			targetMethod.Invoke(targetObject, parameters);
 		} else {
-			Echo(targetMethod.Invoke(targetObject, parameters).ToString());
+			Echo(ParseObjectIntoString(targetMethod.Invoke(targetObject, parameters)));
 		}
 
+	}
+
+	public static string ParseObjectIntoString(object obj) {
+		//Type type = obj.GetType();
+		if (obj is ICollection) {
+			StringBuilder sb = new StringBuilder();
+			sb.Append(obj.ToString())
+			.Append(" {\n");
+			foreach (object o in (ICollection)obj) {
+				sb.Append("\t")
+				.Append(o.ToString())
+				.Append("\n");
+			}
+			sb.Append("}");
+			return sb.ToString();
+		}
+		return obj.ToString();
 	}
 
 	// Returns: object reference to a "public static main" object of the same type as the class provided, if it exists within the class provided.
@@ -656,32 +618,42 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	// Returns: boolean, true if member is not marked Inaccessible
 	public static bool IsAccessible(MemberInfo member) {
-#if UNITY_DEBUG || UNITY_EDITOR
-		if (Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) != null) {
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+		if (Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) != null || Attribute.GetCustomAttribute(member.DeclaringType, typeof(InaccessibleAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked inaccessible and cannot be accessed normally!");
 		}
 		return true;
 #else
-		return Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) == null;
+		return Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) == null || Attribute.GetCustomAttribute(member.DeclaringType, typeof(InaccessibleAttribute)) != null;
 #endif
 	}
 
 	// Returns: boolean, true if member is marked cheat. Changing any property, field, or calling any method marked cheat through the console must trigger appropriate responses.
 	public static bool IsCheat(MemberInfo member) {
-#if UNITY_DEBUG
-		if (Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null) {
+#if DEVELOPMENT_BUILD
+		if (Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null || Attribute.GetCustomAttribute(member.DeclaringType, typeof(CheatAttribute)) != null) {
 			Echo("Member "+member.Name+" is marked a cheat and cannot be accessed normally without cheats!");
 		}
 		return false;
 #else
-		return Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null;
+		return Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null || Attribute.GetCustomAttribute(member.DeclaringType, typeof(CheatAttribute)) != null;
 #endif
+	}
+
+	public static bool IsBlacklisted(string command) {
+		foreach (string cls in classBlacklist) {
+			if ((command == cls) || (command.StartsWith(cls) && command[cls.Length] == '.')) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	[Inaccessible] public static void PrintCheatMessage(string memberName) {
 		Echo(memberName + " is a cheat command. Set \"cheats\" to 1 to use it.");
 	}
 
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
 	public static void ToggleConsole() {
 		window.open = !window.open;
 		window.textField = "";
@@ -708,6 +680,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		}
 
 	}
+#endif
 
 	public static void Echo() {
 		Echo("");
@@ -1059,11 +1032,12 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			.Closed()
 			.Area(Screen.all.MiddleCenter(0.7f, 0.8f).Move(0.1f, 0.0f));
 		window.textWindow = initialText.ParseNewlines();
+		window.depth = -2000000000;
 	}
 
 	public void SetUpInitialData() {
 		autoexecPath = Application.persistentDataPath + "/autoexec.cfg";
-		classBlacklist = blacklistedClasses.ToList<string>();
+		classBlacklist = blacklist.ToList<string>();
 		if (!classBlacklist.Contains("InAppPurchases")) { classBlacklist.Add("InAppPurchases"); }
 		if (!classBlacklist.Contains("AdManager")) { classBlacklist.Add("AdManager"); }
 	}
@@ -1077,6 +1051,9 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	}
 
+	/// <summary> Get a list of ALL keys bound to a given command </summary>
+	/// <param name="command">Command to look up</param>
+	/// <returns>List containing all keycodes that a</returns>
 	public static List<KeyCode> GetKeysByCommand(string command) {
 		List<KeyCode> ret = new List<KeyCode>();
 		foreach (KeyValuePair<KeyCode, string> kvp in binds) {
@@ -1085,6 +1062,27 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			}
 		}
 		return ret;
+	}
+
+	/// <summary> Returns the primary bound thing for the given command </summary>
+	/// <param name="command">Command name to look up (as a button) </param>
+	/// <param name="alternate">Alternate command to look up (as an axis) </param>
+	/// <returns>String representation of the key bound to command</returns>
+	public static string GetBindForCommand(string command, string alternate = null) {
+		string bind = "UNBOUND";
+		if (alternate == null) { alternate = command; }
+
+		var keys = GetKeysByCommand(command);
+		if (keys.Count > 0) {
+			bind = Joysticks.GetControlName(keys[0].ToString());
+		} else {
+			var axis = GetAxesByCommand(alternate);
+			if (axis.Count > 0) {
+				bind = Joysticks.GetControlName(axis[0]);
+			}
+		}
+
+		return bind;
 	}
 
 	public static List<string> GetAxesByCommand(string command) {
@@ -1105,16 +1103,14 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		return axisMappings.ContainsKey(axis) && axisMappings[axis] == command;
 	}
 
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Struct)]
 	public class CheatAttribute : Attribute {
-
 		public CheatAttribute() { }
-
 	}
 
+	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Struct)]
 	public class InaccessibleAttribute : Attribute {
-
 		public InaccessibleAttribute() { }
-
 	}
 }
 

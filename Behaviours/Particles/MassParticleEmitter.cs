@@ -29,7 +29,7 @@ public class MassParticleEmitter : MonoBehaviour {
 	public Color colorRangeStart = Color.white;
 	public Color colorRangeEnd = Color.white;
 	
-	float emitTime;
+	//float emitTime;
 	float timeout = 0;
 	
 	public virtual ParticleMaker MakeParticle() {

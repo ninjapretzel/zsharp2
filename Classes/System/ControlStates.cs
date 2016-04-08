@@ -125,8 +125,10 @@ public static class ControlStates {
 	/// <summary> Standard axis wrapper property. Camera Movement around the X axis. Typically represens the 'up/down' direction on the 'right' stick, or Arrow Keys up/down. Camera Inversion is handled in a PlayerControl script if needed. </summary>
 	public static float pitchAxis { get { return Get<float>("pitchAxis"); } set { Set("pitchAxis", value.ToString()); } }
 
-	/// <summary> Standard axis wrapper property. Camera Movement in/out. Typically represents the shoulder button analogs if present, or scroll wheel. </summary>
-	public static float zoomAxis { get { return Get<float>("zoomAxis"); } set { Set("zoomAxis", value.ToString()); } }
+	/// <summary> Standard axis wrapper property. Camera Movement out. Typically represents a shoulder button analogs if present, or scroll wheel. </summary>
+	public static float zoomOutAxis { get { return Get<float>("zoomOutAxis"); } set { Set("zoomOutAxis", value.ToString()); } }
+	/// <summary> Standard axis wrapper property. Camera Movement in. Typically represents a shoulder button analogs if present, or scroll wheel. </summary>
+	public static float zoomInAxis { get { return Get<float>("zoomInAxis"); } set { Set("zoomInAxis", value.ToString()); } }
 
 	/// <summary> Standard button wrapper property. Movement on the +Z axis. Typically represents the 'up' direction on the 'left' stick, or Keyboard W. </summary>
 	public static bool forward { get { return Get<bool>("forward"); } set { Set("forward", value.ToString()); } }

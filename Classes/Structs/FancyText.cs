@@ -122,7 +122,7 @@ public class FancyText {
 		///<summary> Randomness to velocity of new text </summary>
 		public Vector2 randVelocity = new Vector2(10, 0);
 		///<summary> Gravity of text </summary>
-		public Vector2 gravity = new Vector2(0, 50);
+		public Vector2 gravity = new Vector2(0, 500);
 		///<summary> Get a random velocity </summary>
 		public Vector2 velocity { get { return baseVelocity + randVelocity * Random.unit; } }
 		///<summary> Get adjusted spacing based on screen size </summary>

@@ -113,8 +113,12 @@ public class GUIRoot : MonoBehaviour {
 		return main.Switch(obj);
 	}
 
+	/// <summary> Default function to run when the escape key is hit </summary>
+	public static Action defaultOnEscape = () => { Sounds.Play("MenuBack"); PopStatic(); };
+
 	/// <summary> Function to run when escape key is hit. Set to null to enable default behaviour. </summary>
-	public static Action onEscape = PopStatic;
+	public static Action onEscape = defaultOnEscape;
+
 
 	public const int REGISTER = 0;
 	public const int BIND = 1;
@@ -137,10 +141,10 @@ public class GUIRoot : MonoBehaviour {
 		while (delayedRemove.Count > 0) {
 			_Remove(delayedRemove[0]);
 			delayedRemove.RemoveAt(0);
-
 		}
 
-		if (onEscape == null) { onEscape = PopStatic; }
+
+		if (onEscape == null) { onEscape = defaultOnEscape; }
 
 		if (Input.GetKeyDown(KeyCode.Escape)) {
 			onEscape();

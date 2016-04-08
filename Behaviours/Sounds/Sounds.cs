@@ -74,20 +74,39 @@ public class Sounds : MonoBehaviour {
 		
 		started = true;
 	}
-	
+
+	/// <summary> Plays the given sound by name. Used via UGUI </summary>
+	/// <param name="sound">Sound to look up and play. </param>
+	public void Play_(string sound) { Play(sound); }
+
+	/// <summary> Play a audio clip, in a new AudioSource, with a given AudioSource's settings. Positions sound on the camera. </summary>
+	/// <param name="sc">Source Clip to play</param>
+	/// <param name="settings">AudioSource to copy settings from </param>
+	/// <returns>AudioSource created with copy of settings, playing sc</returns>
 	public static AudioSource Play(AudioClip sc, AudioSource settings) {
 		if (audioSettings == null) { return null; }
 		if (sc == null) { return null; }
 		if (Camera.main != null) { return Play(sc, settings, Camera.main.transform); }
 		return Play(sc, settings, Vector3.zero);
 	}
-	
+
+	/// <summary> Play a audio clip, in a new AudioSource, with a given AudioSource's settings. Positions sound at a given transform's position and parents it. </summary>
+	/// <param name="sc">Source Clip to play</param>
+	/// <param name="settings">AudioSource to copy settings from </param>
+	/// <param name="t">Transform to play at, and parent to </param>
+	/// <returns>AudioSource created with copy of settings, playing sc</returns>
 	public static AudioSource Play(AudioClip sc, AudioSource settings, Transform t) {
 		AudioSource snd = Play(sc, settings, t.position); 
 		if (snd != null) { snd.transform.parent = t; }
 		return snd;
-	} 
-		
+	}
+
+	
+	/// <summary> Play a audio clip, in a new AudioSource, with a given AudioSource's settings. Positions sound at the given position. </summary>
+	/// <param name="sc">Source Clip to play</param>
+	/// <param name="settings">AudioSource to copy settings from </param>
+	/// <param name="pos">Position to play the sound at</param>
+	/// <returns>AudioSource created with copy of settings, playing sc</returns>
 	public static AudioSource Play(AudioClip sc, AudioSource settings, Vector3 pos) {
 		if (audioSettings == null && settings == null) { return null; }
 		if (sc == null) { return null; }
@@ -101,13 +120,43 @@ public class Sounds : MonoBehaviour {
 		
 		return source;
 	}
-	
+
+
+	/// <summary> Load and play a sound by name </summary>
+	/// <param name="sc"> Name of sound to play </param>
+	/// <returns>AudioSource playing the given sound sc at the camera</returns>
 	public static AudioSource Play(string sc) { return Play(GetSound(sc), GetSettings(sc)); }
+
+	/// <summary> Load and play a sound by name, at a position</summary>
+	/// <param name="sc">Name of sound to play</param>
+	/// <param name="pos">Position to play sound at</param>
+	/// <returns>AudioSource playing the given sound sc at the given position pos</returns>
 	public static AudioSource Play(string sc, Vector3 pos) { return Play(GetSound(sc), GetSettings(sc), pos); }
+
+	/// <summary> Load and play a sound by name, following a given object </summary>
+	/// <param name="sc">Name of sound to play</param>
+	/// <param name="t">Transform of object to follow</param>
+	/// <returns>AudioSource playing the given sound, on an object attached to the given Transform</returns>
 	public static AudioSource Play(string sc, Transform t) { return Play(GetSound(sc), GetSettings(sc), t); }
-	
+
+	/// <summary> Load and play a sound by name, using settings by name </summary>
+	/// <param name="sc"> Name of sound to play </param>
+	/// <param name="settings">Name of sound settings to load</param>
+	/// <returns>AudioSource playing the given sound sc, with the given settings, playing at the camera</returns>
 	public static AudioSource Play(string sc, string settings) { return Play(GetSound(sc), GetSettings(settings)); }
+	
+	/// <summary> Load and play a sound by name, using settings by name </summary>
+	/// <param name="sc"> Name of sound to play </param>
+	/// <param name="settings">Name of sound settings to load</param>
+	/// <param name="pos">Position to play sound at</param>
+	/// <returns>AudioSource playing the given sound sc, with the given settings, at the given position</returns>
 	public static AudioSource Play(string sc, string settings, Vector3 pos) { return Play(GetSound(sc), GetSettings(settings), pos); }
+
+	/// <summary> Load and play a sound by name, using settings by name </summary>
+	/// <param name="sc"> Name of sound to play </param>
+	/// <param name="settings">Name of sound settings to load</param>
+	/// <param name="t">Transform of object to follow</param>
+	/// <returns>AudioSource playing the given sound sc, with the given settings, attached to the given Transform</returns>
 	public static AudioSource Play(string sc, string settings, Transform t) { return Play(GetSound(sc), GetSettings(settings), t); }
 	
 	public static AudioClip Get(string sc) { return GetSound(sc); }
