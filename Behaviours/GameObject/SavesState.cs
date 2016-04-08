@@ -29,7 +29,7 @@ public class SavesState : MonoBehaviour {
 	[NonSerialized] private Transform savedParent;
 	[NonSerialized] private Vector3 velocity;
 	[NonSerialized] private Vector3 angularVelocity;
-	[NonSerialized] private bool resetVelocity = false;
+	[NonSerialized] private bool resetTransform = false;
 	[NonSerialized] private Vector3 initialPosition;
 	[NonSerialized] private Quaternion initialRotation;
 	[NonSerialized] private Vector3 initialScale;
@@ -63,13 +63,18 @@ public class SavesState : MonoBehaviour {
 	}
 
 	public void FixedUpdate() {
-		if (resetVelocity) {
+		if (resetTransform) {
+			transform.parent = savedParent;
+			transform.localPosition = position;
+			transform.localRotation = rotation;
+			transform.localScale = scale;
+			
 			Rigidbody rb = GetComponent<Rigidbody>();
 			if (rb != null) {
 				rb.velocity = velocity;
 				rb.angularVelocity = angularVelocity;
 			}
-			resetVelocity = false;
+			resetTransform = false;
 		}
 	}
 	
@@ -145,11 +150,7 @@ public class SavesState : MonoBehaviour {
 	
 	public void Restore() {
 		// Restore transform properties
-		transform.parent = savedParent;
-		transform.localPosition = position;
-		transform.localRotation = rotation;
-		transform.localScale = scale;
-		resetVelocity = true;
+		resetTransform = true;
 		// Get all Behaviours currently attached to this object
 		Behaviour[] behaviours = gameObject.GetComponents<Behaviour>();
 		foreach(Behaviour c in behaviours) {
