@@ -309,8 +309,6 @@ public static class StringUtils {
 	public static byte ParseByte(this string s) { return byte.Parse(s, NumberStyles.HexNumber); }
 	public static Color ParseColor(this string s) { return Colors.FromString(s); }
 	public static Color ParseColor(this string s, char delim) { return Colors.FromString(s, delim); }
-	public static Table ParseTable(this string s) { return Table.CreateFromLine(s); }
-	public static Table ParseTable(this string s, char delim) { return Table.CreateFromLine(s, delim); }
 	public static List<string> ParseStringList(this string s) { return s.ParseStringList(','); }
 	public static List<string> ParseStringList(this string s, char delim) { return s.Split(delim).ToList(); }
 	

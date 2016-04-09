@@ -9,29 +9,11 @@ public static class GUIUtils {
 	
 }
 
-public static class GUIFontSize {
-	public static Table fontSizes;
-	static GUIFontSize() {
-		TextAsset t = Resources.Load("BaseFontSizes", typeof(TextAsset)) as TextAsset;
-		fontSizes = Table.CreateFromCSV(t.text);
-		
-		t = Resources.Load("FontSizes", typeof(TextAsset)) as TextAsset;
-		if (t != null) { fontSizes += Table.CreateFromCSV(t.text); }
-		
-	}
-	
-	public static float Get(string s) {
-		if (!fontSizes.ContainsKey(s)) { return fontSizes["default"]; }
-		return fontSizes[s];
-	}
-}
-
 public static class GUIStyleF {
 	
 	public static float LineSize(this GUIStyle c) { return c.CalcHeight(new GUIContent("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 9999999f); }
 	public static GUIStyle Clone(this GUIStyle c) { return new GUIStyle(c); }
 	
-	public static GUIStyle FontSize(this GUIStyle style, string s) { return style.FontSize(GUIFontSize.Get(s)); }
 	public static GUIStyle FontSize(this GUIStyle style, float p) { 
 		GUIStyle copy = new GUIStyle(style);
 		int size = (int) (p/720f * Screen.height);
@@ -43,12 +25,10 @@ public static class GUIStyleF {
 		return copy;
 	}
 	
-	public static void SetFontSize(this GUIStyle style, string s) { style.SetFontSize(GUIFontSize.Get(s)); }
 	public static void SetFontSize(this GUIStyle style, float p, float minFontSize = 8f) {
 		style.fontSize = (int) Mathf.Max(minFontSize, (p * (float)Screen.height));	
 	}
 	
-	public static GUIStyle ScaledFontTo(this GUIStyle style, string s) { return style.ScaledFontTo(GUIFontSize.Get(s)); }
 	public static GUIStyle ScaledFontTo(this GUIStyle style, float p, float minFontSize = 8f) {
 		GUIStyle copy = new GUIStyle(style);
 		copy.fontSize = (int) Mathf.Max(minFontSize, (p * (float)Screen.height));
@@ -117,10 +97,7 @@ public static class GUISkinF {
 	public static GUISkin Clone(this GUISkin source) {
 		return Object.Instantiate(source) as GUISkin;
 	}
-	
-	public static void FontSize(this GUISkin skin, string s) { skin.FontSize(GUIFontSize.Get(s)); }
-	public static void FontSizeFull(this GUISkin skin, string s) { skin.FontSizeFull(GUIFontSize.Get(s)); }
-	
+
 	public static void FontSize(this GUISkin skin, float size, float minFontSize = 8f) { skin.SetFontSize(size/720.0f, minFontSize); }
 	public static void FontSizeFull(this GUISkin skin, float size, float minFontSize = 8f) { skin.SetFontSizeFull(size/720.0f, minFontSize); }
 	
