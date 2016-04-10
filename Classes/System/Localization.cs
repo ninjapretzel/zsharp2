@@ -19,6 +19,7 @@ public static class Localization {
 	private static JsonObject _strs;
 
 	public static Language language = Language.english;
+	public static bool initialized = false;
 
 	public static void Init() {
 		string text = Resources.Load<TextAsset>("strings").text.ConvertNewlines();
@@ -39,7 +40,7 @@ public static class Localization {
 				}
 			}
 		}
-
+		initialized = true;
 	}
 
 	public static string Localize(string name, params object[] args) {
