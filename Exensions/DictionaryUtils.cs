@@ -131,19 +131,6 @@ public static class DictionaryUtils {
 	}
 	
 	
-	
-	public static void Save(this Table d, string name) { d.SaveToPlayerPrefs(name); }
-	public static void Load(this Table d, string name) {
-		if (!PlayerPrefs.HasKey(name + "_count")) { Debug.Log("Dictionary " + name + " does not exist in PlayerPrefs"); return; }
-		int count = PlayerPrefs.GetInt(name + "_count");
-		
-		for (int i = 0; i < count; i++) {
-			string key = PlayerPrefs.GetString(name + "_" + i + "_key");
-			float val = PlayerPrefs.GetFloat(name + "_" + i + "_float");
-			d[key] = val;
-		}
-	}
-	
 }
 
 

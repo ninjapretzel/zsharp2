@@ -2,7 +2,10 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
+
+#if LG_STEAM
 using Steamworks;
+#endif
 
 public enum Language {
 	english,
@@ -26,6 +29,7 @@ public static class Localization {
 		//JsonArray levelsArray = JsonArray.ParseCSV(text, '|');
 		_strs = JsonObject.ParseCSV(text, '|');
 		//Debug.Log(_strs.PrettyPrint());
+		#if LG_STEAM
 		// Use a switch here instead of parsing the enum (we don't support all those langauges yet!)
 		if (SteamManager.Initialized) {
 			switch (SteamApps.GetCurrentGameLanguage()) {
@@ -40,6 +44,8 @@ public static class Localization {
 				}
 			}
 		}
+		#endif
+
 		initialized = true;
 	}
 
