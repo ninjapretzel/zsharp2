@@ -3,7 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 
-public class Switcher : MonoBehaviour {
+public class SwitchPageOnKeyPress : MonoBehaviour {
 
 	public GameObject nextWindow;
 	public bool anyKey = false;
@@ -47,9 +47,9 @@ public class Switcher : MonoBehaviour {
 
 	public void Switch() {
 		if (nextWindow != null) {
-			GUIRoot.Push(nextWindow);
+			UGUIRoot.main.Push(nextWindow);
 		} else {
-			GUIRoot.Pop();
+			UGUIRoot.main.Pop();
 		}
 		
 	}

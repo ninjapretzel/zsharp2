@@ -14,8 +14,8 @@ public class ModalDialog : MonoBehaviour {
 
 	public void Start() {
 		mainTextBox.text = prompt;
-		onEscapeBackup = GUIRoot.onEscape;
-		GUIRoot.onEscape = () => { };
+		onEscapeBackup = UGUIRoot.onEscape;
+		UGUIRoot.onEscape = () => { };
 
 	}
 
@@ -23,7 +23,7 @@ public class ModalDialog : MonoBehaviour {
 		if (callback != null) {
 			callback(choice);
 		}
-		GUIRoot.onEscape = onEscapeBackup;
+		UGUIRoot.onEscape = onEscapeBackup;
 		Destroy(gameObject);
 
 	}
