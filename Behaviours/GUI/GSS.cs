@@ -17,15 +17,29 @@ public partial class GSS : MonoBehaviour {
 #if XtoJSON
 
 [ExecuteInEditMode]
+/// <summary> 
+///	GUI StyleSheets behaviour.
+/// Applies styles to UGUI behaviours based on the name of the object,
+/// as well as a given set of stylesheets in the project.
+/// 
+/// Provides detection of changes on the stylesheets, and will reload the stylesheets source files have changed.
+/// </summary>
 public partial class GSS : MonoBehaviour {
-
+	
+	/// <summary> Hash of the last 'Built-In' stylesheet file </summary>
 	[NonSerialized] private static int lastDefaultHash = 0;
+	/// <summary> Hash of the last 'Custom' stylesheet file </summary>
 	[NonSerialized] private static int lastStyleHash = 0;
-	static JsonObject styles = LoadStyles();
 
+	/// <summary> Currently loaded stylesheets. </summary>
+	static JsonObject styles = LoadStyles();
+	/// <summary> Global flag to restyle everything on the next frame</summary>
 	public static bool restyleEverything = false;
+	/// <summary> Are stylesheets loaded? </summary>
 	public static bool loaded { get { return styles != null; } }
 
+	/// <summary> Load StyleSheet files from resources, and return the loaded sheets as a JsonObject </summary>
+	/// <returns> JsonObject containing stylesheets</returns>
 	static JsonObject LoadStyles() {
 		try {
 			string defaultStyleJson = Resources.Load<TextAsset>("defaultStyles").text;
@@ -53,6 +67,7 @@ public partial class GSS : MonoBehaviour {
 
 
 #if UNITY_EDITOR
+			//Print out this message if stylesheets have been loaded or re-loaded
 			Debug.Log("GSS: Loaded/Reloaded Stylesheets");
 #endif
 
@@ -62,6 +77,7 @@ public partial class GSS : MonoBehaviour {
 		}
 	}
 
+	/// <summary> Check for styles being out-of-date, and reload if necessary.. </summary>
 	public static bool ReloadStyles() {
 		if (styles == null) { 
 			styles = LoadStyles();
@@ -82,8 +98,14 @@ public partial class GSS : MonoBehaviour {
 		return reload;
 	}
 
+	/// <summary> Scale ratio for text size. </summary>
 	static float scaleRatio { get { return ((float)Screen.height) / 720f; } }
-	
+
+	/// <summary>
+	/// Quick acess to the 'cascades' defined in the stylesheet.
+	/// This is an array of objects describing what object names
+	///		to automatically apply styles to.
+	/// </summary>
 	public static JsonArray cascades { get { return styles["cascades"] as JsonArray; } }
 
 	void Start() {
@@ -114,24 +136,40 @@ public partial class GSS : MonoBehaviour {
 		restyleEverything = false;
 	}
 
+
+	/// <summary> Update style based on the object's tag and style </summary>
 	public void UpdateStyle() { UpdateStyle(curTag, curStyle); }
+
+	/// <summary> Update style based on a given tag and style </summary>
 	void UpdateStyle(string tag, string style) { ApplyStyle(this, tag, style); }
+
+	/// <summary> Update style based on description in a JsonObject </summary>
 	void ApplyStyle(JsonObject style) { ApplyStyle(this, style); }
 
+	/// <summary> Apply styles to a given object. </summary>
 	public static void ApplyStyle(Component c, string tag, string style) {
+		JsonObject combObj = GetStyle(tag, style);
+		if (combObj != null) { ApplyStyle(c, combObj); }
+
+	}
+
+	/// <summary> Get the JsonObject describing the style for a given tag and style</summary>
+	public static JsonObject GetStyle(string tag, string style = null) {
+		JsonObject combObj = null;
 		if ((tag != null && styles.ContainsKey(tag)) || (style != null && styles.ContainsKey(style))) {
 			JsonObject styleObj = styles.Get<JsonObject>(style);
 			JsonObject tagObj = styles.Get<JsonObject>(tag);
 
-			JsonObject combObj = new JsonObject();
+			combObj = new JsonObject();
 			if (tagObj != null) { combObj.Set(tagObj); }
 			if (styleObj != null && tag != style) { combObj.Set(styleObj); }
 
 			//Debug.Log("Built Style [" + tag + "." + style + "] :" + combObj.PrettyPrint());
-			ApplyStyle(c, combObj);
 		}
-
+		return combObj;
 	}
+
+	/// <summary> Apply style to all supported components on a given object. </summary>
 	public static void ApplyStyle(Component c, JsonObject style) {
 		string inherit = style.Get<string>("inherit");
 		if (inherit != null && inherit != "" && styles.ContainsKey(inherit)) {
@@ -162,6 +200,7 @@ public partial class GSS : MonoBehaviour {
 		}
 
 	}
+
 
 	static void ApplyImageStyle(Image img, JsonObject style) {
 		if (style.ContainsKey("image")) { img.sprite = Resources.Load<Sprite>(style.Get<string>("image")); }

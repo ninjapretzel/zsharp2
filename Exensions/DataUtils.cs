@@ -867,54 +867,6 @@ public static class DataFUnity {
 	}*/
 }
 
-///////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
-public static class DataFTable {
-	
-	
-	
-	public static Color[] ToColorArray(this Table table) { return table.ToColorList().ToArray(); }
-	public static List<Color> ToColorList(this Table table) {
-		List<Color> list = new List<Color>();
-		int i = 0;
-		string key = i.ToString();
-		while (table.ContainsColor(key)) {
-			list.Add(table.GetColor(key));
-			
-			++i;
-			key = i.ToString();
-		}
-		
-		return list;
-	}
-	
-	
-	public static Table ToTable(this List<Color> list) {
-		Table t = new Table();
-		
-		for (int i = 0; i < list.Count; ++i) {
-			t.SetColor(i.ToString(), list[i]); 
-		}
-		
-		return t;
-	}	
-	
-	public static Table ToTable(this Color[] array) {
-		Table t = new Table();
-		
-		for (int i = 0; i < array.Length; ++i) {
-			t.SetColor(i.ToString(), array[i]);
-		}
-		
-		return t;
-	}
-	
-	
-	
-	
-}
 
 public static class DataFiles {
 	
