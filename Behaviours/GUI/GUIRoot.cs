@@ -20,8 +20,6 @@ public class GUIRoot : MonoBehaviour {
 
 	public static GUIRoot main;
 
-	public static Action pause;
-	
 	public static List<ZWindow> windows = new List<ZWindow>();
 	static List<WindowInfo> delayedAdd = new List<WindowInfo>();
 	static List<string> delayedRemove = new List<string>();
@@ -30,94 +28,6 @@ public class GUIRoot : MonoBehaviour {
 	private static Dictionary<string, ZWindow> holdBinds = new Dictionary<string,ZWindow>();
 	private static Dictionary<string, ZWindow> registeredWindows = new Dictionary<string,ZWindow>();
 
-	private static GameObject _modalContainer;
-	public static GameObject modalContainer {
-		get {
-			if (_modalContainer == null) {
-				_modalContainer = new GameObject("ModalContainer");
-				_modalContainer.transform.SetParent(main.transform);
-				RectTransform rt = _modalContainer.AddComponent<RectTransform>();
-				rt.anchorMin = Vector2.zero;
-				rt.anchorMax = Vector2.one;
-				rt.offsetMin = Vector2.zero;
-				rt.offsetMax = Vector2.zero;
-				Image img = _modalContainer.AddComponent<Image>();
-				Sprite sprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0,0,1,1), new Vector2(0.5f, 0.5f));
-				img.sprite = sprite;
-				img.color = new Color32(32, 32, 32, 192);
-				_modalContainer.gameObject.SetActive(false);
-			}
-			return _modalContainer;
-		}
-	}
-
-	/// <summary> History of GameObjects that have been visited as menus. </summary>
-	private static Stack<GameObject> history = new Stack<GameObject>();
-	/// <summary> What is the current menu's GameObject </summary>
-	private static GameObject active { get { return history.Peek(); } }
-
-	/// <summary> Push a menu GameObject on the stack from static context. </summary>
-	public static void Push(GameObject next) { main.Pushx(next); }
-	/// <summary> Push a menu GameObject on the stack from a instance context </summary>
-	public void Pushx(GameObject next) {
-		if (history.Count > 0) {
-			active.SetActive(false);
-		}
-		next.SetActive(true);
-		history.Push(next);
-	}
-
-	//Gay shit to call Pop() from a referenced thing
-	/// <summary> Pop a menu GameObject from static context, return nothing. </summary>
-	public static void PopStatic() { main.Popy(); }
-	/// <summary> Pop a menu GameObject from static context, return popped game object. </summary>
-	public static GameObject Pop() { return main.Popy(); }
-
-	/// <summary> Pop a menu GameObject from instance context, return nothing. </summary>
-	public void Popx() { Popy(); }
-	/// <summary> Pop a menu GameObject from instance context, return popped game object. </summary>
-	public GameObject Popy() {
-		if (history.Count <= 1) { return null; }
-
-		GameObject obj = history.Pop();
-		obj.SetActive(false);
-
-		if (active != null) {
-			active.SetActive(true);
-		}
-
-		return obj;
-	}
-
-	public void PopTo(GameObject target) {
-		while (history.Contains(target) && active != target) {
-			Pop();
-		}
-	}
-
-	/// <summary> Switch to a given menu GameObject from instance context, return nothing. </summary>
-	public void Switchx(GameObject obj) {
-		Pop();
-		Push(obj);
-	}
-
-	/// <summary> Switch to a given menu GameObject from instance context, return popped game object. </summary>
-	public GameObject Switch(GameObject obj) {
-		var popped = Pop();
-		Push(obj);
-		return popped;
-	}
-	
-	/// <summary> Switch to a given menu GameObject from static context, return popped game object. </summary>
-	public static GameObject Switchz(GameObject obj) {
-		return main.Switch(obj);
-	}
-
-	/// <summary> Default function to run when the escape key is hit </summary>
-	public static Action defaultOnEscape = () => { Sounds.Play("MenuBack"); PopStatic(); };
-
-	/// <summary> Function to run when escape key is hit. Set to null to enable default behaviour. </summary>
-	public static Action onEscape = defaultOnEscape;
 
 
 	public const int REGISTER = 0;
@@ -144,11 +54,6 @@ public class GUIRoot : MonoBehaviour {
 		}
 
 
-		if (onEscape == null) { onEscape = defaultOnEscape; }
-
-		if (Input.GetKeyDown(KeyCode.Escape)) {
-			onEscape();
-		}
 
 		while (delayedAdd.Count > 0) {
 			WindowInfo info = delayedAdd[0];
@@ -176,17 +81,6 @@ public class GUIRoot : MonoBehaviour {
 			window.Update();
 		}
 
-		if (_modalContainer != null) {
-			_modalContainer.transform.SetSiblingIndex(transform.childCount - 1);
-			if (_modalContainer.transform.childCount != 0) {
-				foreach (Transform child in _modalContainer.transform) {
-					child.gameObject.SetActive(false);
-				}
-				_modalContainer.transform.GetChild(0).gameObject.SetActive(true);
-			} else {
-				_modalContainer.SetActive(false);
-			}
-		}
 		
 	}
 
@@ -344,41 +238,9 @@ public class GUIRoot : MonoBehaviour {
 
 	}
 
-	public static void TogglePause() {
-		if (pause != null) {
-			pause();
-		}
-	}
+	
 
-	#region ModalMethods
-	public static void ShowAlertModal(Action<string> responseHandler, string prompt) {
-		RectTransform modalTransform = Resources.Load<RectTransform>("AlertModal");
-		if (modalTransform == null) {
-			modalTransform = Resources.Load<RectTransform>("DefaultAlertModal");
-		}
-		ShowModal(modalTransform, responseHandler, prompt);
-	}
-
-	public static void ShowYesNoModal(Action<string> responseHandler, string prompt) {
-		RectTransform modalTransform = Resources.Load<RectTransform>("YesNoModal");
-		if (modalTransform == null) {
-			modalTransform = Resources.Load<RectTransform>("DefaultYesNoModal");
-		}
-		ShowModal(modalTransform, responseHandler, prompt);
-	}
-
-	public static void ShowModal(RectTransform modalPrefab, Action<string> responseHandler, string prompt) {
-		RectTransform modal = Instantiate(modalPrefab) as RectTransform;
-		modalContainer.SetActive(true);
-		modal.SetParent(modalContainer.transform);
-		modal.offsetMin = Vector2.zero;
-		modal.offsetMax = Vector2.zero;
-		ModalDialog dialog = modal.GetComponent<ModalDialog>();
-		dialog.prompt = prompt;
-		dialog.callback = responseHandler;
-
-	}
-	#endregion
+	
 
 
 }
