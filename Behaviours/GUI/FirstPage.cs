@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -14,7 +14,7 @@ public class FirstPage : MonoBehaviour {
 			t.gameObject.SetActive(false);
 		}
 		
-		GUIRoot.Push(target);
+		UGUIRoot.main.Push(target);
 	}
 
 
