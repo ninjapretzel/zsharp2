@@ -33,6 +33,16 @@ public partial class GSS : MonoBehaviour {
 
 	/// <summary> Currently loaded stylesheets. </summary>
 	static JsonObject styles = LoadStyles();
+
+	
+	//Yay for dynamic programming optimizations
+	/// <summary> Cached styles, used for efficiency, since many elements will share the same styles. When styles are reloaded, this object is purged. </summary>
+	static JsonObject cachedStyles = new JsonObject();
+
+	//Yay for dynamic programming optimizations
+	/// <summary> Cached inheritance, used for efficiency, since many styles inherit from the same set of styles. When styles are reloaded, this object is purged. </summary>
+	static JsonObject cachedInherit = new JsonObject();
+
 	/// <summary> Global flag to restyle everything on the next frame</summary>
 	public static bool restyleEverything = false;
 	/// <summary> Are stylesheets loaded? </summary>
@@ -65,7 +75,8 @@ public partial class GSS : MonoBehaviour {
 
 			}
 
-
+			cachedStyles = new JsonObject();
+			cachedInherit = new JsonObject();
 #if UNITY_EDITOR
 			//Print out this message if stylesheets have been loaded or re-loaded
 			Debug.Log("GSS: Loaded/Reloaded Stylesheets");
@@ -156,7 +167,12 @@ public partial class GSS : MonoBehaviour {
 	/// <summary> Get the JsonObject describing the style for a given tag and style</summary>
 	public static JsonObject GetStyle(string tag, string style = null) {
 		JsonObject combObj = null;
-		if ((tag != null && styles.ContainsKey(tag)) || (style != null && styles.ContainsKey(style))) {
+		if (tag == null) { tag = ""; }
+		if (style == null) { style = ""; }
+		string styleID = tag + "." + style;
+		if (cachedStyles.ContainsKey(styleID)) { return cachedStyles.Get<JsonObject>(styleID); }
+
+		if (styles.ContainsKey(tag) || styles.ContainsKey(style)) {
 			JsonObject styleObj = styles.Get<JsonObject>(style);
 			JsonObject tagObj = styles.Get<JsonObject>(tag);
 
@@ -164,19 +180,61 @@ public partial class GSS : MonoBehaviour {
 			if (tagObj != null) { combObj.Set(tagObj); }
 			if (styleObj != null && tag != style) { combObj.Set(styleObj); }
 
-			//Debug.Log("Built Style [" + tag + "." + style + "] :" + combObj.PrettyPrint());
+			combObj = ApplyInheritance(combObj);
+
+			//Debug.Log("GSS.GetStyle: Created style [" + styleID + "] : " + combObj.PrettyPrint());
+			cachedStyles[styleID] = combObj;
+
 		}
+
 		return combObj;
+	}
+
+	/// <summary>Finds all JsonObjects under <paramref name="style"/> that inherit styles, and proccesses all of those inherited styles.</summary>
+	/// <param name="style">Original style to process inheritance for</param>
+	/// <returns><paramref name="style"/>, and all of its children, applied on top of the styles they inherit</returns>
+	public static JsonObject ApplyInheritance(JsonObject style) {
+		JsonObject clone = style.Clone();
+
+		foreach (var pair in style) {
+			if (pair.Value.isObject) {
+				JsonObject obj = pair.Value as JsonObject;
+				if (obj.ContainsKey("inherit")) {
+					clone[pair.Key] = ApplyInheritance(obj);
+				}
+			}
+		}
+
+		string inherit = style.Get<string>("inherit");
+		clone.Remove("inherit");
+		if (inherit != null) {
+			JsonObject inherited = GetInherited(inherit);
+
+			return inherited.CombineRecursively(clone);
+		}
+
+		return clone;
+	}
+
+
+	/// <summary> Gets the COMPLETE inheritance tree of the style called <paramref name="inherit"/></summary>
+	/// <param name="inherit">Name of style to calculate inheritance from </param>
+	/// <returns>Complete style by name of <paramref name="inherit"/>, including all of the actual information from its parent styles </returns>
+	public static JsonObject GetInherited(string inherit) {
+		if (cachedInherit.ContainsKey(inherit)) { return cachedInherit.Get<JsonObject>(inherit); }
+
+		JsonObject style = styles.Get<JsonObject>(inherit);
+		if (style.ContainsKey("inherit")) {
+			JsonObject inherited = GetInherited(style.Get<string>("inherit"));
+			if (inherited != null) { return inherited.CombineRecursively(style); }
+		}
+
+		cachedInherit[inherit] = style;
+		return style;
 	}
 
 	/// <summary> Apply style to all supported components on a given object. </summary>
 	public static void ApplyStyle(Component c, JsonObject style) {
-		string inherit = style.Get<string>("inherit");
-		if (inherit != null && inherit != "" && styles.ContainsKey(inherit)) {
-			JsonObject inheritedStyle = styles.Get<JsonObject>(inherit);
-			ApplyStyle(c, inheritedStyle);
-		}
-
 		Text txt = c.GetComponent<Text>();
 		Image img = c.GetComponent<Image>();
 		Button btn = c.GetComponent<Button>();
@@ -236,13 +294,14 @@ public partial class GSS : MonoBehaviour {
 	}
 
 	static void ApplyTextStyle(Text txt, JsonObject style) {
+		string language = Localization.language.ToString();
+
 		if (style.ContainsKey("font")) { 
 			if (style["font"].isString) { txt.font = Resources.Load<Font>(style.Get<string>("font")); }
 			if (style["font"].isObject) {
-				//Debug.Log("Changing font style for " + Localization.language.ToString());
 				JsonObject languageFonts = style.Get<JsonObject>("font");
-				if (languageFonts.ContainsKey(Localization.language.ToString())) {
-					txt.font = Resources.Load<Font>(languageFonts.Get<string>(Localization.language.ToString() ) );
+				if (languageFonts.ContainsKey(language)) {
+					txt.font = Resources.Load<Font>(languageFonts.Get<string>(language) );
 				} else {
 					txt.font = Resources.Load<Font>(languageFonts.Get<string>("english"));
 				}
@@ -250,8 +309,25 @@ public partial class GSS : MonoBehaviour {
 		}
 		if (style.ContainsKey("fontStyle")) { txt.fontStyle = style.Get<FontStyle>("fontStyle"); }
 
-		bool scale = style.Extract("sizeScale", true);
-		if (style.ContainsKey("fontSize")) { txt.fontSize = (int)(style.Get<float>("fontSize") * (scale ? scaleRatio : 1)); }
+		if (style.ContainsKey("fontSize")) { 
+			bool scale = style.Extract("sizeScale", true);
+			float screenScale = 1.0f * (scale ? scaleRatio : 1f);
+			float languageScale = 1.0f;
+			if (style.ContainsKey("fontScale")) {
+				if (style["fontScale"].isNumber) { languageScale = style.Get<float>("fontScale"); }
+				if (style["fontScale"].isObject) {
+					JsonObject languageScales = style.Get<JsonObject>("fontScale");
+					if (languageScales.ContainsKey(language)) {
+						languageScale = languageScales.Get<float>(language);
+					}
+					//Debug.Log("Applying fontScale for " + language + " : " + languageScale + " : " + languageScales);
+				}
+			}
+
+			//Debug.Log(txt.transform.GetRelativePath() + " Scales for " + language + " : " + languageScale + " * " + screenScale + " = " + languageScale*screenScale);
+			float fontSize = (style.Get<float>("fontSize")) * languageScale * screenScale;
+			txt.fontSize = (int)fontSize;
+		}
 		if (style.ContainsKey("richText")) { txt.supportRichText = style.Get<bool>("richText"); }
 		if (style.ContainsKey("alignment")) { txt.alignment = style.Get<TextAnchor>("alignment"); }
 		if (style.ContainsKey("lineSpacing")) { txt.lineSpacing = style.Get<float>("lineSpacing"); }
