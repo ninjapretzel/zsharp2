@@ -45,6 +45,7 @@ public partial class GSS : MonoBehaviour {
 
 	/// <summary> Global flag to restyle everything on the next frame</summary>
 	public static bool restyleEverything = false;
+
 	/// <summary> Are stylesheets loaded? </summary>
 	public static bool loaded { get { return styles != null; } }
 
@@ -75,13 +76,14 @@ public partial class GSS : MonoBehaviour {
 
 			}
 
-			cachedStyles = new JsonObject();
-			cachedInherit = new JsonObject();
 #if UNITY_EDITOR
 			//Print out this message if stylesheets have been loaded or re-loaded
 			Debug.Log("GSS: Loaded/Reloaded Stylesheets");
 #endif
+			cachedStyles = new JsonObject();
+			cachedInherit = new JsonObject();
 
+			
 			return obj;
 		} catch {
 			return null;
@@ -90,7 +92,8 @@ public partial class GSS : MonoBehaviour {
 
 	/// <summary> Check for styles being out-of-date, and reload if necessary.. </summary>
 	public static bool ReloadStyles() {
-		if (styles == null) { 
+		if (styles == null) {
+			
 			styles = LoadStyles();
 			return true;
 		}
@@ -105,7 +108,11 @@ public partial class GSS : MonoBehaviour {
 			
 		}
 
-		if (reload) { styles = LoadStyles(); }
+		if (reload) {
+			cachedStyles = new JsonObject();
+			cachedInherit = new JsonObject();
+			styles = LoadStyles(); 
+		}
 		return reload;
 	}
 
@@ -128,19 +135,29 @@ public partial class GSS : MonoBehaviour {
 		}
 		
 	}
-	
+
+	int lastHeight = -1;
+	int lastWidth = -1;
+
 	void Update() {
+
 		if (restyleEverything) {
 			curTag = "";
 			curStyle = "";
 			//Debug.Log("EVERYTHING IS GETTING RESTYLED");
+		} 
+		if (lastHeight != Screen.height || lastWidth != Screen.width) {
+			curTag = "";
+			curStyle = "";
 		}
 		if (styleClass != curStyle || tagClass != curTag) {
 			UpdateStyle(tagClass, styleClass);
 			curStyle = styleClass;
 			curTag = tagClass;
 		}
-		
+
+		lastWidth = Screen.width;
+		lastHeight = Screen.height;
 	}
 
 	void LateUpdate() {
