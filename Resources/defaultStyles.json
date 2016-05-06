@@ -112,8 +112,8 @@
 	},
 	"interactable":{
 		"transition":"ColorTint",
-		"normalColor":"#DDDDDDFF",
-		"highlightedColor":"#FFFFFFFF",
+		"normalColor":"#FFFFFFFF",
+		"highlightedColor":"#44FFFFFF",
 		"pressedColor":"#0056FFFF",
 		"disabledColor":"#FF000080",
 		"colorMultiplier":1,
