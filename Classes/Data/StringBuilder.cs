@@ -61,6 +61,11 @@ public class StringBuilder {
 	public int Length { get { return str.Length; } set { str.Length = value; } }
 	/// <summary> Wrapper for MaxCapacity property. The absolute maximum number of space that this StringBuilder can be resized to</summary>
 	public int MaxCapacity { get { return str.MaxCapacity; } }
+
+	/// <summary> Wrapper for indexer </summary>
+	/// <param name="index">Index to index at </param>
+	/// <returns>character at position index</returns>
+	public char this[int index] { get { return str[index]; } set { str[index] = value; } }
 	
 	#region Pass-Throughs
 	/// <summary> Wrapper for Append(bool). Appends the string representation of the parameter to the end of the builder's array, resizing if necessary. </summary>
