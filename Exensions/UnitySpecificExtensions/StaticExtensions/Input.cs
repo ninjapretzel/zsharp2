@@ -77,6 +77,10 @@ public static class Input {
 	public static Vector2 compositionCursorPos { get { return In.compositionCursorPos; } set { In.compositionCursorPos = value; } }
 	public static string compositionString { get { return In.compositionString; } }
 	public static DeviceOrientation deviceOrientation { get { return In.deviceOrientation; } }
+
+	public static bool simulateMouseWithTouches { get { return In.simulateMouseWithTouches; } set { In.simulateMouseWithTouches = value; } }
+	public static bool touchSupported { get { return In.touchSupported; } }
+
 	public static Gyroscope gyro { get { return In.gyro; } }
 	public static IMECompositionMode imeCompositionMode { get { return In.imeCompositionMode; } set { In.imeCompositionMode = value; } }
 	public static bool imeIsSelected { get { return In.imeIsSelected; } }
