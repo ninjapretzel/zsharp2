@@ -14,6 +14,7 @@
 	"text":{
 		"font":{
 			"english":"rs",
+			"spanish":"es_exo"
 			"japanese":"nicokaku",
 		},
 		"fontStyle":"Normal",
@@ -28,7 +29,7 @@
 		"bestFit":false,
 		"color":"#777777FF",
 		"material":null,
-		"raycastTarget":false
+		"raycastTarget":false,
 	},
 	"header":{
 		"inherit":"text",
@@ -40,7 +41,7 @@
 			"fontSize":44,
 			"alignment":"MiddleCenter",
 			"color":"#DDDDDDFF",
-		}
+		},
 	},
 	"panel":{
 		"image":"UIBackground",
@@ -63,7 +64,7 @@
 		"Text":{
 			"inherit":"text",
 			"alignment":"MiddleCenter",
-		}
+		},
 	},
 	"scrollView":{
 		"horizontal":false,
@@ -111,8 +112,8 @@
 	},
 	"interactable":{
 		"transition":"ColorTint",
-		"normalColor":"#DDDDDDFF",
-		"highlightedColor":"#FFFFFFFF",
+		"normalColor":"#FFFFFFFF",
+		"highlightedColor":"#44FFFFFF",
 		"pressedColor":"#0056FFFF",
 		"disabledColor":"#FF000080",
 		"colorMultiplier":1,

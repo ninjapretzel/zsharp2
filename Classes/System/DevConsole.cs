@@ -93,12 +93,16 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	}
 
+
+	/// <summary> Calls Defaults(true, true); for easy use from console. </summary>
+	public static void Defaults() { Defaults(true, true); }
+
 	/// <summary>
 	/// Deletes the config.cfg and recreates it using the settings specified in <see cref="persistent"/>.
 	/// </summary>
 	/// <param name="resetBinds">Optional boolean specifying whether to wipe all binds and axis mappings before restoring persistent settings.</param>
 	/// <param name="resetAliases">Optional boolean specifying whether to wipe all aliases before restoring persistent settings.</param>
-	public static void Defaults(bool resetBinds = true, bool resetAliases = true) {
+	public static void Defaults(bool resetBinds, bool resetAliases) {
 		if (resetAliases) {
 			aliases = new Dictionary<string, string>();
 		}
@@ -1035,7 +1039,11 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			Unbind(unbindMe);
 		} catch (ArgumentException) {
 			try {
-				Input.GetAxisRaw(st); // Will throw exception if invalid
+				if (name[name.Length - 1] == '-' || name[name.Length - 1] == '+') {
+					Input.GetAxisRaw(name.Substring(0, name.Length - 1)); // Will throw exception if axis doesn't exist
+				} else {
+					Input.GetAxisRaw(name); // Will throw exception if axis doesn't exist
+				}
 				if (axisMappings.ContainsKey(name)) {
 					axisMappings.Remove(name);
 				} else {
@@ -1234,7 +1242,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="alternate">Alternate command to look up (as an axis).</param>
 	/// <returns>String representation of the key bound to command.</returns>
 	public static string GetBindForCommand(string command, string alternate = null) {
-		string bind = "UNBOUND";
+		string bind = "NOT BOUND";
 		if (alternate == null) { alternate = command; }
 
 		var keys = GetKeysByCommand(command);
