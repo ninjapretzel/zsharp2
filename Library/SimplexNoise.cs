@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 [System.Serializable]
@@ -240,22 +240,22 @@ public class SimplexNoise {
 	
 	//2D simplex noise function
 	//Uses a triangle grid.
+	const float F2 = .5f * (SQRT3 - 1.0f);
+	const float G2 = (3.0f - SQRT3) / 6.0f;
 	public float RawNoise2D(Vector2 position) {
 		//Noise contributions from the corners
 		float x = position.x;
 		float y = position.y;
 		
-		float n0, n1, n2;
+		float n0 = 0, n1 = 0, n2 = 0;
 		
 		//Skew the intput space to determine what simplex cell it is in.
-		float F2 = .5f * (SQRT3 - 1.0f);
 		//Hairy factor for 2d
 		float s = (x + y) * F2;
 		
 		int i = FastFloor(x + s);
 		int j = FastFloor(y + s);
 		
-		float G2 = (3.0f - SQRT3) / 6.0f;
 		float t = (i + j) * G2;
 		//Unskew back into normal space
 		float X0 = i-t;
@@ -288,22 +288,19 @@ public class SimplexNoise {
 		
 		// Calculate the contribution from the three corners
 		float t0 = 0.5f - x0*x0-y0*y0;
-		if(t0<0) n0 = 0.0f;
-		else {
+		if(t0>0) {
 			t0 *= t0;
 			n0 = t0 * t0 * Dot(grad3[gi0], x0, y0); // (x,y) of grad3 used for 2D gradient
 		}
 
 		float t1 = 0.5f - x1*x1-y1*y1;
-		if(t1<0) n1 = 0.0f;
-		else {
+		if(t1>0) {
 			t1 *= t1;
 			n1 = t1 * t1 * Dot(grad3[gi1], x1, y1);
 		}
 
 		float t2 = 0.5f - x2*x2-y2*y2;
-		if(t2<0) n2 = 0.0f;
-		else {
+		if(t2>0) {
 			t2 *= t2;
 			n2 = t2 * t2 * Dot(grad3[gi2], x2, y2);
 		}
@@ -313,15 +310,11 @@ public class SimplexNoise {
 		return 70.0f * (n0 + n1 + n2);
 	}
 	
-	int FastFloor(float f) {
-		return f > 0 ? (int) f : (int) f - 1;
-	}
+	int FastFloor(float f) { return f > 0 ? (int) f : (int) f - 1; }
 	
 	//Dot with some gradient.
 	//In this case, it's using the x and y values of the 3d gradient.
-	float Dot(int[] g, float x, float y) {
-		return g[0]*x + g[1] * y;
-	}
+	float Dot(int[] g, float x, float y) { return g[0]*x + g[1] * y; }
 }
 
 

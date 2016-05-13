@@ -4,7 +4,7 @@
 		"ForwardLights":["1","2","4","8","16","32","64"],
 		"Particles":"4step",
 		"MSAA":["1x","2x","4x","8x"],
-		"FXAA":["OFF","V1A","V1B","V2","v3"],
+		"FXAA":["OFF","V1A","V1B","V2","V3"],
 		"Bloom":"tog",
 		"AmbientOcclusion":"tog",
 		"DepthOfField":"tog",
