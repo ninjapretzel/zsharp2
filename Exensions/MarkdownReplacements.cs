@@ -6,6 +6,41 @@ using System.Collections.Generic;
 
 public static class MarkdownReplacements {
 	
+	static Regex glyphs = new Regex( @"\{\w+\}" );
+	public static string ReplaceGlyphs(this string markdown) {
+		StringBuilder str = markdown;
+
+		int pos = 0;
+		while (glyphs.IsMatch(str, pos)) {
+			var match = glyphs.Match(str, pos);
+			string val = match.Value.Substring(1, match.Length-2);
+			string sheet = null;
+			string sprite = null;
+			if (val.IndexOf("_") >= 0) {
+				sheet = val.Substring(0, val.IndexOf("_"));
+				sprite = val.Substring(val.IndexOf("_")+1);
+
+			} else {
+				sprite = val;
+			}
+
+			StringBuilder rep = "<sprite";
+			if (sheet != null) { rep += "=\"" + sheet + "\""; }
+			if (sprite != null) { rep += " name=\"" + sprite + "\""; }
+			rep += ">";
+
+			if (rep.Length > 8) {
+				str.Replace(match.Value, rep);
+				pos = match.Index + rep.Length;
+			} else {
+				pos = match.Index + match.Length;
+			}
+
+		}
+
+		return str;
+	}
+
 	static Regex bolds = new Regex( @"\*\*\ *?\S+?[\S \t]*?\*\*" );
 	static Regex italics = new Regex( @"\*\ *?\S+?[\S \t]*?\*" );
 	
