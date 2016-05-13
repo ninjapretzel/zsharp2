@@ -93,12 +93,16 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	}
 
+	/// <summary> Easy access to full defaults behaviour from console </summary>
+	public static void Defaults() { Defaults(true, true); }
+
+
 	/// <summary>
 	/// Deletes the config.cfg and recreates it using the settings specified in <see cref="persistent"/>.
 	/// </summary>
 	/// <param name="resetBinds">Optional boolean specifying whether to wipe all binds and axis mappings before restoring persistent settings.</param>
 	/// <param name="resetAliases">Optional boolean specifying whether to wipe all aliases before restoring persistent settings.</param>
-	public static void Defaults(bool resetBinds = true, bool resetAliases = true) {
+	public static void Defaults(bool resetBinds, bool resetAliases) {
 		if (resetAliases) {
 			aliases = new Dictionary<string, string>();
 		}
@@ -779,6 +783,18 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		AliasButton(thing, location);
 		Bind(key, "+" + thing);
 	}
+
+	/// <summary>
+	/// Creates + and - aliases for <paramref name="thing"/> which call "ControlStates.Set [thing] [value]" with value being "true" or "false" depending, and binds it to <paramref name="key"/>.
+	/// </summary>
+	/// <param name="key">Key to bind</param>
+	/// <param name="thing">ControlState to set</param>
+	public static void BindButton(string key, string thing) {
+		Alias("+" + thing, "ControlStates.Set " + thing + " true");
+		Alias("-" + thing, "ControlStates.Set " + thing + " false");
+		Bind(key, "+"+thing);
+	}
+
 
 	/// <summary>
 	/// Parses <paramref name="st"/> into an alias. If <paramref name="st"/> is empty, runs <see cref="Alias"/>. If it has one
