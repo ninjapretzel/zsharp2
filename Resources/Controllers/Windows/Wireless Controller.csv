@@ -1,4 +1,5 @@
 #unity identifier,control name. Controller has same name thru Bluetooth as wired (can't tell them apart), but axes are different. Axis 8 is DPad up/down on Bluetooth.
+Sheet,ps4
 Button0,Square
 Button1,Cross
 Button2,Circle
@@ -29,5 +30,5 @@ Axis6-,DPad Left
 Axis6+,DPad Right
 Axis7-,DPad Down
 Axis7+,DPad Up
-Axis8-,Wireless DPad Down
-Axis8+,Wireless DPad Up
+Axis8-,DPad Down
+Axis8+,DPad Up
