@@ -3,7 +3,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System;
+#if TMPRO
+using TMPro;
 
+public partial class GSS {
+	static Dictionary<TextAnchor, TextAlignmentOptions> alignmentMappings = new Dictionary<TextAnchor,TextAlignmentOptions>() {
+		{TextAnchor.UpperLeft,		TextAlignmentOptions.TopLeft},
+		{TextAnchor.UpperCenter,	TextAlignmentOptions.Top},
+		{TextAnchor.UpperRight,		TextAlignmentOptions.TopRight},
+		{TextAnchor.MiddleLeft,		TextAlignmentOptions.Left},
+		{TextAnchor.MiddleCenter,	TextAlignmentOptions.Center},
+		{TextAnchor.MiddleRight,	TextAlignmentOptions.Right},
+		{TextAnchor.LowerLeft,		TextAlignmentOptions.BottomLeft},
+		{TextAnchor.LowerCenter,	TextAlignmentOptions.Bottom},
+		{TextAnchor.LowerRight,		TextAlignmentOptions.BottomRight},
+	};
+
+	static Dictionary<FontStyle, FontStyles> styleMappings = new Dictionary<FontStyle,FontStyles>() {
+		{FontStyle.Normal,			FontStyles.Normal},
+		{FontStyle.Bold,			FontStyles.Bold},
+		{FontStyle.Italic,			FontStyles.Italic},
+		{FontStyle.BoldAndItalic,	FontStyles.Bold & FontStyles.Italic},
+	};
+
+	static TMP_FontAsset GetTMPFontAsset(string fontName) {
+		var check = Resources.Load<TMP_FontAsset>(fontName);
+		if (check != null) { return check; }
+		return Resources.Load<TMP_FontAsset>(fontName + " SDF");
+	}
+}
+#endif
 
 public partial class GSS : MonoBehaviour {
 	public string tagClass = "";
@@ -144,8 +173,8 @@ public partial class GSS : MonoBehaviour {
 		if (restyleEverything) {
 			curTag = "";
 			curStyle = "";
-			//Debug.Log("EVERYTHING IS GETTING RESTYLED");
 		} 
+
 		if (lastHeight != Screen.height || lastWidth != Screen.width) {
 			curTag = "";
 			curStyle = "";
@@ -257,6 +286,11 @@ public partial class GSS : MonoBehaviour {
 		Button btn = c.GetComponent<Button>();
 		ScrollRect scr = c.GetComponent<ScrollRect>();
 		InputField inf = c.GetComponent<InputField>();
+#if TMPRO
+		TextMeshProUGUI tmp = c.GetComponent<TextMeshProUGUI>();
+
+		if (tmp != null) { ApplyTextProStyle(tmp, style); }
+#endif
 
 		if (txt != null) { ApplyTextStyle(txt, style); }
 		if (img != null) { ApplyImageStyle(img, style); }
@@ -295,7 +329,6 @@ public partial class GSS : MonoBehaviour {
 	}
 
 
-
 	static void ApplyButtonStyle(Button btn, JsonObject style) {
 		ApplySelectableStyle(btn, style);
 	}
@@ -309,6 +342,69 @@ public partial class GSS : MonoBehaviour {
 		if (style.ContainsKey("selectionColor")) { inf.selectionColor = GetColor(style, "selectionColor"); }
 
 	}
+
+#if TMPRO
+	static void ApplyTextProStyle(TextMeshProUGUI tmp, JsonObject style) {
+		string language = Localization.language.ToString();
+
+		if (style.ContainsKey("font")) {
+			if (style["font"].isString) { tmp.font = GetTMPFontAsset(style.Get<string>("font")); }
+			if (style["font"].isObject) {
+				JsonObject languageFonts = style.Get<JsonObject>("font");
+				if (languageFonts.ContainsKey(language)) {
+					tmp.font = GetTMPFontAsset(languageFonts.Get<string>(language));
+				} else {
+					tmp.font = GetTMPFontAsset(languageFonts.Get<string>("english"));
+				}
+			}
+		}
+		
+		if (style.ContainsKey("fontSize")) {
+			bool scale = style.Extract("sizeScale", true);
+			float screenScale = 1.0f * (scale ? scaleRatio : 1f);
+			float languageScale = 1.0f;
+			if (style.ContainsKey("fontScale")) {
+				if (style["fontScale"].isNumber) { languageScale = style.Get<float>("fontScale"); }
+				if (style["fontScale"].isObject) {
+					JsonObject languageScales = style.Get<JsonObject>("fontScale");
+					if (languageScales.ContainsKey(language)) {
+						languageScale = languageScales.Get<float>(language);
+					}
+				}
+			}
+
+
+			float fontSize = (style.Get<float>("fontSize")) * languageScale * screenScale;
+			tmp.fontSize = fontSize;
+		}
+
+		//Note: Rich text is forced on in TextMeshPro!
+		if (style.ContainsKey("fontStyle")) { 
+			var st = style.Get<FontStyle>("fontStyle");
+			tmp.fontStyle = styleMappings[st];
+		}
+
+		if (style.ContainsKey("alignment")) { 
+			var anchor = style.Get<TextAnchor>("alignment");
+			tmp.alignment = alignmentMappings[anchor];
+		}
+		if (style.ContainsKey("lineSpacing")) { tmp.lineSpacing = style.Get<float>("lineSpacing"); }
+		//Note: TextMeshPro has no 'alignByGeometry' property, and no equivlent options
+
+		//Note: TextMeshPro uses different settings for for horizontalOverflow or verticalOverflow
+		if (style.ContainsKey("verticalOverflow")) { 
+			var ver = style.Get<VerticalWrapMode>("verticalOverflow");
+			tmp.OverflowMode = (ver == VerticalWrapMode.Overflow) ? TextOverflowModes.Overflow : TextOverflowModes.Truncate;
+		}
+
+		if (style.ContainsKey("horizontalOverflow")) {
+			var hor = style.Get<HorizontalWrapMode>("horizontalOverflow");
+			tmp.enableWordWrapping = hor == HorizontalWrapMode.Wrap;
+		}
+
+
+	}
+#endif
 
 	static void ApplyTextStyle(Text txt, JsonObject style) {
 		string language = Localization.language.ToString();
