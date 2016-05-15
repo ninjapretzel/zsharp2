@@ -393,8 +393,8 @@ public class Joysticks : MonoBehaviour {
 		return thing;
 	}
 
-	public static void SetCurrentActionSet(string name) {
 #if UNITY_STANDALONE && LG_STEAM
+	public static void SetCurrentActionSet(string name) {
 		if (actionSetHandles.ContainsKey(name)) {
 			ControllerHandle_t handle;
 			if (SteamControllerConnected(out handle)) {
@@ -403,9 +403,8 @@ public class Joysticks : MonoBehaviour {
 		} else {
 			Debug.LogErrorFormat("No Steam Controller action set defined with name {0}", name);
 		}
-#endif
 	}
-
+	
 	public static ControllerActionSetHandle_t GetCurrentActionSet() {
 		ControllerHandle_t handle;
 		if (SteamControllerConnected(out handle)) {
@@ -414,7 +413,6 @@ public class Joysticks : MonoBehaviour {
 		return default(ControllerActionSetHandle_t);
 	}
 
-#if UNITY_STANDALONE && LG_STEAM
 	public static string GetSteamGlyph(ControllerActionSetHandle_t set, ControllerDigitalActionHandle_t action) {
 		ControllerHandle_t controllerHandle;
 		if (SteamControllerConnected(out controllerHandle)) {
