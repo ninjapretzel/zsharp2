@@ -1,18 +1,10 @@
 using UnityEngine;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEditor;
 
 public class ControlStatesInspector : EditorWindow {
 
-	private PropertyInfo[] controlStates;
-
 	public ControlStatesInspector() {
 		titleContent = new GUIContent("Control States");
-		controlStates = typeof(ControlStates).GetProperties();
-		controlStates = Array.FindAll<PropertyInfo>(controlStates, x => { return x.GetGetMethod() != null; });
 	}
 
 	[MenuItem ("Tools/ControlStates")]
@@ -24,8 +16,8 @@ public class ControlStatesInspector : EditorWindow {
 
 	public void OnGUI() {
 		EditorGUILayout.BeginVertical(); {
-			foreach (PropertyInfo pinfo in controlStates) {
-				EditorGUILayout.LabelField(pinfo.Name, pinfo.GetGetMethod().Invoke(null, new object[0]).ToString());
+			foreach (var kvp in ControlStates.GetAll()) {
+				EditorGUILayout.LabelField(kvp.Key, kvp.Value + " Down: " + ControlStates.GetDown(kvp.Key) + " Up: " + ControlStates.GetUp(kvp.Key), GUILayout.MinWidth(650));
 			}
 		}
 	}
