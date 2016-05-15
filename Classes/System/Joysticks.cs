@@ -43,12 +43,13 @@ public class Joysticks : MonoBehaviour {
 	private static List<string> joystickNames = new List<string>(8);
 	private static List<Dictionary<string, string>> controlNames = new List<Dictionary<string, string>>(8);
 
+	private static JsonObject glyphData;
+
 #if UNITY_STANDALONE && LG_STEAM
 	protected static Dictionary<string, ControllerAnalogActionHandle_t> analogActionHandles;
 	protected static Dictionary<string, ControllerDigitalActionHandle_t> digitalActionHandles;
 	protected static Dictionary<string, ControllerActionSetHandle_t> actionSetHandles;
 	private static Dictionary<EControllerActionOrigin, string> actionOriginGlyphNames;
-	private static JsonObject glyphData;
 #endif
 
 	public virtual void Awake() {
@@ -66,17 +67,18 @@ public class Joysticks : MonoBehaviour {
 			controlNames.Add(LoadControlNamesForJoystick(name));
 		}
 
+		JsonObject gameActions = Json.Parse(Resources.Load<TextAsset>("GameActions").text) as JsonObject;
+		glyphData = gameActions.Get<JsonObject>("GlyphSets");
+
 #if UNITY_STANDALONE && LG_STEAM
 
 		actionSetHandles = new Dictionary<string, ControllerActionSetHandle_t>();
 		analogActionHandles = new Dictionary<string, ControllerAnalogActionHandle_t>();
 		digitalActionHandles = new Dictionary<string, ControllerDigitalActionHandle_t>();
-
-		JsonObject steamActions = Json.Parse(Resources.Load<TextAsset>("SteamActions").text) as JsonObject;
-
-		JsonArray actionSets = steamActions.Get<JsonArray>("ActionSets");
-		JsonArray analogActions = steamActions.Get<JsonArray>("AnalogActions");
-		JsonArray digitalActions = steamActions.Get<JsonArray>("DigitalActions");
+		
+		JsonArray actionSets = gameActions.Get<JsonArray>("ActionSets");
+		JsonArray analogActions = gameActions.Get<JsonArray>("AnalogActions");
+		JsonArray digitalActions = gameActions.Get<JsonArray>("DigitalActions");
 		if (actionSets != null) {
 			foreach (var st in actionSets) {
 				actionSetHandles.Add(st.stringVal, SteamController.GetActionSetHandle(st.stringVal));
@@ -92,8 +94,6 @@ public class Joysticks : MonoBehaviour {
 				digitalActionHandles.Add(st.stringVal, SteamController.GetDigitalActionHandle(st.stringVal));
 			}
 		}
-
-		glyphData = steamActions.Get<JsonObject>("GlyphSets");
 
 		actionOriginGlyphNames = new Dictionary<EControllerActionOrigin, string>() {
 			{ EControllerActionOrigin.k_EControllerActionOrigin_A, "steam_button_a" },
@@ -295,7 +295,7 @@ public class Joysticks : MonoBehaviour {
 	/// Gets the glyph replacement for the controls bound to a controller, or a human-readable string
 	/// of the controls otherwise.
 	/// </summary>
-	/// <param name="thing">The control to get a glyph for. Defined in SteamActions.json.</param>
+	/// <param name="thing">The control to get a glyph for. Defined in GameActions.json.</param>
 	/// <returns>The name of the glyph to use in place of this control (in the format "{glyphname}"),
 	/// or if no glyph replacement is available, a human-readable string of the relevant controls.</returns>
 	public static string Glyph(string thing) {
