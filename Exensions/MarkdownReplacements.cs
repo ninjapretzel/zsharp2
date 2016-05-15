@@ -13,12 +13,12 @@ public static class MarkdownReplacements {
 		int pos = 0;
 		while (glyphs.IsMatch(str, pos)) {
 			var match = glyphs.Match(str, pos);
-			string val = match.Value.Substring(1, match.Length-2);
+			string val = match.Value.Substring(1, match.Length - 2);
 			string sheet = null;
 			string sprite = null;
 			if (val.IndexOf("_") >= 0) {
 				sheet = val.Substring(0, val.IndexOf("_"));
-				sprite = val.Substring(val.IndexOf("_")+1);
+				sprite = val.Substring(val.IndexOf("_") + 1);
 
 			} else {
 				sprite = val;

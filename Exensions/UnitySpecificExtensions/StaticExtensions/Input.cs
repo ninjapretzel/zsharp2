@@ -96,6 +96,7 @@ public static class Input {
 		}
 	}
 	
+	public static bool mousePresent { get { return In.mousePresent; } }
 	
 	public static Vector3 screenMousePosition { 
 		get { return In.mousePosition; }

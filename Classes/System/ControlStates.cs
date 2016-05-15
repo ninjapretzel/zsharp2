@@ -27,6 +27,15 @@ public static class ControlStates {
 	/// <summary> Remove ControlState 'thing' from the dictionary </summary>
 	public static void Unset(string thing) { if (values.ContainsKey(thing)) { values.Remove(thing); } }
 
+	/// <summary>
+	/// Gets the current state of all values in a new <c>Dictionary</c>. This <c>Dictionary</c> is a copy of the values
+	/// so changes made to the dictionary will be lost.
+	/// </summary>
+	/// <returns>Current state of all values.</returns>
+	public static Dictionary<string, string> GetAll() {
+		return new Dictionary<string, string>(values);
+	}
+
 	/// <summary> Get the previous state of ControlState 'thing' </summary>
 	private static T GetPrevious<T>(string thing) { return GetInternal<T>(thing, previous); }
 

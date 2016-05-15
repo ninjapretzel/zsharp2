@@ -611,6 +611,9 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <returns><c>string</c> representation of <paramref name="obj"/>.</returns>
 	public static string ParseObjectIntoString(object obj) {
 		//Type type = obj.GetType();
+		if (obj == null) {
+			return "null";
+		}
 		if (obj is ICollection) {
 			StringBuilder sb = new StringBuilder();
 			sb.Append(obj.ToString())
@@ -1257,13 +1260,13 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		string bind = "NOT BOUND";
 		if (alternate == null) { alternate = command; }
 
-		var keys = GetKeysByCommand(command);
-		if (keys.Count > 0) {
-			bind = Joysticks.GetControlName(keys[0].ToString());
+		var axis = GetAxesByCommand(alternate);
+		if (axis.Count > 0) {
+			bind = axis[0];
 		} else {
-			var axis = GetAxesByCommand(alternate);
-			if (axis.Count > 0) {
-				bind = Joysticks.GetControlName(axis[0]);
+			var keys = GetKeysByCommand(command);
+			if (keys.Count > 0) {
+				bind = keys[0].ToString();
 			}
 		}
 
