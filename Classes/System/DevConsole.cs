@@ -788,6 +788,18 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	}
 
 	/// <summary>
+	/// Creates + and - aliases for <paramref name="thing"/> which call "ControlStates.Set [thing] [value]" with value being "true" or "false" depending, and binds it to <paramref name="key"/>.
+	/// </summary>
+	/// <param name="key">Key to bind</param>
+	/// <param name="thing">ControlState to set</param>
+	public static void BindButton(string key, string thing) {
+		Alias("+" + thing, "ControlStates.Set " + thing + " true");
+		Alias("-" + thing, "ControlStates.Set " + thing + " false");
+		Bind(key, "+"+thing);
+	}
+
+
+	/// <summary>
 	/// Parses <paramref name="st"/> into an alias. If <paramref name="st"/> is empty, runs <see cref="Alias"/>. If it has one
 	/// parameter, echoes what the alias with that parameter as its name does. If it has two parameters, aliases the first parameter
 	/// to execute the rest of the string.
