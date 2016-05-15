@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
-#if UNITY_STANDALONE
+#if UNITY_STANDALONE && LG_STEAM
 using Steamworks;
 #endif
 
@@ -43,7 +43,7 @@ public class Joysticks : MonoBehaviour {
 	private static List<string> joystickNames = new List<string>(8);
 	private static List<Dictionary<string, string>> controlNames = new List<Dictionary<string, string>>(8);
 
-#if UNITY_STANDALONE
+#if UNITY_STANDALONE && LG_STEAM
 	protected static Dictionary<string, ControllerAnalogActionHandle_t> analogActionHandles;
 	protected static Dictionary<string, ControllerDigitalActionHandle_t> digitalActionHandles;
 	protected static Dictionary<string, ControllerActionSetHandle_t> actionSetHandles;
@@ -66,7 +66,7 @@ public class Joysticks : MonoBehaviour {
 			controlNames.Add(LoadControlNamesForJoystick(name));
 		}
 
-#if UNITY_STANDALONE
+#if UNITY_STANDALONE && LG_STEAM
 
 		actionSetHandles = new Dictionary<string, ControllerActionSetHandle_t>();
 		analogActionHandles = new Dictionary<string, ControllerAnalogActionHandle_t>();
@@ -302,7 +302,7 @@ public class Joysticks : MonoBehaviour {
 		if (glyphData != null) {
 			JsonObject glyph = glyphData.Get<JsonObject>(thing);
 			if (glyph != null) {
-#if UNITY_STANDALONE
+#if UNITY_STANDALONE && LG_STEAM
 				string steamAction = glyph.Get<string>("steam_action");
 				if (analogActionHandles.ContainsKey(steamAction)) {
 					string steamGlyph = GetSteamGlyph(GetCurrentActionSet(), analogActionHandles[steamAction]);
@@ -394,7 +394,7 @@ public class Joysticks : MonoBehaviour {
 	}
 
 	public static void SetCurrentActionSet(string name) {
-#if UNITY_STANDALONE
+#if UNITY_STANDALONE && LG_STEAM
 		if (actionSetHandles.ContainsKey(name)) {
 			ControllerHandle_t handle;
 			if (SteamControllerConnected(out handle)) {
@@ -414,7 +414,7 @@ public class Joysticks : MonoBehaviour {
 		return default(ControllerActionSetHandle_t);
 	}
 
-#if UNITY_STANDALONE
+#if UNITY_STANDALONE && LG_STEAM
 	public static string GetSteamGlyph(ControllerActionSetHandle_t set, ControllerDigitalActionHandle_t action) {
 		ControllerHandle_t controllerHandle;
 		if (SteamControllerConnected(out controllerHandle)) {
