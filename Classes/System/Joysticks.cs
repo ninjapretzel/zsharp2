@@ -284,8 +284,9 @@ public class Joysticks : MonoBehaviour {
 		name = name.RemoveAll(':');
 		string path = "Controllers/" + platformFolder + "/" + name;
 		// Terrible crazy icky hack to load configs specifically on Windows 10 (and up, presumably).
+		TextAsset ta = null;
 #if UNITY_STANDALONE_WIN
-		TextAsset ta = Resources.Load<TextAsset>(path + "_w10");
+		ta = Resources.Load<TextAsset>(path + "_w10");
 		if (ta == null || !SystemInfo.operatingSystem.StartsWith("Windows 1")) {
 #endif
 			ta = Resources.Load<TextAsset>(path);
