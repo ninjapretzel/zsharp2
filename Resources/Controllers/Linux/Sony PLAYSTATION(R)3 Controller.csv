@@ -4,12 +4,12 @@ Axis0-,Left Stick Left
 Axis0+,Left Stick Right
 Axis1-,Left Stick Up
 Axis1+,Left Stick Down
-Axis2+,L1
+Axis2+,L2
 Axis3-,Right Stick Left
 Axis3+,Right Stick Right
 Axis4-,Right Stick Up
 Axis4+,Right Stick Down
-Axis5+,R1
+Axis5+,R2
 Axis6-,DPad Left
 Axis6+,DPad Right
 Axis7-,DPad Up

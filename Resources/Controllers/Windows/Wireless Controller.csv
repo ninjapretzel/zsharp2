@@ -20,10 +20,8 @@ Axis1-,Left Stick Up
 Axis1+,Left Stick Down
 Axis2-,Right Stick Left
 Axis2+,Right Stick Right
-Axis3-,Left Trigger Up
-Axis3+,Left Trigger Down
-Axis4-,Right Trigger Up
-Axis4+,Right Trigger Down
+Axis3+,L2
+Axis4+,R2
 Axis5-,Right Stick Up
 Axis5+,Right Stick Down
 Axis6-,DPad Left

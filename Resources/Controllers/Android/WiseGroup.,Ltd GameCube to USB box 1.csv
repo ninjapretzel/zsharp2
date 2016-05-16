@@ -3,7 +3,7 @@ Button15,A Button
 Button16,B Button
 Button17,X Button
 Button18,Y Button
-Button19,Left Trigger Button
+Button19,IGNORE
 Axis0-,Control Stick Left
 Axis0+,Control Stick Right
 Axis1-,Control Stick Up

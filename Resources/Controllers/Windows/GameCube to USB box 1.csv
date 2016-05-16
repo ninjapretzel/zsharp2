@@ -3,8 +3,8 @@ Button0,A Button
 Button1,B Button
 Button2,X Button
 Button3,Y Button
-Button4,Left Trigger Button
-Button5,Right Trigger Button
+Button4,IGNORE
+Button5,IGNORE
 Button6,Z Button
 Button7,Start Button
 Button8,DPad Left

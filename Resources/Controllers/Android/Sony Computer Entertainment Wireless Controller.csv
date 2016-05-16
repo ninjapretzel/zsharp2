@@ -13,15 +13,13 @@ Button13,Circle
 Button14,R1
 Button11,Left Stick Button
 Button10,Right Stick Button
-Button12,Playstation Button
+Button12,PlayStation Button
 Axis0-,Left Stick Left
 Axis0+,Left Stick Right
 Axis1-,Left Stick Up
 Axis1+,Left Stick Down
-Axis2-,Left Trigger Up
-Axis2+,Left Trigger Down
-Axis3-,Right Trigger Up
-Axis3+,Right Trigger Down
+Axis2+,L2
+Axis3+,R2
 Axis4-,DPad Left
 Axis4+,DPad Right
 Axis5-,DPad Up
