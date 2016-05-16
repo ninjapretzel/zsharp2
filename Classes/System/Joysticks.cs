@@ -283,7 +283,15 @@ public class Joysticks : MonoBehaviour {
 		Dictionary<string, string> controlMap = null;
 		name = name.RemoveAll(':');
 		string path = "Controllers/" + platformFolder + "/" + name;
-		TextAsset ta = Resources.Load<TextAsset>(path);
+		// Terrible crazy icky hack to load configs specifically on Windows 10 (and up, presumably).
+#if UNITY_STANDALONE_WIN
+		TextAsset ta = Resources.Load<TextAsset>(path + "_w10");
+		if (ta == null || !SystemInfo.operatingSystem.StartsWith("Windows 1")) {
+#endif
+			ta = Resources.Load<TextAsset>(path);
+#if UNITY_STANDALONE_WIN
+		}
+#endif
 		if (ta != null) {
 			controlMap = new Dictionary<string, string>();
 			controlMap.LoadCSV(ta.text);
