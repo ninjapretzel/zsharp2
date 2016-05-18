@@ -629,19 +629,18 @@ public static class DataUtils {
 	}
 
 	/// <summary>
-	///  Attempts to parse the provided parameters into the specified type.
+	/// Attempts to parse the provided parameters into the specified type.
 	/// This is VERY strict. Exactly the right number of parameters must be passed and they must all parse properly.
 	/// The only thing that cannot possibly fail is String.
 	/// Returns: object reference of the result. Null if improper parameters.
 	/// </summary>
-	/// <param name="typeName">The type of the returned object</param>
-	/// <returns>The resulting object</returns>
-	public static object ParseParameterListIntoType(this string[] parameters, string typeName) {
-		Type targetType = ReflectionUtils.GetTypeInUnityAssemblies(typeName);
-		if (targetType != null && targetType.IsEnum && parameters.Length == 1) {
-			return Enum.Parse(targetType, parameters[0], true);
+	/// <param name="type"><c>System.Type</c> object representing the requested type.</param>
+	/// <returns>The resulting object.</returns>
+	public static object ParseParameterListIntoType(this string[] parameters, Type type) {
+		if (type.IsEnum && parameters.Length == 1) {
+			return Enum.Parse(type, parameters[0], true);
 		}
-		switch(typeName) {
+		switch (type.Name) {
 			case "Vector2": {
 				Vector2 targetV2;
 				PropertyInfo vector2ByName = typeof(Vector2).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
@@ -652,12 +651,12 @@ public static class DataUtils {
 					if (parameters.Length != 2) { return null; }
 					float x = 0.0f;
 					try {
-						x = System.Single.Parse(parameters[0]);
-					} catch (System.FormatException) { return null; }
+						x = float.Parse(parameters[0]);
+					} catch (FormatException) { return null; }
 					float y = 0.0f;
 					try {
-						y = System.Single.Parse(parameters[1]);
-					} catch (System.FormatException) { return null; }
+						y = float.Parse(parameters[1]);
+					} catch (FormatException) { return null; }
 					targetV2 = new Vector2(x, y);
 				}
 				return targetV2;
@@ -672,16 +671,16 @@ public static class DataUtils {
 					if (parameters.Length != 3) { return null; }
 					float x = 0.0f;
 					try {
-						x = System.Single.Parse(parameters[0]);
-					} catch (System.FormatException) { return null; }
+						x = float.Parse(parameters[0]);
+					} catch (FormatException) { return null; }
 					float y = 0.0f;
 					try {
-						y = System.Single.Parse(parameters[1]);
-					} catch (System.FormatException) { return null; }
+						y = float.Parse(parameters[1]);
+					} catch (FormatException) { return null; }
 					float z = 0.0f;
 					try {
-						z = System.Single.Parse(parameters[2]);
-					} catch (System.FormatException) { return null; }
+						z = float.Parse(parameters[2]);
+					} catch (FormatException) { return null; }
 					targetV3 = new Vector3(x, y, z);
 				}
 				return targetV3;
@@ -696,20 +695,20 @@ public static class DataUtils {
 					if (parameters.Length != 4) { return null; }
 					float r = 0.0f;
 					try {
-						r = System.Single.Parse(parameters[0]);
-					} catch (System.FormatException) { return null; }
+						r = float.Parse(parameters[0]);
+					} catch (FormatException) { return null; }
 					float g = 0.0f;
 					try {
-						g = System.Single.Parse(parameters[1]);
-					} catch (System.FormatException) { return null; }
+						g = float.Parse(parameters[1]);
+					} catch (FormatException) { return null; }
 					float b = 0.0f;
 					try {
-						b = System.Single.Parse(parameters[2]);
-					} catch (System.FormatException) { return null; }
+						b = float.Parse(parameters[2]);
+					} catch (FormatException) { return null; }
 					float a = 1.0f;
 					try {
-						a = System.Single.Parse(parameters[3]);
-					} catch (System.FormatException) { return null; }
+						a = float.Parse(parameters[3]);
+					} catch (FormatException) { return null; }
 					targetColor = new Color(r, g, b, a);
 				}
 				return targetColor;
@@ -719,20 +718,20 @@ public static class DataUtils {
 				Rect targetRect;
 				float l = 0.0f;
 				try {
-					l = System.Single.Parse(parameters[0]);
-				} catch (System.FormatException) { return null; }
+					l = float.Parse(parameters[0]);
+				} catch (FormatException) { return null; }
 				float t = 0.0f;
 				try {
-					t = System.Single.Parse(parameters[1]);
-				} catch (System.FormatException) { return null; }
+					t = float.Parse(parameters[1]);
+				} catch (FormatException) { return null; }
 				float w = 0.0f;
 				try {
-					w = System.Single.Parse(parameters[2]);
-				} catch (System.FormatException) { return null; }
+					w = float.Parse(parameters[2]);
+				} catch (FormatException) { return null; }
 				float h = 1.0f;
 				try {
-					h = System.Single.Parse(parameters[3]);
-				} catch (System.FormatException) { return null; }
+					h = float.Parse(parameters[3]);
+				} catch (FormatException) { return null; }
 				targetRect = new Rect(l, t, w, h);
 				return targetRect;
 			}
@@ -758,25 +757,25 @@ public static class DataUtils {
 				if (parameters.Length != 1) { return null; }
 				try {
 					// Use reflection to call the proper Parse method. Because I can.
-					return System.Type.GetType("System." + typeName).GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new System.Type[] { typeof(string) }, null).Invoke(null, new string[] { parameters[0] });
-				} catch (System.Reflection.TargetInvocationException) { // Is thrown in place of the Parse method's exceptions
+					return type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(string) }, null).Invoke(null, new string[] { parameters[0] });
+				} catch (TargetInvocationException) { // Is thrown in place of the Parse method's exceptions
 					return null;
 				}
 			}
 			case "Boolean": {
 				if (parameters.Length != 1) { return null; }
-				if (parameters[0] == "1" || parameters[0].Equals("on", System.StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("yes", System.StringComparison.InvariantCultureIgnoreCase)) {
+				if (parameters[0] == "1" || parameters[0].Equals("on", StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("yes", StringComparison.InvariantCultureIgnoreCase)) {
 					return true;
-				} else if (parameters[0] == "0" || parameters[0].Equals("off", System.StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("no", System.StringComparison.InvariantCultureIgnoreCase)) {
+				} else if (parameters[0] == "0" || parameters[0].Equals("off", StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("no", StringComparison.InvariantCultureIgnoreCase)) {
 					return false;
 				} else {
 					try {
-						float val = System.Single.Parse(parameters[0]);
+						float val = float.Parse(parameters[0]);
 						return val >= 0.5f;
-					} catch (System.FormatException) {
+					} catch (FormatException) {
 						try {
-							return System.Boolean.Parse(parameters[0]);
-						} catch (System.FormatException) {
+							return bool.Parse(parameters[0]);
+						} catch (FormatException) {
 							return null;
 						}
 					}
@@ -786,7 +785,23 @@ public static class DataUtils {
 				return null;
 			}
 		}
+	}
 
+	/// <summary>
+	///  Attempts to parse the provided parameters into the specified type.
+	/// This is VERY strict. Exactly the right number of parameters must be passed and they must all parse properly.
+	/// The only thing that cannot possibly fail is String.
+	/// Returns: object reference of the result. Null if improper parameters.
+	/// </summary>
+	/// <param name="typeName">The type of the requested object.</param>
+	/// <returns>The resulting object.</returns>
+	public static object ParseParameterListIntoType(this string[] parameters, string typeName) {
+		Type targetType = ReflectionUtils.GetTypeInUnityAssemblies(typeName);
+		if (targetType != null) {
+			return ParseParameterListIntoType(parameters, targetType);
+		} else {
+			return null;
+		}
 	}
 	
 	#if !UNITY_WEBPLAYER

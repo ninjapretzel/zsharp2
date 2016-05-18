@@ -64,6 +64,13 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		}
 	}
 
+	/// <summary>A cache of commands that have been run that are NOT blacklisted.</summary>
+	private static HashSet<string> whiteListedCache = new HashSet<string>();
+	/// <summary>A cache of commands that have been run that are NOT marked inaccessible.</summary>
+	private static HashSet<MemberInfo> accessibleCache = new HashSet<MemberInfo>();
+	/// <summary>A cache of commands that have been run that are NOT marked cheats.</summary>
+	private static HashSet<MemberInfo> nonCheatCache = new HashSet<MemberInfo>();
+
 	/// <summary>User-definable autoexec path, pointing to a script that will automatically execute when the game is run.</summary>
 	public static string autoexecPath = "";
 
@@ -286,7 +293,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			Type targetClass = null;
 			if (indexOfDot > 0) {
 				targetClassName = command.Substring(0, indexOfDot);
-				targetMemberName = command.Substring(indexOfDot+1);
+				targetMemberName = command.Substring(indexOfDot + 1);
 				targetClass = ReflectionUtils.GetTypeInUnityAssemblies(targetClassName);
 			} else {
 				targetClass = typeof(DevConsole);
@@ -296,10 +303,10 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			if (targetClass != null) {
 				try {
 					if (!CallField(targetClass, targetMemberName, parameters)) {
-						if (!CallMethod(targetClass, targetMemberName, parameters)) {
-							if (!CallProperty(targetClass, targetMemberName, parameters)) {
+						if (!CallProperty(targetClass, targetMemberName, parameters)) {
+							if (!CallMethod(targetClass, targetMemberName, parameters)) {
 								if (!aliases.ContainsKey(command)) {
-									Echo("Unknown command: "+command);
+									Echo("Unknown command: " + command);
 								} else {
 									Execute(aliases[command] + " " + parameters);
 								}
@@ -337,17 +344,15 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			}
 		}
 		if (targetVar == null || !IsAccessible(targetVar)) { return false; } // Fail: Couldn't find field, or it's marked inaccessible
-		// If field is found, deal with it appropriately based on the parameters given
-		if (parameters == null || parameters.Length < 1) {
-			string output = GetFieldValue(targetInstance, targetVar);
-			if (output == null) { return false; } // Fail: Field is not of a supported type
-			Echo(varName + " is " + output);
-			return true; // Success: Value is printed when no parameters given
-		}
-		if (IsCheat(targetVar) && !cheats) {
+		if (!cheats && IsCheat(targetVar)) {
 			PrintCheatMessage(targetVar.Name);
 		} else {
-			if (!SetFieldValue(targetInstance, targetVar, parameters.SplitUnlessInContainer(' ', '\"'))) {
+			// If field is found, deal with it appropriately based on the parameters given
+			if (parameters == null || parameters.Length < 1) {
+				string output = GetFieldValue(targetInstance, targetVar);
+				Echo(varName + " is " + output);
+				return true; // Success: Value is printed when no parameters given
+			} else if (!SetFieldValue(targetInstance, targetVar, parameters.SplitUnlessInContainer(' ', '\"'))) {
 				Echo("Invalid " + targetVar.FieldType.Name + ": " + parameters);
 			}
 		}
@@ -373,7 +378,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="parameters">An array of strings to parse into a value to use for the field.</param>
 	/// <returns>Boolean value indicating whether the field was set successfully.</returns>
 	public static bool SetFieldValue(object instance, FieldInfo fieldInfo, string[] parameters) {
-		object result = parameters.ParseParameterListIntoType(fieldInfo.FieldType.Name);
+		object result = parameters.ParseParameterListIntoType(fieldInfo.FieldType);
 		if (result != null) {
 			fieldInfo.SetValue(instance, result);
 			return true;
@@ -400,17 +405,15 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			}
 		}
 		if (targetProperty == null || !IsAccessible(targetProperty)) { return false; } // Fail: Couldn't find property, or it's marked inaccessible
-		// If field is found, deal with it appropriately based on the parameters given
-		if (parameters == null || parameters.Length < 1) {
-			string output = GetPropertyValue(targetInstance, targetProperty);
-			if (output == null) { return false; } // Fail: Property is not of a supported type
-			Echo(propertyName + " is " + output);
-			return true; // Success: Value is printed when no parameters given
-		}
-		if (IsCheat(targetProperty) && !cheats) {
+		if (!cheats && IsCheat(targetProperty)) {
 			PrintCheatMessage(targetProperty.Name);
 		} else {
-			if (!SetPropertyValue(targetInstance, targetProperty, parameters.SplitUnlessInContainer(' ', '\"'))) {
+			// If field is found, deal with it appropriately based on the parameters given
+			if (parameters == null || parameters.Length < 1) {
+				string output = GetPropertyValue(targetInstance, targetProperty);
+				Echo(propertyName + " is " + output);
+				return true; // Success: Value is printed when no parameters given
+			} else if (!SetPropertyValue(targetInstance, targetProperty, parameters.SplitUnlessInContainer(' ', '\"'))) {
 				Echo("Invalid " + targetProperty.PropertyType.Name + ": " + parameters);
 			}
 		}
@@ -439,12 +442,11 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	public static bool SetPropertyValue(object instance, PropertyInfo propertyInfo, string[] parameters) {
 		if (propertyInfo.GetSetMethod() == null) {
 			string output = GetPropertyValue(instance, propertyInfo);
-			if (output == null) { return false; } // Fail: Property is not of a supported type
 			Echo(propertyInfo.Name + " is read-only!");
 			Echo(propertyInfo.Name + " is " + output);
 			return true; // Success: Value is printed when property is read-only
 		}
-		object result = parameters.ParseParameterListIntoType(propertyInfo.PropertyType.Name);
+		object result = parameters.ParseParameterListIntoType(propertyInfo.PropertyType);
 		if (result != null) {
 			propertyInfo.SetValue(instance, result, null);
 			return true;
@@ -470,23 +472,24 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			targetInstancedMethods = targetClass.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy);
 		}
 		if (parameters != null && parameters.Length != 0) {
+			string[] parameterList = parameters.SplitUnlessInContainer(' ', '\"');
 			// Try to find a static method matching name and parameters
-			if (CallMethodMatchingParameters(null, methodName, targetMethods, parameters.SplitUnlessInContainer(' ', '\"'))) {
+			if (CallMethodMatchingParameters(null, methodName, targetMethods, parameterList)) {
 				return true;
 			}
 			// Try to find an instanced method matching name and parameters if a main object to invoke on exists
 			if (main != null) {
-				if (CallMethodMatchingParameters(main, methodName, targetInstancedMethods, parameters.SplitUnlessInContainer(' ', '\"'))) {
+				if (CallMethodMatchingParameters(main, methodName, targetInstancedMethods, parameterList)) {
 					return true;
 				}
 			}
 			// Try to find a static method matching name with one string parameter
 			MethodInfo targetMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
 			if (targetMethod != null && IsAccessible(targetMethod)) {
-				if (IsCheat(targetMethod) && !cheats) {
+				if (!cheats && IsCheat(targetMethod)) {
 					PrintCheatMessage(targetMethod.Name);
 				} else {
-					InvokeAndEchoResult(targetMethod, null, new string[] { parameters.SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType("String").ToString() });
+					InvokeAndEchoResult(targetMethod, null, new string[] { parameterList.ParseParameterListIntoType(typeof(string)).ToString() });
 				}
 				return true;
 			}
@@ -494,10 +497,10 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			if (main != null) {
 				MethodInfo targetInstancedMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
 				if (targetInstancedMethod != null && IsAccessible(targetInstancedMethod)) {
-					if (IsCheat(targetInstancedMethod) && !cheats) {
+					if (!cheats && IsCheat(targetInstancedMethod)) {
 						PrintCheatMessage(targetInstancedMethod.Name);
 					} else {
-						InvokeAndEchoResult(targetInstancedMethod, main, new string[] { parameters.SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType("String").ToString() });
+						InvokeAndEchoResult(targetInstancedMethod, main, new string[] { parameterList.ParseParameterListIntoType(typeof(string)).ToString() });
 					}
 					return true;
 				}
@@ -506,7 +509,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		// Try to find a static parameterless method matching name
 		MethodInfo targetParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { }, null);
 		if (targetParameterlessMethod != null && IsAccessible(targetParameterlessMethod)) {
-			if (IsCheat(targetParameterlessMethod) && !cheats) {
+			if (!cheats && IsCheat(targetParameterlessMethod)) {
 				PrintCheatMessage(targetParameterlessMethod.Name);
 			} else {
 				InvokeAndEchoResult(targetParameterlessMethod, null, new object[] { });
@@ -517,7 +520,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		if (main != null) {
 			MethodInfo targetInstancedParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { }, null);
 			if (targetInstancedParameterlessMethod != null && IsAccessible(targetInstancedParameterlessMethod)) {
-				if (IsCheat(targetInstancedParameterlessMethod) && !cheats) {
+				if (!cheats && IsCheat(targetInstancedParameterlessMethod)) {
 					PrintCheatMessage(targetInstancedParameterlessMethod.Name);
 				} else {
 					InvokeAndEchoResult(targetInstancedParameterlessMethod, main, new object[] { });
@@ -552,21 +555,22 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	/// <summary>
 	/// Given a method with name <paramref name="methodName"/> and an array of <c>MethodInfo</c> objects, try to match the name and
-	/// parameter list provided and invoke the method on the given <paramref name="targetObject"\>, or invokes it statically if <paramref name="targetObject"/> is <c>null</c>.
+	/// parameter list provided and invoke the method on the given <paramref name="targetObject"/>, or invokes it statically if <paramref name="targetObject"/> is <c>null</c>.
 	/// </summary>
-	/// <param name="targetClass">The Type reference of the target class.</param>
-	/// <param name="methodName">The name of the method to find.</param>
-	/// <param name="parameters">String containing parameters to pass to the method.</param>
+	/// <param name="targetObject">The object on which to invoke the method. If <c>null</c>, method is static.</param>
+	/// <param name="methodName">The name of the method to invoke.</param>
+	/// <param name="targetMethods">Array of <c>MethodInfo</c> objects to search through.</param>
+	/// <param name="parameterList">List of parameters to attempt to parse and match to a method in <paramref name="targetMethods"/>.</param>
 	/// <returns>Boolean value indicating whether a suitable method was found and invoked.</returns>
 	public static bool CallMethodMatchingParameters(object targetObject, string methodName, MethodInfo[] targetMethods, string[] parameterList) {
 		foreach (MethodInfo targetMethod in targetMethods) {
 			if (targetMethod.Name != methodName || !IsAccessible(targetMethod)) { continue; }
-			if (IsCheat(targetMethod) && !cheats) {
+			if (!cheats && IsCheat(targetMethod)) {
 				PrintCheatMessage(targetMethod.Name);
 			} else {
 				ParameterInfo[] parameterInfos = targetMethod.GetParameters();
 				if (parameterInfos.Length != parameterList.Length) { continue; }
-				if (parameterInfos[0].ParameterType.Name == "String" && parameterInfos.Length == 1) { continue; }
+				if (parameterInfos[0].ParameterType == typeof(string) && parameterInfos.Length == 1) { continue; }
 				object[] parsedParameters = new object[parameterInfos.Length];
 				bool failed = false;
 				for (int i = 0; i < parsedParameters.Length; ++i) {
@@ -575,7 +579,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 					// Class.MethodName "7" "1 0.4 0.2 1"
 					// which would get split into "7" and "1 0.4 0.2 1", and this method would try to find a method matching two parameters.
 					// If such a method is found, it would further split "1 0.4 0.2 1" into four separate strings and pass them to ParseParameterListIntoType
-					parsedParameters[i] = parameterList[i].SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType(parameterInfos[i].ParameterType.Name);
+					parsedParameters[i] = parameterList[i].SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType(parameterInfos[i].ParameterType);
 					if (parsedParameters[i] == null) { failed = true; break; }
 				}
 				if (failed) { continue; }
@@ -585,9 +589,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		}
 		return false;
 	}
-
-	// 
-	// Echoes nothing if the method is void.
+	
 	/// <summary>
 	/// Invokes the target method on the target object using the parameters supplied, and echoes a nice string representation of the result to the console,
 	/// or does nothing with the return value if it returns <c>void</c>.
@@ -651,35 +653,42 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	}
 
 	/// <summary>
-	/// Gets whether the given <paramref name="member"/> does not have an <see cref="Inaccessible"/> attribute applied to it.
+	/// Gets whether the given <paramref name="member"/> does not have an <see cref="InaccessibleAttribute"/> attribute applied to it.
 	/// </summary>
 	/// <param name="member">The <c>MemberInfo</c> to check.</param>
-	/// <returns><c>true</c> if <paramref name="member"/> does NOT have an <see cref="Inaccessible"/> attribute.</returns>
+	/// <returns><c>true</c> if <paramref name="member"/> does NOT have an <see cref="InaccessibleAttribute"/> attribute.</returns>
 	public static bool IsAccessible(MemberInfo member) {
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
+		if (accessibleCache.Contains(member)) { return true; }
 		if (Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) != null || Attribute.GetCustomAttribute(member.DeclaringType, typeof(InaccessibleAttribute)) != null) {
-			Echo("Member "+member.Name+" is marked inaccessible and cannot be accessed normally!");
-		}
-		return true;
+			// If not accessible
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+			// Allow this to run in the editor anyway
+			Echo("Member " + member.Name + " is marked inaccessible and cannot be accessed normally!");
+			return true;
 #else
-		return Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) == null || Attribute.GetCustomAttribute(member.DeclaringType, typeof(InaccessibleAttribute)) != null;
+			return false;
 #endif
+		} else {
+			// If accessible
+			accessibleCache.Add(member);
+			return true;
+		}
 	}
 
 	/// <summary>
-	/// Gets whether the given <paramref name="member"/> has a <see cref="Cheat"/> attribute applied to it.
+	/// Gets whether the given <paramref name="member"/> has a <see cref="CheatAttribute"/> attribute applied to it.
 	/// </summary>
 	/// <param name="member">The <c>MemberInfo</c> to check.</param>
-	/// <returns><c>true</c> if <paramref name="member"/> has a <see cref="Cheat"/> attribute.</returns>
+	/// <returns><c>true</c> if <paramref name="member"/> has a <see cref="CheatAttribute"/> attribute.</returns>
 	public static bool IsCheat(MemberInfo member) {
-#if DEVELOPMENT_BUILD
+		if (nonCheatCache.Contains(member)) { return false; }
 		if (Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null || Attribute.GetCustomAttribute(member.DeclaringType, typeof(CheatAttribute)) != null) {
-			Echo("Member "+member.Name+" is marked a cheat and cannot be accessed normally without cheats!");
+			// If cheat
+			return true;
+		} else {
+			nonCheatCache.Add(member);
+			return false;
 		}
-		return false;
-#else
-		return Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null || Attribute.GetCustomAttribute(member.DeclaringType, typeof(CheatAttribute)) != null;
-#endif
 	}
 
 	/// <summary>
@@ -688,11 +697,13 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="command">Command to check.</param>
 	/// <returns>Boolean value indicating whether this command is blacklisted.</returns>
 	public static bool IsBlacklisted(string command) {
+		if (whiteListedCache.Contains(command)) { return false; }
 		foreach (string cls in classBlacklist) {
 			if ((command == cls) || (command.StartsWith(cls) && command[cls.Length] == '.')) {
 				return true;
 			}
 		}
+		whiteListedCache.Add(command);
 		return false;
 	}
 

@@ -348,7 +348,7 @@ public static class ReflectionUtils {
 			throw new ArgumentNullException();
 		}
 		foreach (string assembly in ReflectionUtils.assemblies) {
-			Type targetClass = GetType(targetTypeName + assembly);
+			Type targetClass = assembly.Length > 0 ? GetType(targetTypeName + assembly) : GetType(targetTypeName);
 			if (targetClass != null) {
 				return targetClass;
 			}
