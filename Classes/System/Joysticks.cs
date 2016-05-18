@@ -79,19 +79,21 @@ public class Joysticks : MonoBehaviour {
 		JsonArray actionSets = gameActions.Get<JsonArray>("ActionSets");
 		JsonArray analogActions = gameActions.Get<JsonArray>("AnalogActions");
 		JsonArray digitalActions = gameActions.Get<JsonArray>("DigitalActions");
-		if (actionSets != null) {
-			foreach (var st in actionSets) {
-				actionSetHandles.Add(st.stringVal, SteamController.GetActionSetHandle(st.stringVal));
+		if (SteamManager.Initialized) {
+			if (actionSets != null) {
+				foreach (var st in actionSets) {
+					actionSetHandles.Add(st.stringVal, SteamController.GetActionSetHandle(st.stringVal));
+				}
 			}
-		}
-		if (analogActions != null) {
-			foreach (var st in analogActions) {
-				analogActionHandles.Add(st.stringVal, SteamController.GetAnalogActionHandle(st.stringVal));
+			if (analogActions != null) {
+				foreach (var st in analogActions) {
+					analogActionHandles.Add(st.stringVal, SteamController.GetAnalogActionHandle(st.stringVal));
+				}
 			}
-		}
-		if (digitalActions != null) {
-			foreach (var st in digitalActions) {
-				digitalActionHandles.Add(st.stringVal, SteamController.GetDigitalActionHandle(st.stringVal));
+			if (digitalActions != null) {
+				foreach (var st in digitalActions) {
+					digitalActionHandles.Add(st.stringVal, SteamController.GetDigitalActionHandle(st.stringVal));
+				}
 			}
 		}
 
@@ -404,6 +406,9 @@ public class Joysticks : MonoBehaviour {
 
 #if UNITY_STANDALONE && LG_STEAM
 	public static void SetCurrentActionSet(string name) {
+		if (!SteamManager.Initialized) {
+			return;
+		}
 		if (actionSetHandles.ContainsKey(name)) {
 			ControllerHandle_t handle;
 			if (SteamControllerConnected(out handle)) {
