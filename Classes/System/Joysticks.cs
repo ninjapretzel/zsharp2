@@ -19,11 +19,11 @@ public delegate void JoystickEvent(int num, string name);
 public class Joysticks : MonoBehaviour {
 
 	public const string blacklistedName = "IGNORE";
-#if UNITY_STANDALONE_WIN
+#if (UNITY_STANDALONE_WIN && !UNITY_EDITOR) || UNITY_EDITOR_WIN
 	public const string platformFolder = "Windows";
-#elif UNITY_STANDALONE_OSX
+#elif (UNITY_STANDALONE_OSX && !UNITY_EDITOR) || UNITY_EDITOR_OSX
 	public const string platformFolder = "OSX";
-#elif UNITY_STANDALONE_LINUX
+#elif (UNITY_STANDALONE_LINUX && !UNITY_EDITOR) || UNITY_EDITOR_LINUX
 	public const string platformFolder = "Linux";
 #elif UNITY_ANDROID
 	public const string platformFolder = "Android";
