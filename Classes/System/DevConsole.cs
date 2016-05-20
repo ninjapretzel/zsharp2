@@ -979,11 +979,10 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 				} else {
 					Input.GetAxisRaw(name); // Will throw exception if axis doesn't exist
 				}
-				if (!axisMappings.ContainsKey(name)) {
-					axisMappings.Add(name, "");
-				} else {
-					axisMappings[name] = "";
+				if (axisMappings.ContainsKey(name)) {
+					axisMappings.Remove(name);
 				}
+				axisMappings[name] = "";
 				string[] cmdList = cmds.SplitUnlessInContainer(';', '\"');
 				foreach (string cmd in cmdList) {
 					axisMappings[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
@@ -1003,11 +1002,10 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="name">Key to bind.</param>
 	/// <param name="cmds">Commands to run when key <paramref name="name"/> is pressed.</param>
 	public static void Bind(KeyCode name, string cmds) {
-		if (!binds.ContainsKey(name)) {
-			binds.Add(name, "");
-		} else {
-			binds[name] = "";
+		if (binds.ContainsKey(name)) {
+			binds.Remove(name);
 		}
+		binds[name] = "";
 		string[] cmdList = cmds.SplitUnlessInContainer(';', '\"');
 		foreach (string cmd in cmdList) {
 			binds[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
@@ -1250,19 +1248,6 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	}
 
-	/// <summary> Get a list of ALL keys bound to a given command. </summary>
-	/// <param name="command">Command to look up.</param>
-	/// <returns>List containing all <c>KeyCode</c>s bound to <paramref name="command"/>.</returns>
-	public static List<KeyCode> GetKeysByCommand(string command) {
-		List<KeyCode> ret = new List<KeyCode>();
-		foreach (KeyValuePair<KeyCode, string> kvp in binds) {
-			if (command == kvp.Value) {
-				ret.Add(kvp.Key);
-			}
-		}
-		return ret;
-	}
-
 	/// <summary> Returns the primary bound thing for the given command. </summary>
 	/// <param name="command">Command name to look up (as a button).</param>
 	/// <param name="alternate">Alternate command to look up (as an axis).</param>
@@ -1282,6 +1267,35 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		}
 
 		return bind;
+	}
+
+	/// <summary> Returns all bound things for the given command, with axes listed first. </summary>
+	/// <param name="command">Command name to look up (as a button).</param>
+	/// <param name="alternate">Alternate command to look up (as an axis).</param>
+	/// <returns>String representation of the key bound to command.</returns>
+	public static List<string> GetBindsForCommand(string command, string alternate = null) {
+		if (alternate == null) { alternate = command; }
+
+		List<string> binds = new List<string>(GetAxesByCommand(alternate));
+		var keys = GetKeysByCommand(command);
+		foreach (KeyCode key in keys) {
+			binds.Add(key.ToString());
+		}
+		
+		return binds;
+	}
+
+	/// <summary> Get a list of ALL keys bound to a given command. </summary>
+	/// <param name="command">Command to look up.</param>
+	/// <returns>List containing all <c>KeyCode</c>s bound to <paramref name="command"/>.</returns>
+	public static List<KeyCode> GetKeysByCommand(string command) {
+		List<KeyCode> ret = new List<KeyCode>();
+		foreach (KeyValuePair<KeyCode, string> kvp in binds) {
+			if (command == kvp.Value) {
+				ret.Add(kvp.Key);
+			}
+		}
+		return ret;
 	}
 
 	/// <summary> Get a list of ALL axes mapped to a given command. </summary>
