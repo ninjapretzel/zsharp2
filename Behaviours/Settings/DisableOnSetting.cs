@@ -22,6 +22,7 @@ public class DisableOnSetting : MonoBehaviour {
 	public List<GameObject> toDisableObjects = new List<GameObject>();
 	
 	private bool lastEnabled = false;
+	bool checkEnabled = false;
 	
 	public bool isEnabled { 
 		get { 
@@ -49,10 +50,12 @@ public class DisableOnSetting : MonoBehaviour {
 				Disable();
 			}
 		}
+		checkEnabled = Settings.changed;
+
 	}
 	
 	void LateUpdate() {
-		lastEnabled = isEnabled;
+		if (checkEnabled) { lastEnabled = isEnabled; }
 	}
 	
 	void Enable() { SetEnabled(true); }
