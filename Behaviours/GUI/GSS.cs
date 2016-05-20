@@ -6,7 +6,9 @@ using System;
 #if TMPRO
 using TMPro;
 
+//Extensions to GSS for supporting TextMeshPro UI Text objects
 public partial class GSS {
+	/// <summary> Mappings of alignments from Unity's TextAnchor to TextMeshPro's TextAlignmentOptions </summary>
 	static Dictionary<TextAnchor, TextAlignmentOptions> alignmentMappings = new Dictionary<TextAnchor,TextAlignmentOptions>() {
 		{TextAnchor.UpperLeft,		TextAlignmentOptions.TopLeft},
 		{TextAnchor.UpperCenter,	TextAlignmentOptions.Top},
@@ -19,6 +21,7 @@ public partial class GSS {
 		{TextAnchor.LowerRight,		TextAlignmentOptions.BottomRight},
 	};
 
+	/// <summary> Mappings of styles from Unity's FontStyle to TextMeshPro's FontStyles</summary>
 	static Dictionary<FontStyle, FontStyles> styleMappings = new Dictionary<FontStyle,FontStyles>() {
 		{FontStyle.Normal,			FontStyles.Normal},
 		{FontStyle.Bold,			FontStyles.Bold},
@@ -26,10 +29,21 @@ public partial class GSS {
 		{FontStyle.BoldAndItalic,	FontStyles.Bold & FontStyles.Italic},
 	};
 
+	/// <summary> Resources paths to check when loading TextMeshPro Font assets/materials </summary>
+	static string[] fontAssetPaths = { "", "Font", "Fonts", "Fonts & Materials", };
+	/// <summary> Loads a TextMeshPro TMP_FontAsset object. Checks paths given in fontAssetPaths, and checks for fonts named (fontName + " SDF") as well </summary>
+	/// <param name="fontName"> Font name to check for </param>
+	/// <returns> Font named fontName or (fontName + " SDF") located in Resources, Resources/Font, Resources/Fonts, or Resources/Fonts & Materials </returns>
 	static TMP_FontAsset GetTMPFontAsset(string fontName) {
-		var check = Resources.Load<TMP_FontAsset>(fontName);
-		if (check != null) { return check; }
-		return Resources.Load<TMP_FontAsset>(fontName + " SDF");
+		TMP_FontAsset check;
+		foreach (var path in fontAssetPaths) {
+			var p = path + ((path.Length > 0) ? "/" : "");
+			check = Resources.Load<TMP_FontAsset>(p + fontName);
+			if (check != null) { return check; }
+			check = Resources.Load<TMP_FontAsset>(p + fontName + " SDF");
+			if (check != null) { return check; }
+		}
+		return null;
 	}
 }
 #endif
