@@ -228,10 +228,8 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		}
 
 		if (window.open) {
-#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_MAC
 			GUI.depth = -2000000000;
 			window.Draw();
-#endif
 		} else {
 			//ConsoleWindow.focusTheTextField = true;
 		}
