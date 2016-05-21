@@ -29,6 +29,7 @@ public class BMM {
 
 	///<summary> Get the (next) value, distributed with perlin noise </summary>
 	public float Perlin(float x, float y) {
+		if (!randomize) { return 1.0f; }
 		float f = PerlinNoise.GetValue(x, y);
 		return min + (max-min) * f; 
 	}

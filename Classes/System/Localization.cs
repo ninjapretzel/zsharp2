@@ -48,6 +48,20 @@ public static class Localization {
 
 		initialized = true;
 	}
+	public static string Localize_NOMARKUP(string name, params object[] args) {
+		if (name.Length == 0) { return name; }
+		if (_strs.ContainsKey(name)) {
+
+			JsonObject localized = _strs.Get<JsonObject>(name);
+			string st = localized.Get<string>(language.ToString());
+
+			if (!string.IsNullOrEmpty(st)) {
+				return string.Format(st.Replace("\\n", "\n"), args);
+			}
+
+		}
+		return name;
+	}
 
 	public static string Localize(string name, params object[] args) {
 		if (name.Length == 0) { return name; }
