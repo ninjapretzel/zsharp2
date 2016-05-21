@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ public class ModalDialog : MonoBehaviour {
 
 	public Text mainTextBox;
 
+	public GameObject defaultButton;
+
 	private Action onEscapeBackup;
 
 	public void Start() {
@@ -17,6 +20,9 @@ public class ModalDialog : MonoBehaviour {
 		onEscapeBackup = UGUIRoot.onEscape;
 		UGUIRoot.onEscape = () => { };
 
+		if (defaultButton != null) {
+			EventSystem.current.SetSelectedGameObject(defaultButton);
+		}
 	}
 
 	public void OnModalButtonClicked(string choice) {
