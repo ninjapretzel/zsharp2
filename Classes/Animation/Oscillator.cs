@@ -48,6 +48,14 @@ public class Oscillator {
 		maxTime = time;
 		curTime = start;
 	}
+
+	/// <summary> Set the current position of this oscillator </summary>
+	/// <param name="time">Time to set to. Will be clamped to [0...1] and scaled</param>
+	/// <param name="up">Is the oscillator rising (true) or falling (false)?</param>
+	public void SetTime(float time, bool up = false) {
+		curTime = time;
+		this.up = up;
+	}
 	
 	/// <summary> Update the oscillator and get the next value. </summary>
 	public float Update() {

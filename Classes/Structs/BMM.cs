@@ -4,6 +4,17 @@ using System.Collections;
 ///<summary> Stands for 'bool min max', stores a bool and a range. Used for randomizations. </summary>
 [System.Serializable]
 public class BMM {
+
+	static PerlinNoise noise;
+	public static bool init = Init();
+	public static bool Init() {
+		noise = new PerlinNoise();
+		noise.freqBase = 31.337f;
+		noise.octaves = 1;
+		noise.persistance = 1f;
+		return true;
+	}
+
 	///<summary> Randomize this field? </summary>
 	public bool randomize = false;
 	///<summary> Lowest possible value. </summary>
@@ -30,7 +41,7 @@ public class BMM {
 	///<summary> Get the (next) value, distributed with perlin noise </summary>
 	public float Perlin(float x, float y) {
 		if (!randomize) { return 1.0f; }
-		float f = PerlinNoise.GetValue(x, y);
+		float f = noise.Get(x, y);
 		return min + (max-min) * f; 
 	}
 
