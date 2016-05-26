@@ -4,6 +4,7 @@ using System.Collections;
 public class HoverEntropy : MonoBehaviour {
 	public static int seed = 123919541;
 	public BMM time = new BMM();
+	public BMM curTime = new BMM(false, 0, 1);
 	public BMM scale = new BMM();
 	public BMM offsetx = new BMM();
 	public BMM offsety = new BMM();
@@ -11,13 +12,9 @@ public class HoverEntropy : MonoBehaviour {
 	
 	public RandomType randomness = RandomType.Seeded;	
 	
-	public bool useSeed {
-		get { return randomness == RandomType.Seeded; }
-	}
+	public bool useSeed { get { return randomness == RandomType.Seeded; } }
+	public bool usePerlin { get { return randomness == RandomType.Perlin; } }
 	
-	public bool usePerlin {
-		get { return randomness == RandomType.Perlin; }
-	}
 	
 	
 	void Start() {
@@ -26,29 +23,33 @@ public class HoverEntropy : MonoBehaviour {
 		if (hover != null) {
 			if (usePerlin) {
 				int num = Mathf.Min(hover.offsets.Length, hover.oscis.Length);
-				Vector3 pos = transform.position;
-				pos.x *= .12112f;
-				pos.y *= .32131f;
-				pos.z *= .51241f;
+				Vector3 p = transform.position;
+				p.x *= .12112f;
+				p.y *= .32131f;
+				p.z *= .51241f;
 				
-				pos.x += pos.z;
-				pos.y += pos.z * .5f;
+				p.x += p.z;
+				p.y += p.z * .5f;
 				
 				
 				for (int i = 0; i < num; i++) {
+					var pos = p + new Vector3(i * .01337f, i * .31337f, i * .73313f);
+
 					Oscillator osci = hover.oscis[i];
+
+					if (curTime.randomize) { osci.SetTime(curTime.Perlin(pos.z, pos.x), PerlinNoise.GetValue(pos.y, pos.z) < .5f); }
 					
 					osci.maxTime *= time.Perlin(pos.x, pos.y);
 					osci.curTime = osci.maxTime * new BMM(true, 0, 1).Perlin(pos.z, pos.x);
-					float val = scale.Perlin(pos.x, pos.y);
+					float val = scale.Perlin(pos.y, pos.x);
 					osci.minVal *= val;
 					osci.maxVal *= val;
 					
 					Vector3 offset = hover.offsets[i];
-					Vector3 scales = new Vector3(offsetx.Perlin(pos.x, pos.y), offsety.Perlin(pos.x, pos.y), offsetz.Perlin(pos.x, pos.y));
+					Vector3 scales = new Vector3(offsetx.Perlin(pos.y, pos.z), offsety.Perlin(pos.z, pos.x), offsetz.Perlin(pos.z, pos.y));
 					hover.offsets[i] = Vector3.Scale(offset, scales);
 					
-					if (PerlinNoise.GetValue(pos.x, pos.y) < .5) { hover.offsets[i] *= -1; }
+					if (PerlinNoise.GetValue(pos.x, pos.z) < .5) { hover.offsets[i] *= -1; }
 					
 				}
 				
@@ -60,6 +61,8 @@ public class HoverEntropy : MonoBehaviour {
 				for (int i = 0; i < num; i++) {
 					Oscillator osci = hover.oscis[i];
 					
+					if (curTime.randomize) { osci.SetTime(curTime.value, curTime.value < .5f ); }
+
 					osci.maxTime *= time.value;
 					osci.curTime = osci.maxTime * Random.value;
 					float val = scale.value;
@@ -78,12 +81,5 @@ public class HoverEntropy : MonoBehaviour {
 		}
 		Destroy(this);
 	}
-	
-	
-	
-	//float Lerp(float min, float max, float f) { return min + (max-min) * f; }
-	//float Noise(float x, float y) { return PerlinNoise.GetValue(x, y); }
-	
-	
 	
 }
