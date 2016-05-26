@@ -3,10 +3,10 @@ using UnityEngine.UI;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-
+using UnityEngine.EventSystems;
 
 [ExecuteInEditMode]
-public class OptionSelecter : MonoBehaviour {
+public class OptionSelecter : Selectable {
 
 	public string settingName = "dummySetting";
 	
@@ -42,8 +42,9 @@ public class OptionSelecter : MonoBehaviour {
 	}
 #endif
 
-	protected virtual void Start() {
+	protected override void Start() {
 		if (Application.isPlaying) {
+			base.Start();
 			label = transform.Find("Label").GetComponent<Text>();
 			label.text = gameObject.name.FromFirst("OptionSelector");
 			display = transform.Find("Display").GetComponent<Text>();
@@ -110,5 +111,28 @@ public class OptionSelecter : MonoBehaviour {
 		Debug.Log(settingName + " set to " + currentOption);
 		
 	}
-	
+
+	public override void OnMove(AxisEventData eventData) {
+		if (!IsActive() || !IsInteractable()) {
+			base.OnMove(eventData);
+			return;
+		}
+		
+		switch (eventData.moveDir) {
+			case MoveDirection.Left: {
+				SelectPrev();
+				break;
+			}
+			case MoveDirection.Right: {
+				SelectNext();
+				break;
+			}
+			case MoveDirection.Up:
+			case MoveDirection.Down: {
+				base.OnMove(eventData);
+				break;
+			}
+		}
+	}
+
 }

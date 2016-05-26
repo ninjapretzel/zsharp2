@@ -69,7 +69,8 @@ public class ResolutionSelecter : OptionSelecter {
 		return res.width == Screen.currentResolution.width && res.height == Screen.currentResolution.height;
 	}
 
-	public void Awake() {
+	protected override void Awake() {
+		base.Awake();
 
 #if !UNITY_EDITOR
 
@@ -95,7 +96,9 @@ public class ResolutionSelecter : OptionSelecter {
 
 	}
 
-	void OnEnable() {
+	protected override void OnEnable() {
+		base.OnEnable();
+
 		width = Screen.width;
 		height = Screen.height;
 		fullScreen = Screen.fullScreen;
