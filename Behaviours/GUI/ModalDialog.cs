@@ -6,10 +6,16 @@ using System.Collections.Generic;
 
 public class ModalDialog : MonoBehaviour {
 
+	public static ModalDialog current = null;
+
 	public string prompt;
 	public Action<string> callback;
 
+#if TMPRO
+	public TMPro.TextMeshProUGUI mainTextBox;
+#else
 	public Text mainTextBox;
+#endif
 
 	public GameObject defaultButton;
 
@@ -19,10 +25,8 @@ public class ModalDialog : MonoBehaviour {
 		mainTextBox.text = prompt;
 		onEscapeBackup = UGUIRoot.onEscape;
 		UGUIRoot.onEscape = () => { };
-
-		if (defaultButton != null) {
-			EventSystem.current.SetSelectedGameObject(defaultButton);
-		}
+		
+		EventSystem.current.SetSelectedGameObject(defaultButton);
 	}
 
 	public void OnModalButtonClicked(string choice) {

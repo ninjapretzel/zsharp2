@@ -48,15 +48,19 @@ public class UGUIRoot : PageSwitcher {
 			onEscape();
 		}
 
-		if (_modalContainer != null) {
-			_modalContainer.transform.SetSiblingIndex(transform.childCount - 1);
-			if (_modalContainer.transform.childCount != 0) {
-				foreach (Transform child in _modalContainer.transform) {
-					child.gameObject.SetActive(false);
+		if (modalContainer != null) {
+			modalContainer.transform.SetSiblingIndex(transform.childCount - 1);
+			if (modalContainer.transform.childCount != 0) {
+				for (int i = 0; i < modalContainer.transform.childCount; ++i) {
+					if (i == 0) {
+						ModalDialog.current = modalContainer.transform.GetChild(i).GetComponent<ModalDialog>();
+						modalContainer.transform.GetChild(i).gameObject.SetActive(true);
+					} else {
+						modalContainer.transform.GetChild(i).gameObject.SetActive(false);
+					}
 				}
-				_modalContainer.transform.GetChild(0).gameObject.SetActive(true);
 			} else {
-				_modalContainer.SetActive(false);
+				modalContainer.SetActive(false);
 			}
 		}
 	}
@@ -68,23 +72,23 @@ public class UGUIRoot : PageSwitcher {
 	}
 
 	#region ModalMethods
-	public static void ShowAlertModal(Action<string> responseHandler, string prompt) {
+	public static ModalDialog ShowAlertModal(Action<string> responseHandler, string prompt) {
 		RectTransform modalTransform = Resources.Load<RectTransform>("AlertModal");
 		if (modalTransform == null) {
 			modalTransform = Resources.Load<RectTransform>("DefaultAlertModal");
 		}
-		ShowModal(modalTransform, responseHandler, prompt);
+		return ShowModal(modalTransform, responseHandler, prompt);
 	}
 
-	public static void ShowYesNoModal(Action<string> responseHandler, string prompt) {
+	public static ModalDialog ShowYesNoModal(Action<string> responseHandler, string prompt) {
 		RectTransform modalTransform = Resources.Load<RectTransform>("YesNoModal");
 		if (modalTransform == null) {
 			modalTransform = Resources.Load<RectTransform>("DefaultYesNoModal");
 		}
-		ShowModal(modalTransform, responseHandler, prompt);
+		return ShowModal(modalTransform, responseHandler, prompt);
 	}
 
-	public static void ShowModal(RectTransform modalPrefab, Action<string> responseHandler, string prompt) {
+	public static ModalDialog ShowModal(RectTransform modalPrefab, Action<string> responseHandler, string prompt) {
 		RectTransform modal = Instantiate(modalPrefab) as RectTransform;
 		modalContainer.SetActive(true);
 		modal.SetParent(modalContainer.transform);
@@ -93,7 +97,8 @@ public class UGUIRoot : PageSwitcher {
 		ModalDialog dialog = modal.GetComponent<ModalDialog>();
 		dialog.prompt = prompt;
 		dialog.callback = responseHandler;
-
+		modal.SetAsFirstSibling();
+		return dialog;
 	}
 	#endregion
 	
