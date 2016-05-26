@@ -67,9 +67,6 @@
 		},
 	},
 	"scrollView":{
-		"horizontal":false,
-		"vertical":true,
-		
 		"movementType":"Clamped",
 		"inertia":true,
 		"decelerationRate":0.135,
@@ -112,7 +109,7 @@
 	},
 	"interactable":{
 		"transition":"ColorTint",
-		"normalColor":"#888888FF",
+		"normalColor":"#606060FF",
 		"highlightedColor":"#FFFFFFFF",
 		"pressedColor":"#0056FFFF",
 		"disabledColor":"#FF000080",
