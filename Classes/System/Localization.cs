@@ -64,7 +64,7 @@ public static class Localization {
 	}
 
 	public static string Localize(string name, params object[] args) {
-		if (name.Length == 0) { return name; }
+		if (name == null || name.Length == 0) { return ""; }
 		if (_strs.ContainsKey(name)) {
 
 			JsonObject localized = _strs.Get<JsonObject>(name);
