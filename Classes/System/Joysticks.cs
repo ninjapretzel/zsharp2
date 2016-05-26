@@ -427,6 +427,15 @@ public class Joysticks : MonoBehaviour {
 		return default(ControllerActionSetHandle_t);
 	}
 
+	public static string GetSteamGlyph(string action) {
+		if (analogActionHandles.ContainsKey(action)) {
+			return GetSteamGlyph(GetCurrentActionSet(), analogActionHandles[action]);
+		} else if (digitalActionHandles.ContainsKey(action)) {
+			return GetSteamGlyph(GetCurrentActionSet(), digitalActionHandles[action]);
+		}
+		return null;
+	}
+
 	public static string GetSteamGlyph(ControllerActionSetHandle_t set, ControllerDigitalActionHandle_t action) {
 		ControllerHandle_t controllerHandle;
 		if (SteamControllerConnected(out controllerHandle)) {
