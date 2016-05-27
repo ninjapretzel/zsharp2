@@ -71,7 +71,7 @@ public static class ControlStates {
 	public static T Get<T>(string thing) { return GetInternal<T>(thing, values); }
 
 	/// <summary> Deadzone for treating axis as buttons</summary>
-	public static float deadzone = .25f;
+	public static float deadzone = .5f;
 
 	/// <summary> Internal Get function, used by Get and GetPrevious. </summary>
 	private static T GetInternal<T>(string thing, Dictionary<string, string> values) {
