@@ -5,7 +5,7 @@
 		{ "nameContains":"Scroll View",	"tagWith":"scrollView", },
 		{ "nameContains":"Header",		"tagWith":"header", },
 		{ "nameSuffix":"Panel",			"tagWith":"panel", },
-		{ "nameContains":"Modal",		"tagWith":"modal", },
+		{ "nameSuffix":"Modal",			"tagWith":"modal", },
 		{ "nameContains":"Toggle", 		"tagWith":"toggle", },
 		{ "nameSuffix":"Slider", 		"tagWith":"slider", },
 		{ "nameSuffix":"InputField", 	"tagWith":"inputField", },
