@@ -56,6 +56,7 @@ public class ResolutionSelecter : OptionSelecter {
 		height = Screen.height;
 		fullScreen = Screen.fullScreen;
 
+#if XtoJSON
 		var obj = new JsonObject();
 		obj["width"] = width;
 		obj["height"] = height;
@@ -63,6 +64,9 @@ public class ResolutionSelecter : OptionSelecter {
 		obj["borderless"] = borderless;
 
 		Settings.instance["resolution"] = obj;
+#else
+		Debug.LogWarning("Settings does not have fields for screen settings at the moment");
+#endif
 	}
 
 	public static bool IsCurrentResolution(Resolution res) {

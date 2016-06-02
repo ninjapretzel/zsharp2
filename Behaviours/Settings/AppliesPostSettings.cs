@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityStandardAssets.ImageEffects;
 
 public class AppliesPostSettings : MonoBehaviour {
-
+#if XtoJSON
 	static Dictionary<string, bool> settings = new Dictionary<string,bool>();
 	public static void Set(string key, bool val) { 
 		settings[key] = val; 
@@ -63,5 +63,5 @@ public class AppliesPostSettings : MonoBehaviour {
 			if (set.last != settings[set.setting]) { set.Toggle(); }
 		}
 	}
-	
+#endif
 }

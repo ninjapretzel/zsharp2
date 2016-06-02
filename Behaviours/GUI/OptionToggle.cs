@@ -17,11 +17,11 @@ public class OptionToggle : MonoBehaviour {
 		Settings.instance.Apply(settingName, value);
 	}
 #else
-	public static bool Get(string setting) {
+	public virtual bool Get() {
 		return false;
 	}
 
-	public static void Set(string setting, bool value) {
+	public virtual void Set(bool value) {
 
 	}
 #endif

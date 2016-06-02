@@ -276,6 +276,8 @@ public partial class Settings : JsonObject {
 #else 
 public partial class Settings {
 
+
+	public string language = "english";
 	public int qualityLevel = 3;
 	
 	public float musicVolume = 1;
