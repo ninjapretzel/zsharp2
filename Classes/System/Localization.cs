@@ -22,7 +22,7 @@ public static class Localization {
 	private static JsonObject _strs;
 
 	public static Language language = Language.english;
-	public static bool initialized = false;
+	public static bool initialized { get; private set; }
 
 	public static void Init() {
 		string text = Resources.Load<TextAsset>("strings").text.ConvertNewlines();
