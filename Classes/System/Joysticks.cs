@@ -27,6 +27,8 @@ public class Joysticks : MonoBehaviour {
 	public const string platformFolder = "Linux";
 #elif UNITY_ANDROID
 	public const string platformFolder = "Android";
+#elif UNITY_XBOXONE
+	public const string platformFolder = "XboxOne";
 #else
 	public const string platformFolder = "";
 #endif
@@ -46,10 +48,12 @@ public class Joysticks : MonoBehaviour {
 	private static JsonObject glyphData;
 
 #if UNITY_STANDALONE && LG_STEAM
-	protected static Dictionary<string, ControllerAnalogActionHandle_t> analogActionHandles;
-	protected static Dictionary<string, ControllerDigitalActionHandle_t> digitalActionHandles;
-	protected static Dictionary<string, ControllerActionSetHandle_t> actionSetHandles;
+	public static Dictionary<string, ControllerAnalogActionHandle_t> analogActionHandles;
+	public static Dictionary<string, ControllerDigitalActionHandle_t> digitalActionHandles;
+	public static Dictionary<string, ControllerActionSetHandle_t> actionSetHandles;
 	private static Dictionary<EControllerActionOrigin, string> actionOriginGlyphNames;
+
+	protected ulong lastControlSet = ulong.MaxValue;
 #endif
 
 	public virtual void Awake() {
@@ -287,12 +291,12 @@ public class Joysticks : MonoBehaviour {
 		string path = "Controllers/" + platformFolder + "/" + name;
 		// Terrible crazy icky hack to load configs specifically on Windows 10 (and up, presumably).
 		TextAsset ta = null;
-#if UNITY_STANDALONE_WIN
+#if (UNITY_STANDALONE_WIN && !UNITY_EDITOR) || UNITY_EDITOR_WIN
 		ta = Resources.Load<TextAsset>(path + "_w10");
 		if (ta == null || !SystemInfo.operatingSystem.StartsWith("Windows 1")) {
 #endif
 			ta = Resources.Load<TextAsset>(path);
-#if UNITY_STANDALONE_WIN
+#if (UNITY_STANDALONE_WIN && !UNITY_EDITOR) || UNITY_EDITOR_WIN
 		}
 #endif
 		if (ta != null) {
@@ -404,6 +408,12 @@ public class Joysticks : MonoBehaviour {
 		return thing;
 	}
 
+	public virtual void LateUpdate() {
+#if UNITY_STANDALONE && LG_STEAM
+		lastControlSet = GetCurrentActionSet().m_ControllerActionSetHandle;
+#endif
+	}
+
 #if UNITY_STANDALONE && LG_STEAM
 	public static void SetCurrentActionSet(string name) {
 		if (!SteamManager.Initialized) {
@@ -421,7 +431,7 @@ public class Joysticks : MonoBehaviour {
 	
 	public static ControllerActionSetHandle_t GetCurrentActionSet() {
 		ControllerHandle_t handle;
-		if (SteamControllerConnected(out handle)) {
+		if (SteamManager.Initialized && SteamControllerConnected(out handle)) {
 			return SteamController.GetCurrentActionSet(handle);
 		}
 		return default(ControllerActionSetHandle_t);
