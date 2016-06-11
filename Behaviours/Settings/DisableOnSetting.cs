@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class DisableOnSetting : MonoBehaviour {
+#if XtoJSON
 	[Tooltip("What setting is checked?")]
 	public string setting = "Particles";
 
@@ -95,10 +96,7 @@ public class DisableOnSetting : MonoBehaviour {
 		
 	}
 	//*/
-	
-	
-	
-	
+#endif
 }
 
 

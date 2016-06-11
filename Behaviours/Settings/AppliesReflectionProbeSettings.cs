@@ -3,8 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class AppliesReflectionProbeSettings : MonoBehaviour {
-
-
+#if XtoJSON
 	ReflectionProbe probe;
 	int last;
 	void Start() {
@@ -17,7 +16,6 @@ public class AppliesReflectionProbeSettings : MonoBehaviour {
 	}
 
 	void Set() {
-		
 		int setting = Settings.instance["ReflectionSize"].intVal;
 		
 		if (setting != last) {
@@ -25,4 +23,5 @@ public class AppliesReflectionProbeSettings : MonoBehaviour {
 			last = setting;
 		}
 	}
+#endif
 }

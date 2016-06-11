@@ -28,7 +28,7 @@ public class TransformByDepth : IComparer {
 
 [ExecuteInEditMode]
 public class StyleChildrenWithGSS : MonoBehaviour {
-
+#if XtoJSON
 
 	[NonSerialized] private int lastWidth = -1;
 	[NonSerialized] private int lastHeight = -1;
@@ -115,5 +115,5 @@ public class StyleChildrenWithGSS : MonoBehaviour {
 		return "";
 	}
 	
-
+#endif
 }
