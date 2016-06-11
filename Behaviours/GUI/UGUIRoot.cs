@@ -11,7 +11,7 @@ public class UGUIRoot : PageSwitcher {
 	public static GameObject modalContainer {
 		get {
 			if (_modalContainer == null) {
-				_modalContainer = new GameObject("ModalContainer");
+				_modalContainer = new GameObject("M0dalz");
 				_modalContainer.transform.SetParent(main.transform);
 				RectTransform rt = _modalContainer.AddComponent<RectTransform>();
 				rt.anchorMin = Vector2.zero;
@@ -90,6 +90,10 @@ public class UGUIRoot : PageSwitcher {
 
 	public static ModalDialog ShowModal(RectTransform modalPrefab, Action<string> responseHandler, string prompt) {
 		RectTransform modal = Instantiate(modalPrefab) as RectTransform;
+		modal.gameObject.name = modal.gameObject.name.Replace("(Clone)", "");
+		if (!modal.gameObject.name.EndsWith("Modal")) {
+			modal.gameObject.name += "Modal";
+		}
 		modalContainer.SetActive(true);
 		modal.SetParent(modalContainer.transform);
 		modal.offsetMin = Vector2.zero;
