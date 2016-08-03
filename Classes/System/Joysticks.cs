@@ -68,7 +68,7 @@ public class Joysticks : MonoBehaviour {
 			if (OnJoystickConnected != null) {
 				OnJoystickConnected(i + 1, name);
 			}
-			controlNames.Add(LoadControlNamesForJoystick(name));
+			controlNames.Add(LoadControlNamesForJoystick(GetControllerName(name)));
 		}
 
 		JsonObject gameActions = Json.Parse(Resources.Load<TextAsset>("GameActions").text) as JsonObject;
@@ -153,36 +153,66 @@ public class Joysticks : MonoBehaviour {
 	public virtual void Update() {
 		string[] names = Input.GetJoystickNames();
 		if (names.Length > joystickNames.Count) {
-			// The length of GetJoystickNames is only ever incremented if changed.
+			// On Windows, when a joystick is disconnected the array stays the same length but joystick name gets set to "".
 			for (int i = joystickNames.Count; i < names.Length; ++i) {
 				if (OnJoystickConnected != null) {
 					OnJoystickConnected(i + 1, names[i]);
 				}
 				joystickNames.Add(names[i]);
-				controlNames.Add(LoadControlNamesForJoystick(names[i]));
+				controlNames.Add(LoadControlNamesForJoystick(GetControllerName(names[i])));
 			}
-		}
-		
-		// At this point, the locally tracked joystick names and Unity's list should be the same length.
-		for (int i = 0; i < names.Length; ++i) {
-			if (names[i].Length == 0 && joystickNames[i].Length != 0) {
-				// If the name of the joystick is empty but the locally tracked name is not, we've got a disconnect.
-				if (OnJoystickDisconnected != null) {
-					OnJoystickDisconnected(i + 1, joystickNames[i]);
-					// Replace locally tracked name so as not to spam the delegate.
-				}
-				joystickNames[i] = "";
-			} else if (names[i].Length != 0 && joystickNames[i].Length == 0) {
-				// If an empty joystick name suddenly has a name again, a joystick has been reconnected.
-				if (OnJoystickReconnected != null) {
-					OnJoystickReconnected(i + 1, names[i]);
-				}
-				joystickNames[i] = names[i];
-				if (controlNames[i] == null) {
-					controlNames[i] = LoadControlNamesForJoystick(names[i]);
+		} else if (names.Length < joystickNames.Count) {
+			// On some other platforms, the joystick might actually be completely removed from the array.
+			// This is INCORRECT behavior, but we still need to handle it until Unity fixes their BS.
+			int iCurrentNames = 0;
+			for (int i = 0; i < joystickNames.Count; ++i) {
+				if (joystickNames[i].Length > 0 && (iCurrentNames >= names.Length || joystickNames[i] != names[iCurrentNames])) {
+					if (OnJoystickDisconnected != null) {
+						OnJoystickDisconnected(i + 1, joystickNames[i] + "");
+					}
+					joystickNames[i] = "";
+				} else {
+					++iCurrentNames;
 				}
 			}
+		} else {
+			// Name arrays are same length
+			for (int i = 0; i < names.Length; ++i) {
+				if (names[i].Length == 0 && joystickNames[i].Length != 0) {
+					// If the name of the joystick is empty but the locally tracked name is not, we've got a disconnect.
+					if (OnJoystickDisconnected != null) {
+						OnJoystickDisconnected(i + 1, joystickNames[i]);
+						// Replace locally tracked name so as not to spam the delegate.
+					}
+					joystickNames[i] = "";
+				} else if (names[i].Length != 0 && joystickNames[i].Length == 0) {
+					// If an empty joystick name suddenly has a name again, a joystick has been reconnected.
+					if (OnJoystickReconnected != null) {
+						OnJoystickReconnected(i + 1, names[i]);
+					}
+					joystickNames[i] = names[i];
+					if (controlNames[i] == null) {
+						controlNames[i] = LoadControlNamesForJoystick(GetControllerName(names[i]));
+					}
+				}
+			}
 		}
+	}
+
+	/// <summary>
+	/// Parses a name from GetJoystickNames() to get the actual name of the controller.
+	/// For example, "Xbox One for Windows (Controller)" and "Controller (Xbox One for Windows)"
+	/// will both return "Xbox One for Windows".
+	/// </summary>
+	/// <param name="name">The name from GetJoystickNames().</param>
+	/// <returns>The parsed name, or <paramref name="name"/> if nothing changed.</returns>
+	public static string GetControllerName(string name) {
+		if (name.EndsWith(" (Controller)")) {
+			return name.Substring(0, name.Length - " (Controller)".Length);
+		} else if (name.StartsWith("Controller (")) {
+			return name.Substring("Controller (".Length, name.Length - "Controller (".Length - 1);
+		}
+		return name.Replace(":", "").Replace("/", "").Replace("\\", "");
 	}
 
 	/// <summary>
@@ -342,7 +372,7 @@ public class Joysticks : MonoBehaviour {
 				} else if (tokens.Length == 1) {
 					if (joystickNum > 0 && Input.GetJoystickNames().Length >= joystickNum) {
 						if (controlNames[joystickNum - 1] != null && controlNames[joystickNum - 1].ContainsKey("Sheet")) {
-							return "{" + controlNames[joystickNum - 1]["Sheet"] + "_" + tokens[0].RemoveAll(' ') + "}";
+							return "[" + controlNames[joystickNum - 1]["Sheet"] + "_" + tokens[0].RemoveAll(' ') + "]";
 						} else {
 							return Localization.Localize(tokens[0]);
 						}
@@ -379,7 +409,7 @@ public class Joysticks : MonoBehaviour {
 					} else {
 						if (joystickNum > 0 && Input.GetJoystickNames().Length >= joystickNum) {
 							if (controlNames[joystickNum - 1] != null && controlNames[joystickNum - 1].ContainsKey("Sheet")) {
-								return "{" + controlNames[joystickNum - 1]["Sheet"] + "_" + oneThing.RemoveAll(' ') + "}";
+								return "[" + controlNames[joystickNum - 1]["Sheet"] + "_" + oneThing.RemoveAll(' ') + "]";
 							} else {
 								return Localization.Localize(oneThing);
 							}
@@ -395,7 +425,7 @@ public class Joysticks : MonoBehaviour {
 				
 				if (joystickNum > 0 && Input.GetJoystickNames().Length >= joystickNum) {
 					if (controlNames[joystickNum - 1] != null && controlNames[joystickNum - 1].ContainsKey("Sheet")) {
-						return "{" + controlNames[joystickNum - 1]["Sheet"] + "_" + token.RemoveAll(' ') + "}";
+						return "[" + controlNames[joystickNum - 1]["Sheet"] + "_" + token.RemoveAll(' ') + "]";
 					} else {
 						return Localization.Localize(token);
 					}

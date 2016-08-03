@@ -1158,11 +1158,11 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="type">The type of log. Depending on this value and the value of <see cref="debug"/> it will be echoed into the console.</param>
 	private void LogCallback(string logString, string stackTrace, LogType type) {
 		if (type == LogType.Exception) {
-			Echo(logString + "\n" + stackTrace);
+			Echo("<color=\"#FF0000\">" + logString + "\n" + stackTrace + "</color>");
 			return;
 		}
-		if (type == LogType.Warning && debug >= 1) { Echo("Warning: " + logString); return; }
-		if ((type == LogType.Error || type == LogType.Assert) && debug >= 1) { Echo("Error: " + logString); return; }
+		if (type == LogType.Warning && debug >= 1) { Echo("<color=\"#FFFF00\">Warning: " + logString + "</color>"); return; }
+		if ((type == LogType.Error || type == LogType.Assert) && debug >= 1) { Echo("<color=\"#FF0000\">Error: " + logString + "</color>"); return; }
 		if (debug >= 2) { Echo(logString); return; }
 	}
 
