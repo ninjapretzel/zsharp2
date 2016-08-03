@@ -28,7 +28,7 @@ public class UGUIRoot : PageSwitcher {
 		}
 	}
 	/// <summary> Default function to run when the escape key is hit </summary>
-	public static Action defaultOnEscape { get { return () => { Sounds.Play("MenuBack"); main.Pop(); }; } }
+	public static Action defaultOnEscape { get { return () => { Sounds.Play("MenuBack"); main.PopAndDestroy(); }; } }
 
 	/// <summary> Function to run when escape key is hit. Set to null to enable default behaviour. </summary>
 	public static Action onEscape = defaultOnEscape;

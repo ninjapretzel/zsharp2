@@ -105,7 +105,7 @@ public class FancyText {
 	public class DisplaySettings {
 		///<summary> Is the text outlined? </summary>
 		public bool outlined = true;
-		///<summary> Delay for each character ot appear </summary>
+		///<summary> Delay for each character to appear </summary>
 		public float delay = .05f;
 		///<summary> Time of fade for all text </summary>
 		public float fadeTime = .1f;
