@@ -129,11 +129,38 @@ public static class Input {
 	public static void ResetInputAxes() { In.ResetInputAxes(); }
 	#endregion
 	
+	
+	/// <summary>
+	/// Get the name of the primary controller that is connected
+	/// </summary>
+	public static string primaryController { 
+		get { 
+			foreach (string str in GetJoystickNames()) {
+				if (str != null && str != "") { return str; }
+			}
+			return "";
+		}
+	}
+
+	public static int primaryControllerIndex {
+		get {
+			var joysticks = GetJoystickNames();
+			for (int i = 0; i < joysticks.Length; i++) {
+				var str = joysticks[i];
+				if (str != null && str != "") { return i; }
+			}
+			return -1;
+		}
+	}
+
+	/// <summary> true if primaryController is not empty string, false otherwise. </summary>
+	public static bool controllerConnected { get { return primaryController != ""; } }
+
 	///Specific Touches
 	public static Touch firstTouch { get { return In.touches[0]; } }
 	public static Touch secondTouch { get { return In.touches[1]; } }
-	
-	///Get Average Touch position
+
+	///<summary>Get Average Touch position</summary>
 	public static Vector2 averageTouch {
 		get { 
 			if (In.touches.Length == 0) { return -Vector2.one; }
@@ -148,6 +175,7 @@ public static class Input {
 	}
 	
 	
+	/// <summary> Direction from center of screen to mouse cursor</summary>
 	public static Vector3 mouseDirection { get { return (mousePosition - new Vector3(Screen.width/2, Screen.height/2, 0)).normalized; } }
 	
 	public static Vector2 TouchScroll(this Vector2 v, Rect area, float sensitivity = 1f) {
