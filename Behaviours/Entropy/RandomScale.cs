@@ -46,7 +46,7 @@ public class RandomScale : MonoBehaviour {
 			transform.localScale = Vector3.Scale(transform.localScale, scale);
 			
 		} else {
-			if (useSeed) { Random.PushSeed(seed); }
+			if (useSeed) { Random.Push(seed); }
 
 			Vector3 scales = Vector3.zero;
 			
@@ -60,7 +60,7 @@ public class RandomScale : MonoBehaviour {
 			
 			transform.localScale = Vector3.Scale(transform.localScale, scales);
 			
-			if (useSeed) { Random.PopSeed(); seed++; }
+			if (useSeed) { Random.Pop(); seed++; }
 		}
 		Destroy(this);
 	}

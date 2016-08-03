@@ -41,13 +41,13 @@ public class RandomPosition : MonoBehaviour {
 			offset.y = Noise(pos.x, pos.z);
 			offset.z = Noise(pos.x, pos.y);
 		} else if (useSeed) {
-			Random.PushSeed(seed);
+			Random.Push(seed);
 			
 			offset.x = Random.value;
 			offset.y = Random.value;
 			offset.z = Random.value;
 			
-			Random.PopSeed();
+			Random.Pop();
 			seed++;
 		} else {
 			offset.x = Random.value;

@@ -52,7 +52,7 @@ public class HoverRotationEntropy : MonoBehaviour {
 				}
 
 			} else {
-				if (useSeed) { Random.PushSeed(seed); }
+				if (useSeed) { Random.Push(seed); }
 				int num = Mathf.Min(hover.rotations.Length, hover.oscis.Length);
 				for (int i = 0; i < num; i++) {
 					Oscillator osci = hover.oscis[i];
@@ -68,7 +68,7 @@ public class HoverRotationEntropy : MonoBehaviour {
 					hover.rotations[i] = Vector3.Scale(offset, scales);
 					if (Random.value < .5) { hover.rotations[i] *= -1; }
 				}
-				if (useSeed) { Random.PopSeed(); seed++; }
+				if (useSeed) { Random.Pop(); seed++; }
 			}
 			
 		}

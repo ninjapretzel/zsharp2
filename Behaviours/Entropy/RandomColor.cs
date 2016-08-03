@@ -19,7 +19,7 @@ public class RandomColor : MonoBehaviour {
 	}
 	
 	void SetColor() {
-		if (useSeed) { Random.PushSeed(seed); }
+		if (useSeed) { Random.Push(seed); }
 		
 		if (GetComponent<Renderer>().material.HasProperty(target)) { 
 			Color c = colors.Lerp(Random.value);
@@ -28,7 +28,7 @@ public class RandomColor : MonoBehaviour {
 		}
 		
 		
-		if (useSeed) { Random.PopSeed(); seed++; }
+		if (useSeed) { Random.Pop(); seed++; }
 		Destroy(this);
 	}
 	

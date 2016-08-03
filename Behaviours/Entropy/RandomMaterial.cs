@@ -42,12 +42,12 @@ public class RandomMaterial : MonoBehaviour {
 			index = (int)(materials.Length * f * .99999f);
 			
 		} else if (useSeed) {
-			Random.PushSeed(seed);
+			Random.Push(seed);
 			
 			if (weights.Length == 0) { index = materials.RandomIndex(); }
 			else { index = Random.WeightedChoose(weights); }
 			
-			Random.PopSeed();
+			Random.Pop();
 			seed++;
 		} else {
 			if (weights.Length == 0) { index = materials.RandomIndex(); }

@@ -239,7 +239,7 @@ public class QuickPlayerSettings : EditorWindow {
 				PlayerSettings.renderingPath = tempmobileRenderingPath;
 				break;
 			case "stereoscopic3D":
-				PlayerSettings.stereoscopic3D = Boolean.Parse(val);
+				PlayerSettings.SetPropertyString("VR::devices", Boolean.Parse(val) ? "stereo" : "mono");
 				break;
 			#endregion
 			#region android
@@ -410,7 +410,7 @@ public class QuickPlayerSettings : EditorWindow {
 		output += "mobileMTRendering," + PlayerSettings.mobileMTRendering + "\n";
 		output += "renderingPath," + PlayerSettings.renderingPath + "\n";
 		output += "mobileRenderingPath," + PlayerSettings.renderingPath + "\n";
-		output += "stereoscopic3D," + PlayerSettings.stereoscopic3D + "\n";
+		//output += "stereoscopic3D," + PlayerSettings.stereoscopic3D + "\n";
 		#endregion
 		if(currentPlatform == BuildTargetGroup.Android) {
 			#region android

@@ -43,13 +43,13 @@ public class RandomRotation : MonoBehaviour {
 			
 			
 		} else {
-			if (useSeed) { Random.PushSeed(seed); }
+			if (useSeed) { Random.Push(seed); }
 			
 			if (x) { rotation.x = Random.Range(min.x, max.x); }
 			if (y) { rotation.y = Random.Range(min.y, max.y); }
 			if (z) { rotation.z = Random.Range(min.z, max.z); }
 			
-			if (useSeed) { Random.PopSeed(); seed++; }
+			if (useSeed) { Random.Pop(); seed++; }
 		}
 		
 		transform.rotation = Quaternion.Euler(rotation);

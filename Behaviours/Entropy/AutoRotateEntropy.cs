@@ -13,7 +13,7 @@ public class AutoRotateEntropy : MonoBehaviour {
 	public bool normalDist = false;
 	
 	void Start() {
-		if (useSeed) { Random.PushSeed(seed); }
+		if (useSeed) { Random.Push(seed); }
 		
 		AutoRotate rotater = GetComponent<AutoRotate>();
 		if (rotater != null) {
@@ -26,7 +26,7 @@ public class AutoRotateEntropy : MonoBehaviour {
 			
 		}
 		
-		if (useSeed) { Random.PopSeed(); seed++; }
+		if (useSeed) { Random.Pop(); seed++; }
 		Destroy(this);
 	}
 

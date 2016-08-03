@@ -54,7 +54,7 @@ public class HoverEntropy : MonoBehaviour {
 				}
 				
 			} else {
-				if (useSeed) { Random.PushSeed(seed); }
+				if (useSeed) { Random.Push(seed); }
 			
 				
 				int num = Mathf.Min(hover.offsets.Length, hover.oscis.Length);
@@ -76,7 +76,7 @@ public class HoverEntropy : MonoBehaviour {
 				
 				}
 			
-				if (useSeed) { Random.PopSeed(); seed++; }
+				if (useSeed) { Random.Pop(); seed++; }
 			}
 		}
 		Destroy(this);
