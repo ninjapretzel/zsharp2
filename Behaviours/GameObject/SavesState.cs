@@ -55,8 +55,10 @@ public class SavesState : MonoBehaviour {
 			angularVelocity = initialAngularVelocity;
 			savedParent = initialSavedParent;
 			Restore();
+			gameObject.BroadcastMessage("OnReset", SendMessageOptions.DontRequireReceiver);
 		} else if(restore) {
 			Restore();
+			gameObject.BroadcastMessage("OnRestore", SendMessageOptions.DontRequireReceiver);
 		} else if(save) {
 			SaveState();
 		}
@@ -185,6 +187,9 @@ public class SavesState : MonoBehaviour {
 				kvp.Key.SetValue(b.reference, kvp.Value);
 			}
 		}
+	
 		
 	}
+
+	
 }
