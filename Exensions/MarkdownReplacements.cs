@@ -6,7 +6,17 @@ using System.Collections.Generic;
 
 public static class MarkdownReplacements {
 	
-	static Regex glyphs = new Regex( @"\{\w+\}" );
+	static Regex glyphs = new Regex( @"\[\w+\]" );
+	/// <summary>
+	/// Replaces glyph placeholders with the appropriate TextMeshPro sprite XML tags
+	/// 
+	/// Examples:
+	///		The placeholder {abutton} will be translated to a sprite tag of 'abutton' in the default sheet.
+	///		The placeholder {xbox_abutton} will be translated to a sprite tag for sheet 'xbox' and sprite 'abutton'
+	///		
+	/// </summary>
+	/// <param name="markdown">markdown to replace.</param>
+	/// <returns>Copy of <paramref name="markdown"/> with gylph placeholders replaced with the proper TextMeshPro sprite XML tags</returns>
 	public static string ReplaceGlyphs(this string markdown) {
 		StringBuilder str = markdown;
 
