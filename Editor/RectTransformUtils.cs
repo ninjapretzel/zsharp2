@@ -42,8 +42,9 @@ public class RectTransformUtils : ZEditorWindow {
 		}
 
 		if (anchorMode) {
-
-			if (rt != null && selected.GetComponent<Canvas>() == null) {
+			
+			if (rt != null && selected.GetComponent<Canvas>() == null && (rt.offsetMax != Vector2.zero || rt.offsetMin != Vector2.zero)) {
+				Undo.RecordObject(rt, "Force rect offsets to zero");
 				rt.rotation = Quaternion.identity;
 				// TODO: figure out how to adjust anchors when these values are nonzero
 				//Vector2 omax = rt.offsetMax;
@@ -53,6 +54,7 @@ public class RectTransformUtils : ZEditorWindow {
 				rt.pivot = new Vector2(0.5f, 0.5f);
 
 			}
+			Undo.IncrementCurrentGroup();
 		}
 
 		Repaint();
