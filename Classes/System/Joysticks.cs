@@ -244,6 +244,16 @@ public class Joysticks : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Gets the name for a specified axis, of the primary controller
+	/// </summary>
+	/// <param name="control">The control to get the name for, must be of format "AxisX[+/-]" or "ButtonX".</param>
+	/// <returns><paramref name="control"/> corresponding to the primary controller number.</returns>
+	public static string GetControlName(string control) {
+		int primary = Input.primaryControllerIndex;
+		return GetControlName(primary, control);
+	}
+
+	/// <summary>
 	/// Gets the name for a specified button. Out parameter will be filled with the joystick's number as determined from <param name="button"/>.
 	/// </summary>
 	/// <param name="joystickNum"><c>out</c> parameter that will be filled with the joystick's number as determined from <param name="button"/>, or -1 if not a joystick.</param>
@@ -252,6 +262,16 @@ public class Joysticks : MonoBehaviour {
 	public static string GetButtonName(out int joystickNum, KeyCode button) {
 		if (button < KeyCode.Joystick1Button0) { joystickNum = -1; return button.ToString(); }
 		return GetControlName(out joystickNum, button.ToString());
+	}
+
+	/// <summary>
+	/// Gets the name for a specified button. 
+	/// </summary>
+	/// <param name="button">The button to get the name for. Must refer to a specific joystick <c>X</c>.</param>
+	/// <returns>The name of <paramref name="button"/> corresponding to the primary controller number <c>x</c></returns>
+	public static string GetButtonName(KeyCode button) {
+		int primary = Input.primaryControllerIndex;
+		return GetButtonName(primary, button);
 	}
 
 	/// <summary>
