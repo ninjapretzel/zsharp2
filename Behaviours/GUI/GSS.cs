@@ -9,7 +9,7 @@ using TMPro;
 //Extensions to GSS for supporting TextMeshPro UI Text objects
 public partial class GSS {
 	/// <summary> Mappings of alignments from Unity's TextAnchor to TextMeshPro's TextAlignmentOptions </summary>
-	static Dictionary<TextAnchor, TextAlignmentOptions> alignmentMappings = new Dictionary<TextAnchor,TextAlignmentOptions>() {
+	public static Dictionary<TextAnchor, TextAlignmentOptions> alignmentMappings = new Dictionary<TextAnchor,TextAlignmentOptions>() {
 		{TextAnchor.UpperLeft,		TextAlignmentOptions.TopLeft},
 		{TextAnchor.UpperCenter,	TextAlignmentOptions.Top},
 		{TextAnchor.UpperRight,		TextAlignmentOptions.TopRight},
@@ -22,7 +22,7 @@ public partial class GSS {
 	};
 
 	/// <summary> Mappings of styles from Unity's FontStyle to TextMeshPro's FontStyles</summary>
-	static Dictionary<FontStyle, FontStyles> styleMappings = new Dictionary<FontStyle,FontStyles>() {
+	public static Dictionary<FontStyle, FontStyles> styleMappings = new Dictionary<FontStyle,FontStyles>() {
 		{FontStyle.Normal,			FontStyles.Normal},
 		{FontStyle.Bold,			FontStyles.Bold},
 		{FontStyle.Italic,			FontStyles.Italic},
