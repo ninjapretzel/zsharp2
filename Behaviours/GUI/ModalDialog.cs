@@ -19,10 +19,12 @@ public class ModalDialog : MonoBehaviour {
 
 	public GameObject defaultButton;
 
-	private Action onEscapeBackup;
+	protected Action onEscapeBackup;
 
-	public void Start() {
-		mainTextBox.text = prompt;
+	public virtual void Start() {
+		if (mainTextBox != null) {
+			mainTextBox.text = prompt;
+		}
 		onEscapeBackup = UGUIRoot.onEscape;
 		UGUIRoot.onEscape = () => { };
 		
