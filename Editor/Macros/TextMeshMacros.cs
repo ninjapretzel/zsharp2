@@ -1,4 +1,4 @@
-#if UNITY_EDITOR && !UNITY_WEBPLAYER && XtoJSON
+#if UNITY_EDITOR && !UNITY_WEBPLAYER
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -7,6 +7,7 @@ using System.Collections;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine.UI;
+#if TMPRO
 using TMPro;
 
 public class TextMeshMacros : ZEditorWindow {
@@ -33,6 +34,7 @@ public class TextMeshMacros : ZEditorWindow {
 				var tmpro = gobj.AddComponent<TextMeshProUGUI>();
 				tmpro.text = txt;
 				tmpro.lineSpacing = lineSpacing;
+				tmpro.fontSize = fontSize;
 				tmpro.fontStyle = GSS.styleMappings[fontStyle];
 				tmpro.alignment = GSS.alignmentMappings[alignment];
 
@@ -52,6 +54,7 @@ public class TextMeshMacros : ZEditorWindow {
 				var tmpro = gobj.AddComponent<TextMeshPro>();
 				tmpro.text = txt;
 				tmpro.lineSpacing = lineSpacing;
+				tmpro.fontSize = fontSize;
 				tmpro.fontStyle = GSS.styleMappings[fontStyle];
 				if (alignment == TextAlignment.Left) { tmpro.alignment = TextAlignmentOptions.Left; }
 				if (alignment == TextAlignment.Center) { tmpro.alignment = TextAlignmentOptions.Center; }
@@ -67,5 +70,6 @@ public class TextMeshMacros : ZEditorWindow {
 	}
 
 }
+#endif 
 
 #endif
