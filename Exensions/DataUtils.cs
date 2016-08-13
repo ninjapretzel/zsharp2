@@ -638,7 +638,11 @@ public static class DataUtils {
 	/// <returns>The resulting object.</returns>
 	public static object ParseParameterListIntoType(this string[] parameters, Type type) {
 		if (type.IsEnum && parameters.Length == 1) {
-			return Enum.Parse(type, parameters[0], true);
+			try {
+				return Enum.Parse(type, parameters[0], true);
+			} catch (ArgumentException) {
+				return null;
+			}
 		}
 		switch (type.Name) {
 			case "Vector2": {

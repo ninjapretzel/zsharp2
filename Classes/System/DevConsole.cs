@@ -967,10 +967,9 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="cmds">Commands to run when key <paramref name="name"/> is pressed.</param>
 	public static void Bind(string name, string cmds) {
 		KeyCode targetKeyCode;
-		try {
-			targetKeyCode = (KeyCode)Enum.Parse(typeof(KeyCode), name, true); // Will throw exception if KeyCode doesn't exist
+		if (EnumUtils.TryParse<KeyCode>(name, true, out targetKeyCode)) {
 			Bind(targetKeyCode, cmds);
-		} catch (ArgumentException) {
+		} else {
 			try {
 				if (name[name.Length - 1] == '-' || name[name.Length - 1] == '+') {
 					Input.GetAxisRaw(name.Substring(0, name.Length - 1)); // Will throw exception if axis doesn't exist
@@ -982,10 +981,12 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 				}
 				axisMappings[name] = "";
 				string[] cmdList = cmds.SplitUnlessInContainer(';', '\"');
+				StringBuilder st = new StringBuilder();
 				foreach (string cmd in cmdList) {
-					axisMappings[name] += ';' + cmd.ReplaceFirstAndLast('\'', '\"');
+					st.Append(';')
+					.Append(cmd.ReplaceFirstAndLast('\'', '\"'));
 				}
-				axisMappings[name] = axisMappings[name].Substring(1);
+				axisMappings[name] = st.ToString().Substring(1);
 			} catch (ArgumentException) {
 				Echo(name + " is not a valid KeyCode or axis!");
 				return;
