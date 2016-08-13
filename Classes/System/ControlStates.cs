@@ -27,6 +27,9 @@ public static class ControlStates {
 	/// <summary> Remove ControlState 'thing' from the dictionary </summary>
 	public static void Unset(string thing) { if (values.ContainsKey(thing)) { values.Remove(thing); } }
 
+	/// <summary> Interprets '<paramref name="thing"/>' as a <c>bool</c>, binary ORs it with '<paramref name="val"/>' and sets it back. </summary>
+	public static void Or(string thing, bool val) { values[thing] = (Get<bool>(thing) | val).ToString(); }
+
 	/// <summary>
 	/// Gets the current state of all values in a new <c>Dictionary</c>. This <c>Dictionary</c> is a copy of the values
 	/// so changes made to the dictionary will be lost.
