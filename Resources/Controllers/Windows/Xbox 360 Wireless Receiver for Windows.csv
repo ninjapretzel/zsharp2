@@ -24,5 +24,7 @@ Axis5-,DPad Left
 Axis5+,DPad Right
 Axis6-,DPad Down
 Axis6+,DPad Up
+Axis8-,IGNORE
 Axis8+,Left Trigger
+Axis9-,IGNORE
 Axis9+,Right Trigger

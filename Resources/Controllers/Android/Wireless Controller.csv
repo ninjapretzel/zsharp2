@@ -19,6 +19,8 @@ Axis0+,Left Stick Right
 Axis1-,Left Stick Up
 Axis1+,Left Stick Down
 Axis2-,L2
+Axis2+,IGNORE
+Axis3-,IGNORE
 Axis3+,R2
 Axis4-,DPad Left
 Axis4+,DPad Right

@@ -28,5 +28,7 @@ Axis5-,IGNORE
 Axis5+,IGNORE
 Axis6-,IGNORE
 Axis6+,IGNORE
+Axis8-,IGNORE
 Axis8+,Left Trigger
+Axis9-,IGNORE
 Axis9+,Right Trigger

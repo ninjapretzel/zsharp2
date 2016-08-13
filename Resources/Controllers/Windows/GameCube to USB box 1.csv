@@ -19,7 +19,9 @@ Axis2-,C Stick Left
 Axis2+,C Stick Right
 Axis3-,C Stick Down
 Axis3+,C Stick Up
+Axis4-,IGNORE
 Axis4+,Right Trigger
+Axis5-,IGNORE
 Axis5+,Left Trigger
 Axis6-,DPad Left
 Axis6+,DPad Right

@@ -9,11 +9,13 @@ Axis0-,Control Stick Left
 Axis0+,Control Stick Right
 Axis1-,Control Stick Up
 Axis1+,Control Stick Down
+Axis2-,IGNORE
 Axis2+,Left Trigger
 Axis3-,C Stick Left
 Axis3+,C Stick Right
 Axis4-,C Stick Down
 Axis4+,C Stick Up
+Axis5-,IGNORE
 Axis5+,Right Trigger
 Axis6-,DPad Left
 Axis6+,DPad Right

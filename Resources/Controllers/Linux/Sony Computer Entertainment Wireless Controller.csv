@@ -20,7 +20,9 @@ Axis1-,Left Stick Up
 Axis1+,Left Stick Down
 Axis2-,Right Stick Left
 Axis2+,Right Stick Right
+Axis3-,IGNORE
 Axis3+,L2
+Axus4-,IGNORE
 Axis4+,R2
 Axis5-,Right Stick Up
 Axis5+,Right Stick Down

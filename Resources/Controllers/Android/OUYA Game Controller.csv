@@ -19,9 +19,10 @@ Axis0-,Left Stick Left
 Axis0+,Left Stick Right
 Axis1-,Left Stick Up
 Axis1+,Left Stick Down
+Axis13-,IGNORE
 Axis13+,Left Trigger
 Axis2-,Right Stick Left
 Axis2+,Right Stick Right
 Axis3-,Right Stick Up
 Axis3+,Right Stick Down
-Axis14+,Right Trigger
+Axis14-,IGNORE
