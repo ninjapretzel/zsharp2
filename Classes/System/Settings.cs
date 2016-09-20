@@ -4,6 +4,10 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+#if UNITY_XBOXONE
+using Users;
+using Storage;
+#endif
 
 /// <summary>
 /// This class holds settings information for things.
@@ -137,6 +141,11 @@ public partial class Settings : JsonObject {
 			GSS.restyleEverything = true;
 		});
 
+#if UNITY_XBOXONE && !UNITY_EDITOR
+		ConnectedStorageWrapper.OnSaveDataDidNotExist += OnSaveDataDidNotExist;
+		ConnectedStorageWrapper.OnSaveDataRetrieved += OnSaveDataRetrieved;
+#endif
+
 	}
 
 	/// <summary> Current active rendering path. </summary>
@@ -167,6 +176,10 @@ public partial class Settings : JsonObject {
 
 	/// <summary> Save settings to a json file inside </summary>
 	public static void Save(string file = "settings") {
+#if UNITY_XBOXONE && !UNITY_EDITOR
+		// No user given; nowhere to save to!
+		return;
+#else
 		string saveFile = savePath + "/" + file + ".json";
 		string json = instance.ToString();
 		
@@ -176,14 +189,81 @@ public partial class Settings : JsonObject {
 		}
 		File.WriteAllText(saveFile, json);
 		//PlayerPrefs.SetString(key, json);
+#endif
 	}
 
-	/// <summary> Load settings from PlayerPrefs (or, default settings if none are saved), and apply them. </summary>
-	public static void Load(string file = "settings") {
+#if UNITY_XBOXONE && !UNITY_EDITOR
+	/// <summary> Load settings from Connected Storage (or, default settings if none are saved) for the given user, and apply them. </summary>
+	public static void Load(User user, string file = "settings") {
+		if (user == null) {
+			OnSaveDataDidNotExist(user, "settings");
+			return;
+		}
+		if (!user.IsSignedIn || !StorageManager.AmFullyInitialized()) {
+			return;
+		}
+		ConnectedStorageWrapper.LoadData(user, file);
+	}
 
+	/// <summary>
+	/// Callback handler for connected storage data retrieved.
+	/// </summary>
+	/// <param name="user">User the data was retrieved for.</param>
+	/// <param name="name">Name of the data container that was retrieved.</param>
+	/// <param name="bytes">Data that was retrieved.</param>
+	private static void OnSaveDataRetrieved(User user, string name, byte[] bytes) {
+		if (name == "settings") {
+			TextAsset defaultSettingsFile = Resources.Load<TextAsset>("defaultSettings");
+			string json = defaultSettingsFile != null ? defaultSettingsFile.text : "{}";
+			JsonObject jobj = Json.Parse(json) as JsonObject;
+
+			string prefs = bytes.GetString();
+			JsonObject pobj = Json.Parse(prefs) as JsonObject;
+
+			jobj.Set(pobj);
+			
+			instance = new Settings();
+			foreach (var pair in jobj) {
+				instance.Apply(pair.Key, pair.Value);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Callback handler for connected storage data did not exist.
+	/// </summary>
+	/// <param name="user">User the data was requested for.</param>
+	/// <param name="name">Name of the data container that was requested.</param>
+	private static void OnSaveDataDidNotExist(User user, string name) {
+		if (name == "settings") {
+			TextAsset defaultSettingsFile = Resources.Load<TextAsset>("defaultSettings");
+			string json = defaultSettingsFile != null ? defaultSettingsFile.text : "{}";
+			JsonObject jobj = Json.Parse(json) as JsonObject;
+			instance = new Settings();
+			foreach (var pair in jobj) {
+				instance.Apply(pair.Key, pair.Value);
+			}
+		}
+	}
+
+	public static void Save(User user, string file = "settings") {
+		if (user == null || !user.IsSignedIn || !StorageManager.AmFullyInitialized()) {
+			return;
+		}
+		string json = instance.ToString();
+		ConnectedStorageWrapper.SaveData(user, file, json.GetBytes());
+	}
+#endif
+
+	/// <summary> Load settings from json (or, default settings if none are saved), and apply them. </summary>
+	public static void Load(string file = "settings") {
 		TextAsset defaultSettingsFile = Resources.Load<TextAsset>("defaultSettings");
 		string json = defaultSettingsFile != null ? defaultSettingsFile.text : "{}";
 		JsonObject jobj = Json.Parse(json) as JsonObject;
+		// For Xbox One, we need more information, like what user to grab settings data for.
+		// In the case where we aren't given a user (like this function) we may as well just
+		// load the defaults.
+#if !UNITY_XBOXONE || UNITY_EDITOR
 		string saveFile = savePath + "/" + file + ".json";
 
 		//if (PlayerPrefs.HasKey(key)) {
@@ -195,6 +275,7 @@ public partial class Settings : JsonObject {
 			
 			jobj.Set(pobj);
 		}
+#endif
 
 		//Debug.Log("Applying Settings " + jobj.PrettyPrint());
 		instance = new Settings();
@@ -273,7 +354,7 @@ public partial class Settings : JsonObject {
 		return Colors.ToColorFromHex(this[name].stringVal);
 	}
 }
-#else 
+#else
 public partial class Settings {
 
 

@@ -8,6 +8,10 @@ using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+#if UNITY_XBOXONE
+using Storage;
+using Users;
+#endif
 
 /// <summary>
 /// Provides an interface for the user to run code or easily change variables in the game.
@@ -47,8 +51,20 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// Since these run every frame regardless, use them sparingly. In the command <c>%value%</c> will be replaced with the value of the axis,
 	/// and <c>%nvalue%</c> will be replaced with the value of the axis multiplied by -1.</summary>
 	private static Dictionary<string, string> axisMappings = new Dictionary<string, string>();
-	/// <summary>Returns the path there the config.cfg lives, where binds and aliases are saved across sessions.</summary>
-	public static string configPath { get { return Application.persistentDataPath + "/config.cfg"; } }
+#if UNITY_XBOXONE && !UNITY_EDITOR
+	/// <summary>Was the config successfully loaded from ConnectedStorage? See <see cref="LoadConfigFileForUser"/>.</summary>
+	public static bool configLoaded { get; private set; }
+#endif
+	/// <summary>Returns the path where the config.cfg lives, where binds and aliases are saved across sessions.</summary>
+	public static string configPath {
+		get {
+#if UNITY_XBOXONE && !UNITY_EDITOR
+			return "Config";
+#else
+			return Application.persistentDataPath + "/config.cfg";
+#endif
+		}
+	}
 	/// <summary>Contains all commands in the "persistent" and "defaults" files in Resources.</summary>
 	public static string persistent { 
 		get {
@@ -64,11 +80,12 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		}
 	}
 
-	/// <summary>A cache of commands that have been run that are NOT blacklisted.</summary>
+	// Optimizations through caching, so every time these commands are run we don't need to reflect their CustomAttributes.
+	/// <summary>Optimization: A cache of commands that have been run that are NOT blacklisted.</summary>
 	private static HashSet<string> whiteListedCache = new HashSet<string>();
-	/// <summary>A cache of commands that have been run that are NOT marked inaccessible.</summary>
+	/// <summary>Optimization: A cache of commands that have been run that are NOT marked inaccessible.</summary>
 	private static HashSet<MemberInfo> accessibleCache = new HashSet<MemberInfo>();
-	/// <summary>A cache of commands that have been run that are NOT marked cheats.</summary>
+	/// <summary>Optimization: A cache of commands that have been run that are NOT marked cheats.</summary>
 	private static HashSet<MemberInfo> nonCheatCache = new HashSet<MemberInfo>();
 
 	/// <summary>User-definable autoexec path, pointing to a script that will automatically execute when the game is run.</summary>
@@ -79,6 +96,10 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	/// <summary>Run as soon as the Behaviour is created.</summary>
 	protected void Awake() {
+#if UNITY_XBOXONE && !UNITY_EDITOR
+		ConnectedStorageWrapper.OnSaveDataRetrieved += OnSaveDataRetrieved;
+		ConnectedStorageWrapper.OnSaveDataDidNotExist += OnSaveDataDidNotExist;
+#endif
 		SetUpInitialData();
 		Application.logMessageReceived += LogCallback;
 
@@ -92,11 +113,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	/// <summary>Run before Update on the frame after the Behaviour is created.</summary>
 	protected void Start() {
-		if (File.Exists(configPath)) {
-			LoadConfigFile();
-		} else {
-			Defaults();
-		}
+		LoadConfigFile(); // Will run Defaults if no config file exists.
 
 	}
 
@@ -117,9 +134,11 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			binds = new Dictionary<KeyCode, string>();
 			axisMappings = new Dictionary<string, string>();
 		}
+#if !UNITY_XBOXONE || UNITY_EDITOR
 		if (File.Exists(configPath)) {
 			File.Delete(configPath);
 		}
+#endif
 		Execute(persistent.Split('\n'));
 		SaveConfigFile();
 
@@ -483,7 +502,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			}
 			// Try to find a static method matching name with one string parameter
 			MethodInfo targetMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
-			if (targetMethod != null && IsAccessible(targetMethod)) {
+			if (targetMethod != null && !targetMethod.IsGenericMethodDefinition && IsAccessible(targetMethod)) {
 				if (!cheats && IsCheat(targetMethod)) {
 					PrintCheatMessage(targetMethod.Name);
 				} else {
@@ -494,7 +513,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			// Try to find a method matching name with one string parameter if a main object to invoke on exists
 			if (main != null) {
 				MethodInfo targetInstancedMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
-				if (targetInstancedMethod != null && IsAccessible(targetInstancedMethod)) {
+				if (targetInstancedMethod != null && !targetMethod.IsGenericMethodDefinition && IsAccessible(targetInstancedMethod)) {
 					if (!cheats && IsCheat(targetInstancedMethod)) {
 						PrintCheatMessage(targetInstancedMethod.Name);
 					} else {
@@ -506,7 +525,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		}
 		// Try to find a static parameterless method matching name
 		MethodInfo targetParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { }, null);
-		if (targetParameterlessMethod != null && IsAccessible(targetParameterlessMethod)) {
+		if (targetParameterlessMethod != null && !targetParameterlessMethod.IsGenericMethodDefinition && IsAccessible(targetParameterlessMethod)) {
 			if (!cheats && IsCheat(targetParameterlessMethod)) {
 				PrintCheatMessage(targetParameterlessMethod.Name);
 			} else {
@@ -517,7 +536,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		// Try to find a parameterless method matching name if a main object to invoke on exists
 		if (main != null) {
 			MethodInfo targetInstancedParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { }, null);
-			if (targetInstancedParameterlessMethod != null && IsAccessible(targetInstancedParameterlessMethod)) {
+			if (targetInstancedParameterlessMethod != null && !targetInstancedParameterlessMethod.IsGenericMethodDefinition && IsAccessible(targetInstancedParameterlessMethod)) {
 				if (!cheats && IsCheat(targetInstancedParameterlessMethod)) {
 					PrintCheatMessage(targetInstancedParameterlessMethod.Name);
 				} else {
@@ -562,26 +581,43 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <returns>Boolean value indicating whether a suitable method was found and invoked.</returns>
 	public static bool CallMethodMatchingParameters(object targetObject, string methodName, MethodInfo[] targetMethods, string[] parameterList) {
 		foreach (MethodInfo targetMethod in targetMethods) {
+			// Enumerating an Array and checking the method name like this is actually faster than enumerating an IEnumerable.
+			// IEnumerable.Where is a pretty fast operation but enumerating an IEnumerable costs more speed here, even without the string comparison.
+			// Using IEnumerable.ToArray is even slower.
 			if (targetMethod.Name != methodName || !IsAccessible(targetMethod)) { continue; }
 			if (!cheats && IsCheat(targetMethod)) {
 				PrintCheatMessage(targetMethod.Name);
 			} else {
 				ParameterInfo[] parameterInfos = targetMethod.GetParameters();
-				if (parameterInfos.Length != parameterList.Length) { continue; }
-				if (parameterInfos[0].ParameterType == typeof(string) && parameterInfos.Length == 1) { continue; }
-				object[] parsedParameters = new object[parameterInfos.Length];
+				Type[] genericParameters = new Type[0];
+				if (targetMethod.IsGenericMethodDefinition) {
+					genericParameters = targetMethod.GetGenericArguments();
+				}
+				if (parameterInfos.Length + genericParameters.Length != parameterList.Length) { continue; }
+				if (genericParameters.Length == 0 && parameterInfos[0].ParameterType == typeof(string) && parameterInfos.Length == 1) { continue; }
 				bool failed = false;
+				Type[] parsedGenericParameters = new Type[genericParameters.Length];
+				for (int i = 0; i < parsedGenericParameters.Length; ++i) {
+					parsedGenericParameters[i] = ReflectionUtils.GetTypeInUnityAssemblies(parameterList[i]);
+					if (parsedGenericParameters[i] == null) { failed = true; break; }
+				}
+				if (failed) { continue; }
+				object[] parsedParameters = new object[parameterInfos.Length];
 				for (int i = 0; i < parsedParameters.Length; ++i) {
 					// Need to split the given parameters AGAIN here if not in container, since ParseParameterListIntoType expects its parameters separately.
 					// For example, if a method takes an int and a Color as an attribute, the user could type
 					// Class.MethodName "7" "1 0.4 0.2 1"
 					// which would get split into "7" and "1 0.4 0.2 1", and this method would try to find a method matching two parameters.
 					// If such a method is found, it would further split "1 0.4 0.2 1" into four separate strings and pass them to ParseParameterListIntoType
-					parsedParameters[i] = parameterList[i].SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType(parameterInfos[i].ParameterType);
+					parsedParameters[i] = parameterList[i + parsedGenericParameters.Length].SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType(parameterInfos[i].ParameterType);
 					if (parsedParameters[i] == null) { failed = true; break; }
 				}
 				if (failed) { continue; }
-				InvokeAndEchoResult(targetMethod, targetObject, parsedParameters);
+				MethodInfo methodToInvoke = targetMethod;
+				if (methodToInvoke.IsGenericMethodDefinition) {
+					methodToInvoke = targetMethod.MakeGenericMethod(parsedGenericParameters);
+				}
+				InvokeAndEchoResult(methodToInvoke, targetObject, parsedParameters);
 			}
 			return true;
 		}
@@ -620,7 +656,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			.Append(" {\n");
 			foreach (object o in (ICollection)obj) {
 				sb.Append("\t")
-				.Append(o.ToString())
+				.Append(ParseObjectIntoString(o))
 				.Append("\n");
 			}
 			sb.Append("}");
@@ -1125,7 +1161,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	}
 
-	#region ILogHandler
+#region ILogHandler
 	/// <summary>
 	/// Logs an exception into the console and calls the <see cref="OnException"/> callback.
 	/// </summary>
@@ -1149,7 +1185,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		// This will ultimately make it back into the console through LogCallback
 		Debug.logger.logHandler.LogFormat(logType, context, format, args);
 	}
-	#endregion
+#endregion
 
 	/// <summary>
 	/// Callback which is hooked into Unity's debuglogger. Runs any time Unity outputs something to the debug logger.
@@ -1171,31 +1207,45 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// Saves the current aliases, binds and axis mappings to a config file to be executed when the game starts.
 	/// </summary>
 	public static void SaveConfigFile() {
-		#if !UNITY_WEBPLAYER
+#if !UNITY_WEBPLAYER && (!UNITY_XBOXONE || UNITY_EDITOR)
 		if (File.Exists(configPath)) {
 			File.Delete(configPath);
 		}
 		
 		StreamWriter sw = File.CreateText(configPath);
-		sw.WriteLine("autoexecPath \"" + autoexecPath + "\"");
-		foreach (string alias in aliases.Keys) {
-			sw.WriteLine("Alias \"" + alias + "\" \"" + aliases[alias].Replace('\"', '\'') + "\"");
-		}
-		foreach (KeyCode bind in binds.Keys) {
-			sw.WriteLine("Bind \"" + bind.ToString() + "\" \"" + binds[bind].Replace('\"', '\'') + "\"");
-		}
-		foreach (string bind in axisMappings.Keys) {
-			sw.WriteLine("Bind \"" + bind.ToString() + "\" \"" + axisMappings[bind].Replace('\"', '\'') + "\"");
-		}
+		sw.Write(GetConfigString());
 		sw.Close();
 
-		#endif
+#endif
+	}
+
+	/// <summary> Generates the string to save to config. </summary>
+	/// <returns>The string to save to config.</returns>
+	private static string GetConfigString() {
+		StringBuilder sb = new StringBuilder();
+		sb.Append("autoexecPath \"" + autoexecPath + "\"\n");
+		foreach (string alias in aliases.Keys) {
+			sb.Append("Alias \"" + alias + "\" \"" + aliases[alias].Replace('\"', '\'') + "\"\n");
+		}
+		foreach (KeyCode bind in binds.Keys) {
+			sb.Append("Bind \"" + bind.ToString() + "\" \"" + binds[bind].Replace('\"', '\'') + "\"\n");
+		}
+		foreach (string bind in axisMappings.Keys) {
+			sb.Append("Bind \"" + bind.ToString() + "\" \"" + axisMappings[bind].Replace('\"', '\'') + "\"\n");
+		}
+		return sb.ToString();
 	}
 
 	/// <summary>
 	/// Loads the file at <see cref="configPath"/> and runs <see cref="Execute"/> on its contents, line-by-line.
 	/// </summary>
 	public static void LoadConfigFile() {
+#if UNITY_XBOXONE && !UNITY_EDITOR
+		// On Xbox, we need to defer loading config file until we have established a user.
+		// Unfortunately, establishing a user is game-specific code, so we must rely on
+		// game-specific code to call LoadConfigFileForUser below.
+		return;
+#else
 		if (File.Exists(configPath)) {
 			Execute(persistent.Split('\n'));
 			// If config exists, clear binds after loading persistent file (we want the default aliases but not the binds)
@@ -1209,8 +1259,89 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			if (File.Exists(autoexecPath)) {
 				Exec(autoexecPath);
 			}
+		} else {
+			Defaults();
+		}
+#endif
+	}
+
+#if UNITY_XBOXONE && !UNITY_EDITOR
+	/// <summary>Loads the config file for the specified user.</summary>
+	/// <param name="user">User to load config for.</param>
+	public static void LoadConfigFileForUser(User user) {
+		if (user == null) {
+			OnSaveDataDidNotExist(user, configPath);
+			return;
+		}
+		if (!user.IsSignedIn || !StorageManager.AmFullyInitialized()) {
+			return;
+		}
+		ConnectedStorageWrapper.LoadData(user, configPath);
+	}
+
+	/// <summary>
+	/// Callback handler for connected storage data retrieved.
+	/// </summary>
+	/// <param name="user">User the data was retrieved for.</param>
+	/// <param name="name">Name of the data container that was retrieved.</param>
+	/// <param name="bytes">Data that was retrieved.</param>
+	private static void OnSaveDataRetrieved(User user, string name, byte[] bytes) {
+		if (name == configPath) {
+			Execute(persistent.Split('\n'));
+			// If config exists, clear binds after loading persistent file (we want the default aliases but not the binds)
+			// TODO: Maybe only clear the binds for this user's controller, in case of splitscreen multiplayer?
+			binds = new Dictionary<KeyCode, string>();
+			axisMappings = new Dictionary<string, string>();
+
+			Execute(bytes.GetString().Split('\n'));
+			foreach (KeyCode key in binds.Keys.ToArray()) {
+				if (key < KeyCode.JoystickButton0) {
+					binds.Remove(key);
+				}
+			}
+			foreach (string axis in axisMappings.Keys.ToArray()) {
+				if (!axis.StartsWith("Joystick")) {
+					axisMappings.Remove(axis);
+				}
+			}
+			configLoaded = true;
 		}
 	}
+
+	/// <summary>
+	/// Callback handler for connected storage data did not exist.
+	/// </summary>
+	/// <param name="user">User the data was requested for.</param>
+	/// <param name="name">Name of the data container that was requested.</param>
+	private static void OnSaveDataDidNotExist(User user, string name) {
+		if (name == configPath) {
+			Execute(persistent.Split('\n'));
+			foreach (KeyCode key in binds.Keys.ToArray()) {
+				if (key < KeyCode.JoystickButton0) {
+					binds.Remove(key);
+				}
+			}
+			foreach (string axis in axisMappings.Keys.ToArray()) {
+				if (!axis.StartsWith("Joystick")) {
+					axisMappings.Remove(axis);
+				}
+			}
+			if (user != null) {
+				SaveConfigFileForUser(user);
+			}
+			configLoaded = true;
+		}
+	}
+
+	/// <summary>Saves the config file for the specified user.</summary>
+	/// <param name="user">User to save config for.</param>
+	public static void SaveConfigFileForUser(User user) {
+		if (user == null || !user.IsSignedIn || !StorageManager.AmFullyInitialized()) {
+			return;
+		}
+		ConnectedStorageWrapper.SaveData(user, configPath, GetConfigString().GetBytes());
+	}
+#endif
 
 	/// <summary>
 	/// Creates a new Window to use as the interface for the console.
@@ -1231,8 +1362,6 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	public void SetUpInitialData() {
 		autoexecPath = Application.persistentDataPath + "/autoexec.cfg";
 		classBlacklist = blacklist.ToList<string>();
-		if (!classBlacklist.Contains("InAppPurchases")) { classBlacklist.Add("InAppPurchases"); }
-		if (!classBlacklist.Contains("AdManager")) { classBlacklist.Add("AdManager"); }
 	}
 
 	/// <summary>
@@ -1328,6 +1457,49 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <returns><c>true</c> if <paramref name="axis"/> is mapped to <paramref name="command"/>.</returns>
 	public static bool IsBoundTo(string axis, string command) {
 		return axisMappings.ContainsKey(axis) && axisMappings[axis] == command;
+	}
+
+	/// <summary>
+	/// Determines if the given joystick has any bindings or axis mappings.
+	/// </summary>
+	/// <param name="num">Joystick number.</param>
+	/// <returns>Whether or not this joystick has a binding or axis mappings.</returns>
+	public static bool HasBindingForJoystick(int num) {
+		KeyCode min = KeyCode.JoystickButton0 + ((KeyCode.Joystick2Button0 - KeyCode.Joystick1Button0) * num);
+		KeyCode max = KeyCode.JoystickButton19 + ((KeyCode.Joystick2Button0 - KeyCode.Joystick1Button0) * num);
+		foreach (KeyCode bind in binds.Keys) {
+			if (bind >= min && bind <= max) { return true; }
+		}
+		foreach (string st in axisMappings.Keys) {
+			if (st.Length > 9 && st.Substring(0, 8) == "Joystick" && st[8] == num.ToString()[0]) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/// <summary>
+	/// Finds all bindings and axis mappings on joystick number <paramref name="from"/> and moves them to
+	/// joystick number <paramref name="to"/>.
+	/// </summary>
+	/// <param name="from">Unity joystick index for old controller.</param>
+	/// <param name="to">Unity joystick index for new controller.</param>
+	public static void MigrateBindingsForJoystick(int from, int to) {
+		KeyCode min = KeyCode.JoystickButton0 + ((KeyCode.Joystick2Button0 - KeyCode.Joystick1Button0) * from);
+		KeyCode max = KeyCode.JoystickButton19 + ((KeyCode.Joystick2Button0 - KeyCode.Joystick1Button0) * from);
+		int shift = (KeyCode.Joystick2Button0 - KeyCode.Joystick1Button0) * (to - from);
+		foreach (KeyCode bind in binds.Keys.ToArray()) {
+			if (bind >= min && bind <= max) {
+				binds[bind + shift] = binds[bind];
+				binds.Remove(bind);
+			}
+		}
+		foreach (string st in axisMappings.Keys.ToArray()) {
+			if (st.Length > 9 && st.Substring(0, 8) == "Joystick" && st[8] == from.ToString()[0]) {
+				axisMappings["Joystick" + to.ToString() + st.Substring(9)] = axisMappings[st];
+				axisMappings.Remove(st);
+			}
+		}
 	}
 
 	/// <summary>

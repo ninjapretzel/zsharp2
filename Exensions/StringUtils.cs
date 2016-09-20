@@ -70,8 +70,14 @@ public static class StringUtils {
 	///Simple convert string to bytes/from bytes
 	public static byte[] GetBytes(this string s) {
 		byte[] bytes = new byte[s.Length * sizeof(char)];
-		System.Buffer.BlockCopy(s.ToCharArray(), 0, bytes, 0, bytes.Length);
+		Buffer.BlockCopy(s.ToCharArray(), 0, bytes, 0, bytes.Length);
 		return bytes;
+	}
+
+	public static string GetString(this byte[] bytes) {
+		char[] chars = new char[bytes.Length / sizeof(char)];
+		Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+		return new string(chars);
 	}
 	
 	///Returns the given string with newline characters converted to the Unix standard
