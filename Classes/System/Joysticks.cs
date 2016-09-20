@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 #if UNITY_STANDALONE && LG_STEAM
 using Steamworks;
+#elif UNITY_XBOXONE
+using Gamepad;
 #endif
 
 /// <summary>
@@ -62,6 +64,15 @@ public class Joysticks : MonoBehaviour {
 			return;
 		}
 		instance = this;
+#if UNITY_XBOXONE && !UNITY_EDITOR
+		joystickNames = new List<string>() { "","","","","","","","" };
+		controlNames.Add(LoadControlNamesForJoystick("Windows.Xbox.Input.Gamepad"));
+		for (uint i = 0; i < 8; ++i) {
+			if (XboxOneInput.IsGamepadActive(i + 1)) {
+				joystickNames[(int)i] = "Windows.Xbox.Input.Gamepad";
+			}
+		}
+#else
 		joystickNames = Input.GetJoystickNames().ToList();
 		for (int i = 0; i < joystickNames.Count; ++i) {
 			string name = joystickNames[i];
@@ -70,6 +81,7 @@ public class Joysticks : MonoBehaviour {
 			}
 			controlNames.Add(LoadControlNamesForJoystick(GetControllerName(name)));
 		}
+#endif
 
 		JsonObject gameActions = Json.Parse(Resources.Load<TextAsset>("GameActions").text) as JsonObject;
 		glyphData = gameActions.Get<JsonObject>("GlyphSets");
@@ -142,6 +154,10 @@ public class Joysticks : MonoBehaviour {
 			{ EControllerActionOrigin.k_EControllerActionOrigin_Gyro_Roll, "steam_gyro" }
 		};
 #endif
+
+#if UNITY_XBOXONE
+		XboxOneInput.OnGamepadStateChange += OnGamepadStateChange;
+#endif
 	}
 
 	/// <summary>
@@ -151,6 +167,7 @@ public class Joysticks : MonoBehaviour {
 	/// reconnected.
 	/// </summary>
 	public virtual void Update() {
+#if !UNITY_XBOXONE || UNITY_EDITOR
 		string[] names = Input.GetJoystickNames();
 		if (names.Length > joystickNames.Count) {
 			// On Windows, when a joystick is disconnected the array stays the same length but joystick name gets set to "".
@@ -197,6 +214,7 @@ public class Joysticks : MonoBehaviour {
 				}
 			}
 		}
+#endif
 	}
 
 	/// <summary>
@@ -390,7 +408,7 @@ public class Joysticks : MonoBehaviour {
 				if (tokens.Length == 0) {
 					return thing;
 				} else if (tokens.Length == 1) {
-					if (joystickNum > 0 && Input.GetJoystickNames().Length >= joystickNum) {
+					if (joystickNum > 0 && joystickNames.Count >= joystickNum) {
 						if (controlNames[joystickNum - 1] != null && controlNames[joystickNum - 1].ContainsKey("Sheet")) {
 							return "[" + controlNames[joystickNum - 1]["Sheet"] + "_" + tokens[0].RemoveAll(' ') + "]";
 						} else {
@@ -427,7 +445,7 @@ public class Joysticks : MonoBehaviour {
 					if (oneThing == "MouseAxis") {
 						return Localization.Localize("The Mouse");
 					} else {
-						if (joystickNum > 0 && Input.GetJoystickNames().Length >= joystickNum) {
+						if (joystickNum > 0 && joystickNames.Count >= joystickNum) {
 							if (controlNames[joystickNum - 1] != null && controlNames[joystickNum - 1].ContainsKey("Sheet")) {
 								return "[" + controlNames[joystickNum - 1]["Sheet"] + "_" + oneThing.RemoveAll(' ') + "]";
 							} else {
@@ -443,7 +461,7 @@ public class Joysticks : MonoBehaviour {
 				int joystickNum = -1;
 				string token = GetControlName(out joystickNum, thing);
 				
-				if (joystickNum > 0 && Input.GetJoystickNames().Length >= joystickNum) {
+				if (joystickNum > 0 && joystickNames.Count >= joystickNum) {
 					if (controlNames[joystickNum - 1] != null && controlNames[joystickNum - 1].ContainsKey("Sheet")) {
 						return "[" + controlNames[joystickNum - 1]["Sheet"] + "_" + token.RemoveAll(' ') + "]";
 					} else {
@@ -540,6 +558,23 @@ public class Joysticks : MonoBehaviour {
 			}
 		}
 		return false;
+	}
+#endif
+
+#if UNITY_XBOXONE
+	public void OnGamepadStateChange(uint index, bool isConnected) {
+		// Hardcode these to report the identifier for a controller on the Xbone, since this is Xbox specific code anyway.
+		if (isConnected) {
+			joystickNames[(int)index] = "Windows.Xbox.Input.Gamepad";
+			if (OnJoystickConnected != null) {
+				OnJoystickConnected((int)index, "Windows.Xbox.Input.Gamepad");
+			}
+		} else {
+			joystickNames[(int)index] = "";
+			if (OnJoystickDisconnected != null) {
+				OnJoystickDisconnected((int)index, "Windows.Xbox.Input.Gamepad");
+			}
+		}
 	}
 #endif
 
