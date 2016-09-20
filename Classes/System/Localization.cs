@@ -29,7 +29,7 @@ public static class Localization {
 		//JsonArray levelsArray = JsonArray.ParseCSV(text, '|');
 		_strs = JsonObject.ParseCSV(text, '|');
 		//Debug.Log(_strs.PrettyPrint());
-		#if LG_STEAM
+#if LG_STEAM
 		// Use a switch here instead of parsing the enum (we don't support all those langauges yet!)
 		if (SteamManager.Initialized) {
 			switch (SteamApps.GetCurrentGameLanguage()) {
@@ -44,7 +44,19 @@ public static class Localization {
 				}
 			}
 		}
-		#endif
+#else
+		switch (Application.systemLanguage) {
+			case SystemLanguage.Spanish: {
+				language = Language.spanish;
+				break;
+			}
+			case SystemLanguage.English:
+			default: {
+				language = Language.english;
+				break;
+			}
+		}
+#endif
 
 		initialized = true;
 	}
