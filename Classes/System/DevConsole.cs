@@ -513,7 +513,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			// Try to find a method matching name with one string parameter if a main object to invoke on exists
 			if (main != null) {
 				MethodInfo targetInstancedMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
-				if (targetInstancedMethod != null && !targetMethod.IsGenericMethodDefinition && IsAccessible(targetInstancedMethod)) {
+				if (targetInstancedMethod != null && !targetInstancedMethod.IsGenericMethodDefinition && IsAccessible(targetInstancedMethod)) {
 					if (!cheats && IsCheat(targetInstancedMethod)) {
 						PrintCheatMessage(targetInstancedMethod.Name);
 					} else {
