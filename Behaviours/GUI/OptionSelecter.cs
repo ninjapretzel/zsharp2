@@ -45,9 +45,16 @@ public class OptionSelecter : Selectable {
 	protected override void Start() {
 		if (Application.isPlaying) {
 			base.Start();
-			label = transform.Find("Label").GetComponent<Text>();
+
+			Transform t;
+			t = transform.Find("Label");
+			if (t == null) { t = transform.Find("LLabel"); }
+			label = t.GetComponent<Text>(); 
 			label.text = gameObject.name.FromFirst("OptionSelector");
-			display = transform.Find("Display").GetComponent<Text>();
+
+			t = transform.Find("Display");
+			if (t == null) { t = transform.Find("DDisplay"); }
+			display = t.GetComponent<Text>();
 			string current = Get(settingName);
 			if (current == null || current == "") {
 				current = defaultOption;
@@ -68,8 +75,16 @@ public class OptionSelecter : Selectable {
 	}
 
 	protected virtual void Update() {
-		if (label == null) { label = transform.Find("Label").GetComponent<Text>(); }
-		if (display == null) { display = transform.Find("Display").GetComponent<Text>(); }
+		if (label == null) { 
+			var t = transform.Find("Label");
+			if (t == null) { t = transform.Find("LLabel"); }
+			label = t.GetComponent<Text>(); 
+		}
+		if (display == null) {
+			var t = transform.Find("Display");
+			if (t == null) { t = transform.Find("DDisplay"); }
+			display = t.GetComponent<Text>(); 
+		}
 
 		if (!Application.isPlaying) {
 			if (label != null) { label.text = gameObject.name; }
