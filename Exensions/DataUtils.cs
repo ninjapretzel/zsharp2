@@ -294,6 +294,16 @@ public static class DataUtils {
 		return chosen;
 	}
 
+	/// <summary> Adds an element to a list, only if that list doesn't contain that element. </summary>
+	/// <typeparam name="T">Generic Type</typeparam>
+	/// <param name="list">List to add thing to</param>
+	/// <param name="thing">Thing to add into list </param>
+	/// <returns>reference to list</returns>
+	public static IList<T> AddUnique<T>(this IList<T> list, T thing) {
+		if (!list.Contains(thing)) { list.Add(thing); } 
+		return list;
+	}
+
 	/// <summary> Adds all elements from an enumerable collection into a given list.</summary>
 	/// <typeparam name="T">Generic type</typeparam>
 	/// <param name="list">List to add elements into</param>
