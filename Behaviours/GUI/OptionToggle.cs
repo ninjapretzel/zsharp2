@@ -26,7 +26,7 @@ public class OptionToggle : MonoBehaviour {
 	}
 #endif
 
-	void Start() {
+	void Awake() {
 		toggle = GetComponent<Toggle>();
 		toggle.onValueChanged.AddListener(Set);
 
