@@ -65,6 +65,8 @@ public class GUIPage : MonoBehaviour {
 	public void PopTo(string target) { context.PopTo(target); }
 	public void PopToAndDestroyAll(GameObject target) { context.PopToAndDestroyAll(target); }
 	public void PopToAndDestroyAll(string target) { context.PopToAndDestroyAll(target); }
+	public void PopToFirstAndDestroy(string targets) { context.PopToFirstAndDestroy(targets); }
+	
 
 	public void Switchx(GameObject obj) { context.Switch(obj); }
 	public GameObject Switch(GameObject obj) { return context.Switch(obj); }
