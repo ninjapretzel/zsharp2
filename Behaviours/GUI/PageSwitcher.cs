@@ -14,6 +14,8 @@ public class PageSwitcher : MonoBehaviour {
 	/// <summary> What is the current menu's GameObject </summary>
 	private GameObject active { get { return history.Peek(); } }
 
+	public string activeName { get { return active.name; } }
+
 	/// <summary> Path of page resources. </summary>
 	public string resourcePath = "Menus";
 	string resPath { 
@@ -111,6 +113,21 @@ public class PageSwitcher : MonoBehaviour {
 		while (history.Where((g => g.name == target) ).Count() > 0 && !(active.name == target)) {
 			PopAndDestroy();
 		}
+	}
+
+	/// <summary> Pop to the first page contained in <paramref name="targets"/> that exists. After one target makes changes, no following targets are used. </summary>
+	/// <param name="targets">Comma separated list of names of target GUI pages to potentially pop to. </param>
+	public void PopToFirstAndDestroy(string targets) {
+		string[] tgs = targets.Split(',');
+
+		int cnt = history.Count;
+
+		foreach (var tg in tgs) {
+			PopToAndDestroyAll(tg);
+			if (cnt != history.Count) { return; }
+		}
+
+
 	}
 
 
