@@ -52,14 +52,16 @@ public static class ConnectedStorageWrapper {
 	}
 
 	public static void LoadData(User user, string name) {
-		Debug.Log("Loading data " + name);
 		loadMapQueue.Enqueue(new KeyValuePair<User, string>(user, name));
+		LoadNextDataInQueue();
 	}
 
 	public static void LoadNextDataInQueue() {
+		Debug.Log("LoadNextDataInQueue when there are " + loadMapQueue.Count + " datas left to get in queue, and currentlyLoadingMap is null: " + (currentlyLoadingMap == null));
 		if (!currentlyLoadingMap.HasValue && loadMapQueue.Count > 0) {
 			KeyValuePair<User, string> pair = loadMapQueue.Dequeue();
 			string name = pair.Value;
+			Debug.Log("Loading data " + name);
 			currentlyLoadingMap = pair;
 			_storages[pair.Key.Id].GetAsync(new string[] { name }, OnGetData);
 		}
@@ -75,18 +77,20 @@ public static class ConnectedStorageWrapper {
 	}
 
 	private static void OnGetData(ContainerContext storage, GetDataMapViewAsyncOp op, DataMapView view) {
-		Debug.Log("OnGetData");
-		if (op.Success) {
-			Debug.Log("Data gotten, returning");
-			if (OnSaveDataRetrieved != null) {
-				OnSaveDataRetrieved(currentlyLoadingMap.Value.Key, currentlyLoadingMap.Value.Value, view.GetBuffer(currentlyLoadingMap.Value.Value));
+		Debug.Log("OnGetData for " + currentlyLoadingMap.Value.Value + " so now there are " + loadMapQueue.Count + " left to get.");
+		try {
+			if (op.Success) {
+				if (OnSaveDataRetrieved != null) {
+					OnSaveDataRetrieved(currentlyLoadingMap.Value.Key, currentlyLoadingMap.Value.Value, view.GetBuffer(currentlyLoadingMap.Value.Value));
+				}
+			} else { // Does not exist (like on first start)
+				if (OnSaveDataDidNotExist != null) {
+					OnSaveDataDidNotExist(currentlyLoadingMap.Value.Key, currentlyLoadingMap.Value.Value);
+				}
 			}
-		} else { // Does not exist (like on first start)
-			if (OnSaveDataDidNotExist != null) {
-				OnSaveDataDidNotExist(currentlyLoadingMap.Value.Key, currentlyLoadingMap.Value.Value);
-			}
-		}
+		} catch { }
 		currentlyLoadingMap = null;
+		LoadNextDataInQueue();
 	}
 }
 #endif
