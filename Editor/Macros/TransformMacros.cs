@@ -125,6 +125,25 @@ public class TransformMacros : Editor {
 		}
 	
 	}
+
+
+	[MenuItem("Macros/Encapsulate With Parent")]
+	public static void EncapsulateWithParent() {
+		foreach (var target in Selection.transforms) {
+			var newParent = new GameObject(target.gameObject.name);
+			
+			Undo.RecordObject(target, "Encapsulate With Parent");
+			Undo.RegisterCompleteObjectUndo(newParent, "Encapsulate With Parent");
+
+
+			newParent.transform.position = target.position;
+			newParent.transform.SetParent(target.parent);
+			target.SetParent(newParent.transform);
+
+		}
+
+		Undo.IncrementCurrentGroup();
+	}
 	
 }
 
