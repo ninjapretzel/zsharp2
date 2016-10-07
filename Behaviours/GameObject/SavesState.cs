@@ -7,6 +7,7 @@ using System.Linq;
 
 public class DontSaveAttribute : Attribute { }
 
+[DisallowMultipleComponent]
 public class SavesState : MonoBehaviour {
 
 	private class SavedBehaviour {
