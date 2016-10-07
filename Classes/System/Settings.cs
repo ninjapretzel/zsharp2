@@ -211,19 +211,37 @@ public partial class Settings : JsonObject {
 	/// <param name="user">User the data was retrieved for.</param>
 	/// <param name="name">Name of the data container that was retrieved.</param>
 	/// <param name="bytes">Data that was retrieved.</param>
+	private static string[] xboxBlacklist = new string[] {
+		"RenderingPath",
+		"ForwardLights",
+		"Textures",
+		"Particles",
+		"MSAA",
+		"FXAA",
+		"AmbientOcclusion",
+		"AnisoFiltering",
+		"ScreenSpaceReflections",
+		"RealtimeReflection",
+		"ReflectionSize",
+		"ShadowType",
+		"ShadowResolution",
+		"ShadowCascades",
+	};
 	private static void OnSaveDataRetrieved(User user, string name, byte[] bytes) {
 		if (name == "settings") {
-			TextAsset defaultSettingsFile = Resources.Load<TextAsset>("defaultSettings");
+			Debug.Log("Settings data loaded");
+			TextAsset defaultSettingsFile = Resources.Load<TextAsset>("xboxDefaultSettings");
 			string json = defaultSettingsFile != null ? defaultSettingsFile.text : "{}";
 			JsonObject jobj = Json.Parse(json) as JsonObject;
 
 			string prefs = bytes.GetString();
 			JsonObject pobj = Json.Parse(prefs) as JsonObject;
 
-			jobj.Set(pobj);
+			jobj.Set(jobj);
 			
 			instance = new Settings();
-			foreach (var pair in jobj) {
+			foreach (var pair in pobj) {
+				if (xboxBlacklist.Contains(pair.Key.stringVal)) { continue; }
 				instance.Apply(pair.Key, pair.Value);
 			}
 		}
@@ -236,7 +254,8 @@ public partial class Settings : JsonObject {
 	/// <param name="name">Name of the data container that was requested.</param>
 	private static void OnSaveDataDidNotExist(User user, string name) {
 		if (name == "settings") {
-			TextAsset defaultSettingsFile = Resources.Load<TextAsset>("defaultSettings");
+			Debug.Log("Settings data did not exist, so it was created");
+			TextAsset defaultSettingsFile = Resources.Load<TextAsset>("xboxDefaultSettings");
 			string json = defaultSettingsFile != null ? defaultSettingsFile.text : "{}";
 			JsonObject jobj = Json.Parse(json) as JsonObject;
 			instance = new Settings();
@@ -257,7 +276,13 @@ public partial class Settings : JsonObject {
 
 	/// <summary> Load settings from json (or, default settings if none are saved), and apply them. </summary>
 	public static void Load(string file = "settings") {
-		TextAsset defaultSettingsFile = Resources.Load<TextAsset>("defaultSettings");
+		string defaultSettingsFilename = 
+#if UNITY_XBOXONE && !UNITY_EDITOR
+			"xboxDefaultSettings";
+#else
+			"defaultSettings";
+#endif
+		TextAsset defaultSettingsFile = Resources.Load<TextAsset>(defaultSettingsFilename);
 		string json = defaultSettingsFile != null ? defaultSettingsFile.text : "{}";
 		JsonObject jobj = Json.Parse(json) as JsonObject;
 		// For Xbox One, we need more information, like what user to grab settings data for.
