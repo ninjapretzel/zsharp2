@@ -1287,6 +1287,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="bytes">Data that was retrieved.</param>
 	private static void OnSaveDataRetrieved(User user, string name, byte[] bytes) {
 		if (name == configPath) {
+			Debug.Log("Config file loaded");
 			Execute(persistent.Split('\n'));
 			// If config exists, clear binds after loading persistent file (we want the default aliases but not the binds)
 			// TODO: Maybe only clear the binds for this user's controller, in case of splitscreen multiplayer?
@@ -1315,6 +1316,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="name">Name of the data container that was requested.</param>
 	private static void OnSaveDataDidNotExist(User user, string name) {
 		if (name == configPath) {
+			Debug.Log("Config file did not exist, so it was created");
 			Execute(persistent.Split('\n'));
 			foreach (KeyCode key in binds.Keys.ToArray()) {
 				if (key < KeyCode.JoystickButton0) {
