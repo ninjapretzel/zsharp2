@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+#if TMPRO
+using TMPro;
+#endif
 
 public class OptionSlider : MonoBehaviour {
 
@@ -25,6 +28,9 @@ public class OptionSlider : MonoBehaviour {
 	}
 
 	Text valLabel;
+#if TMPRO
+	TextMeshProUGUI valLabelTMPro;
+#endif
 	Slider slider;
 	
 #if XtoJSON
@@ -46,7 +52,10 @@ public class OptionSlider : MonoBehaviour {
 	void Start() {
 		slider = GetComponent<Slider>();
 		valLabel = transform.Find("Value").GetComponent<Text>();
-		
+#if TMPRO
+		valLabelTMPro = transform.Find("Value").GetComponent<TextMeshProUGUI>();
+#endif
+
 		slider.onValueChanged.AddListener(Set);
 		slider.value = Get(settingName);
 		Set(slider.value);
@@ -59,6 +68,11 @@ public class OptionSlider : MonoBehaviour {
 
 	void Set(float value) {
 		Set(settingName, value);
+#if TMPRO
+		if (valLabelTMPro != null) {
+			valLabelTMPro.text = prefix + string.Format(code, value * multiplier) + suffix;
+		} else
+#endif
 		if (valLabel != null) {
 			valLabel.text = prefix + string.Format(code, value * multiplier) + suffix;
 			
