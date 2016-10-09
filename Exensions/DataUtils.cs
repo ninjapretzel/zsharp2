@@ -699,6 +699,62 @@ public static class DataUtils {
 				}
 				return targetV3;
 			}
+			case "Vector4": {
+				Vector4 targetV4;
+				PropertyInfo vector4ByName = typeof(Vector4).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
+				if (vector4ByName != null) {
+					if (parameters.Length != 1) { return null; }
+					targetV4 = (Vector4)vector4ByName.GetValue(null, null);
+				} else {
+					if (parameters.Length != 4) { return null; }
+					float x = 0.0f;
+					try {
+						x = float.Parse(parameters[0]);
+					} catch (FormatException) { return null; }
+					float y = 0.0f;
+					try {
+						y = float.Parse(parameters[1]);
+					} catch (FormatException) { return null; }
+					float z = 0.0f;
+					try {
+						z = float.Parse(parameters[2]);
+					} catch (FormatException) { return null; }
+					float w = 0.0f;
+					try {
+						w = float.Parse(parameters[3]);
+					} catch (FormatException) { return null; }
+					targetV4 = new Vector4(x, y, z, w);
+				}
+				return targetV4;
+			}
+			case "Quaternion": {
+				Quaternion targetQuaternion;
+				PropertyInfo quaternionByName = typeof(Quaternion).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
+				if (quaternionByName != null) {
+					if (parameters.Length != 1) { return null; }
+					targetQuaternion = (Quaternion)quaternionByName.GetValue(null, null);
+				} else {
+					if (parameters.Length != 4) { return null; }
+					float x = 0.0f;
+					try {
+						x = float.Parse(parameters[0]);
+					} catch (FormatException) { return null; }
+					float y = 0.0f;
+					try {
+						y = float.Parse(parameters[1]);
+					} catch (FormatException) { return null; }
+					float z = 0.0f;
+					try {
+						z = float.Parse(parameters[2]);
+					} catch (FormatException) { return null; }
+					float w = 0.0f;
+					try {
+						w = float.Parse(parameters[3]);
+					} catch (FormatException) { return null; }
+					targetQuaternion = new Quaternion(x, y, z, w);
+				}
+				return targetQuaternion;
+			}
 			case "Color": {
 				Color targetColor;
 				PropertyInfo colorByName = typeof(Color).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
@@ -724,6 +780,35 @@ public static class DataUtils {
 						a = float.Parse(parameters[3]);
 					} catch (FormatException) { return null; }
 					targetColor = new Color(r, g, b, a);
+				}
+				return targetColor;
+			}
+			case "Color32": {
+				Color32 targetColor;
+				// Since Colors and Color32s are interchangeable in Unity (there are implicit conversion operators) we can cheat and still use these.
+				PropertyInfo colorByName = typeof(Color).GetProperty(parameters[0], BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty);
+				if (colorByName != null) {
+					if (parameters.Length != 1) { return null; }
+					targetColor = (Color)colorByName.GetValue(null, null);
+				} else {
+					if (parameters.Length != 4) { return null; }
+					byte r = 0;
+					try {
+						r = byte.Parse(parameters[0]);
+					} catch (FormatException) { return null; }
+					byte g = 0;
+					try {
+						g = byte.Parse(parameters[1]);
+					} catch (FormatException) { return null; }
+					byte b = 0;
+					try {
+						b = byte.Parse(parameters[2]);
+					} catch (FormatException) { return null; }
+					byte a = 1;
+					try {
+						a = byte.Parse(parameters[3]);
+					} catch (FormatException) { return null; }
+					targetColor = new Color32(r, g, b, a);
 				}
 				return targetColor;
 			}
