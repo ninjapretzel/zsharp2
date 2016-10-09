@@ -664,13 +664,10 @@ public static class DataUtils {
 				} else {
 					if (parameters.Length != 2) { return null; }
 					float x = 0.0f;
-					try {
-						x = float.Parse(parameters[0]);
-					} catch (FormatException) { return null; }
 					float y = 0.0f;
-					try {
-						y = float.Parse(parameters[1]);
-					} catch (FormatException) { return null; }
+					if (!float.TryParse(parameters[0], out x) || !float.TryParse(parameters[1], out y)) {
+						return null;
+					}
 					targetV2 = new Vector2(x, y);
 				}
 				return targetV2;
@@ -684,17 +681,11 @@ public static class DataUtils {
 				} else {
 					if (parameters.Length != 3) { return null; }
 					float x = 0.0f;
-					try {
-						x = float.Parse(parameters[0]);
-					} catch (FormatException) { return null; }
 					float y = 0.0f;
-					try {
-						y = float.Parse(parameters[1]);
-					} catch (FormatException) { return null; }
 					float z = 0.0f;
-					try {
-						z = float.Parse(parameters[2]);
-					} catch (FormatException) { return null; }
+					if (!float.TryParse(parameters[0], out x) || !float.TryParse(parameters[1], out y) || !float.TryParse(parameters[2], out z)) {
+						return null;
+					}
 					targetV3 = new Vector3(x, y, z);
 				}
 				return targetV3;
@@ -708,21 +699,12 @@ public static class DataUtils {
 				} else {
 					if (parameters.Length != 4) { return null; }
 					float x = 0.0f;
-					try {
-						x = float.Parse(parameters[0]);
-					} catch (FormatException) { return null; }
 					float y = 0.0f;
-					try {
-						y = float.Parse(parameters[1]);
-					} catch (FormatException) { return null; }
 					float z = 0.0f;
-					try {
-						z = float.Parse(parameters[2]);
-					} catch (FormatException) { return null; }
 					float w = 0.0f;
-					try {
-						w = float.Parse(parameters[3]);
-					} catch (FormatException) { return null; }
+					if (!float.TryParse(parameters[0], out x) || !float.TryParse(parameters[1], out y) || !float.TryParse(parameters[2], out z) || !float.TryParse(parameters[3], out w)) {
+						return null;
+					}
 					targetV4 = new Vector4(x, y, z, w);
 				}
 				return targetV4;
@@ -736,21 +718,12 @@ public static class DataUtils {
 				} else {
 					if (parameters.Length != 4) { return null; }
 					float x = 0.0f;
-					try {
-						x = float.Parse(parameters[0]);
-					} catch (FormatException) { return null; }
 					float y = 0.0f;
-					try {
-						y = float.Parse(parameters[1]);
-					} catch (FormatException) { return null; }
 					float z = 0.0f;
-					try {
-						z = float.Parse(parameters[2]);
-					} catch (FormatException) { return null; }
 					float w = 0.0f;
-					try {
-						w = float.Parse(parameters[3]);
-					} catch (FormatException) { return null; }
+					if (!float.TryParse(parameters[0], out x) || !float.TryParse(parameters[1], out y) || !float.TryParse(parameters[2], out z) || !float.TryParse(parameters[3], out w)) {
+						return null;
+					}
 					targetQuaternion = new Quaternion(x, y, z, w);
 				}
 				return targetQuaternion;
@@ -764,21 +737,12 @@ public static class DataUtils {
 				} else {
 					if (parameters.Length != 4) { return null; }
 					float r = 0.0f;
-					try {
-						r = float.Parse(parameters[0]);
-					} catch (FormatException) { return null; }
 					float g = 0.0f;
-					try {
-						g = float.Parse(parameters[1]);
-					} catch (FormatException) { return null; }
 					float b = 0.0f;
-					try {
-						b = float.Parse(parameters[2]);
-					} catch (FormatException) { return null; }
 					float a = 1.0f;
-					try {
-						a = float.Parse(parameters[3]);
-					} catch (FormatException) { return null; }
+					if (!float.TryParse(parameters[0], out r) || !float.TryParse(parameters[1], out g) || !float.TryParse(parameters[2], out b) || !float.TryParse(parameters[3], out a)) {
+						return null;
+					}
 					targetColor = new Color(r, g, b, a);
 				}
 				return targetColor;
@@ -791,23 +755,13 @@ public static class DataUtils {
 					if (parameters.Length != 1) { return null; }
 					targetColor = (Color)colorByName.GetValue(null, null);
 				} else {
-					if (parameters.Length != 4) { return null; }
 					byte r = 0;
-					try {
-						r = byte.Parse(parameters[0]);
-					} catch (FormatException) { return null; }
 					byte g = 0;
-					try {
-						g = byte.Parse(parameters[1]);
-					} catch (FormatException) { return null; }
 					byte b = 0;
-					try {
-						b = byte.Parse(parameters[2]);
-					} catch (FormatException) { return null; }
 					byte a = 1;
-					try {
-						a = byte.Parse(parameters[3]);
-					} catch (FormatException) { return null; }
+					if (!byte.TryParse(parameters[0], out r) || !byte.TryParse(parameters[1], out g) || !byte.TryParse(parameters[2], out b) || !byte.TryParse(parameters[3], out a)) {
+						return null;
+					}
 					targetColor = new Color32(r, g, b, a);
 				}
 				return targetColor;
@@ -816,31 +770,17 @@ public static class DataUtils {
 				if (parameters.Length != 4) { return null; }
 				Rect targetRect;
 				float l = 0.0f;
-				try {
-					l = float.Parse(parameters[0]);
-				} catch (FormatException) { return null; }
 				float t = 0.0f;
-				try {
-					t = float.Parse(parameters[1]);
-				} catch (FormatException) { return null; }
 				float w = 0.0f;
-				try {
-					w = float.Parse(parameters[2]);
-				} catch (FormatException) { return null; }
 				float h = 1.0f;
-				try {
-					h = float.Parse(parameters[3]);
-				} catch (FormatException) { return null; }
+				if (!float.TryParse(parameters[0], out l) || !float.TryParse(parameters[1], out t) || !float.TryParse(parameters[2], out w) || !float.TryParse(parameters[3], out h)) {
+					return null;
+				}
 				targetRect = new Rect(l, t, w, h);
 				return targetRect;
 			}
 			case "String": {
-				System.Text.StringBuilder bob = new System.Text.StringBuilder();
-				foreach (string st in parameters) {
-					bob.Append(st + " ");
-				}
-				string allparams = bob.ToString();
-				return allparams.Substring(0, allparams.Length - 1);
+				return string.Join(" ", parameters);
 			}
 			case "Char":
 			case "SByte":
@@ -868,16 +808,15 @@ public static class DataUtils {
 				} else if (parameters[0] == "0" || parameters[0].Equals("off", StringComparison.InvariantCultureIgnoreCase) || parameters[0].Equals("no", StringComparison.InvariantCultureIgnoreCase)) {
 					return false;
 				} else {
-					try {
-						float val = float.Parse(parameters[0]);
+					float val = 0;
+					if (float.TryParse(parameters[0], out val)) {
 						return val >= 0.5f;
-					} catch (FormatException) {
-						try {
-							return bool.Parse(parameters[0]);
-						} catch (FormatException) {
-							return null;
-						}
 					}
+					bool boVal = false;
+					if (bool.TryParse(parameters[0], out boVal)) {
+						return boVal;
+					}
+					return null;
 				}
 			}
 			default: {
