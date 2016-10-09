@@ -395,6 +395,12 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="parameters">An array of strings to parse into a value to use for the field.</param>
 	/// <returns>Boolean value indicating whether the field was set successfully.</returns>
 	public static bool SetFieldValue(object instance, FieldInfo fieldInfo, string[] parameters) {
+		if (parameters.Length == 1 && fieldInfo.FieldType != typeof(string)) {
+			// Need to split unless in container AGAIN here because ParseParameterListIntoType expects parameters separately.
+			// For example, if the user enters "\"1 0 0 1\"" for a Color Field, this method will be passed { "1 0 0 1" },
+			// NOT { "\"1 0 0 1\"" } and NOT { "1", "0", "0", "1" }. But ParseParameterListIntoType wants { "1", "0", "0", "1" }.
+			parameters = parameters[0].SplitUnlessInContainer(' ', '\"');
+		}
 		object result = parameters.ParseParameterListIntoType(fieldInfo.FieldType);
 		if (result != null) {
 			fieldInfo.SetValue(instance, result);
@@ -462,6 +468,12 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 			Echo(propertyInfo.Name + " is read-only!");
 			Echo(propertyInfo.Name + " is " + output);
 			return true; // Success: Value is printed when property is read-only
+		}
+		if (parameters.Length == 1 && propertyInfo.PropertyType != typeof(string)) {
+			// Need to split unless in container AGAIN here because ParseParameterListIntoType expects parameters separately.
+			// For example, if the user enters "\"1 0 0 1\"" for a Color Property, this method will be passed { "1 0 0 1" },
+			// NOT { "\"1 0 0 1\"" } and NOT { "1", "0", "0", "1" }. But ParseParameterListIntoType wants { "1", "0", "0", "1" }.
+			parameters = parameters[0].SplitUnlessInContainer(' ', '\"');
 		}
 		object result = parameters.ParseParameterListIntoType(propertyInfo.PropertyType);
 		if (result != null) {
@@ -1541,7 +1553,10 @@ public class ConsoleWindow : ZWindow {
 				if (textWindow.Length > 16382) {
 					textWindow = textWindow.Substring(textWindow.Length - 16382, 16382);
 				}
+				Color backup = GUI.color;
+				GUI.color = DevConsole.color;
 				Label(textWindow);
+				GUI.color = backup;
 			} GUILayout.EndScrollView();
 			GUILayout.BeginHorizontal(); {
 				GUI.SetNextControlName("ConsoleInput");
@@ -1559,7 +1574,10 @@ public class ConsoleWindow : ZWindow {
 					open = false;
 					textField = "";
 				}
+				Color backup = GUI.color;
+				GUI.color = DevConsole.color;
 				textField = GUILayout.TextField(textField);
+				GUI.color = backup;
 				if (GUILayout.Button("Send", GUILayout.ExpandWidth(false)) && textField.Length > 0) {
 					TryExecute(textField);
 					textField = "";
