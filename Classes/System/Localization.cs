@@ -75,6 +75,10 @@ public static class Localization {
 		return name;
 	}
 
+	public static bool CanLocalize(string name) {
+		return _strs.ContainsKey(name);
+	}
+
 	public static string Localize(string name, params object[] args) {
 		if (name == null || name.Length == 0) { return ""; }
 		if (_strs.ContainsKey(name)) {
