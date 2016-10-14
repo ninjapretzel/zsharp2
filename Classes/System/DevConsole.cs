@@ -117,16 +117,12 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 
 	}
 
-
-	/// <summary> Calls Defaults(true, true); for easy use from console. </summary>
-	public static void Defaults() { Defaults(true, true); }
-
 	/// <summary>
 	/// Deletes the config.cfg and recreates it using the settings specified in <see cref="persistent"/>.
 	/// </summary>
 	/// <param name="resetBinds">Optional boolean specifying whether to wipe all binds and axis mappings before restoring persistent settings.</param>
 	/// <param name="resetAliases">Optional boolean specifying whether to wipe all aliases before restoring persistent settings.</param>
-	public static void Defaults(bool resetBinds, bool resetAliases) {
+	public static void Defaults(bool resetBinds = true, bool resetAliases = true) {
 		if (resetAliases) {
 			aliases = new Dictionary<string, string>();
 		}
@@ -350,7 +346,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="varName">The field name to find.</param>
 	/// <param name="parameters">String containing the value to set the field to. The current value will be echoed if this is null or empty.</param>
 	/// <returns>Boolean indicating whether the command was handled here.</returns>
-	public static bool CallField(Type targetClass, string varName, string parameters = null) {
+	private static bool CallField(Type targetClass, string varName, string parameters = null) {
 		// Attempt to find the field
 		FieldInfo targetVar = targetClass.GetField(varName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 		object targetInstance = null;
@@ -382,7 +378,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="instance">The instance of the object to get the value of <paramref name="fieldInfo"/> from. If <c>null</c> then it's a static field.</param>
 	/// <param name="fieldInfo">The reflected <c>FieldInfo</c> to get the value of.</param>
 	/// <returns>The value of the field parsed into a string.</returns>
-	public static string GetFieldValue(object instance, FieldInfo fieldInfo) {
+	private static string GetFieldValue(object instance, FieldInfo fieldInfo) {
 		if (fieldInfo == null) { return null; }
 		return ParseObjectIntoString(fieldInfo.GetValue(instance));
 	}
@@ -394,7 +390,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="fieldInfo">The reflected <c>FieldInfo</c> to set the value of.</param>
 	/// <param name="parameters">An array of strings to parse into a value to use for the field.</param>
 	/// <returns>Boolean value indicating whether the field was set successfully.</returns>
-	public static bool SetFieldValue(object instance, FieldInfo fieldInfo, string[] parameters) {
+	private static bool SetFieldValue(object instance, FieldInfo fieldInfo, string[] parameters) {
 		if (parameters.Length == 1 && fieldInfo.FieldType != typeof(string)) {
 			// Need to split unless in container AGAIN here because ParseParameterListIntoType expects parameters separately.
 			// For example, if the user enters "\"1 0 0 1\"" for a Color Field, this method will be passed { "1 0 0 1" },
@@ -417,7 +413,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="propertyName">The property name to find.</param>
 	/// <param name="parameters">String containing the value to set the property to. The current value will be echoed if this is null or empty.</param>
 	/// <returns>Boolean indicating whether the command was handled here.</returns>
-	public static bool CallProperty(Type targetClass, string propertyName, string parameters = null) {
+	private static bool CallProperty(Type targetClass, string propertyName, string parameters = null) {
 		// Attempt to find the property
 		PropertyInfo targetProperty = targetClass.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
 		object targetInstance = null;
@@ -449,7 +445,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="instance">The instance of the object to get the value of <paramref name="propertyInfo"/> from. If <c>null</c> then it's a static property.</param>
 	/// <param name="propertyInfo">The reflected <c>PropertyInfo</c> to get the value of.</param>
 	/// <returns>The value of the property parsed into a string, or "write-only" if property is write-only.</returns>
-	public static string GetPropertyValue(object instance, PropertyInfo propertyInfo) {
+	private static string GetPropertyValue(object instance, PropertyInfo propertyInfo) {
 		if (propertyInfo == null) { return null; }
 		if (propertyInfo.GetGetMethod() == null) { return "write-only!"; }
 		return ParseObjectIntoString(propertyInfo.GetGetMethod().Invoke(instance, new object[] { }));
@@ -462,7 +458,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="propertyInfo">The reflected <c>PropertyInfo</c> to set the value of.</param>
 	/// <param name="parameters">An array of strings to parse into a value to use for the property.</param>
 	/// <returns>Boolean value indicating whether the property was set successfully. Will return <c>true</c> if property is read-only.</returns>
-	public static bool SetPropertyValue(object instance, PropertyInfo propertyInfo, string[] parameters) {
+	private static bool SetPropertyValue(object instance, PropertyInfo propertyInfo, string[] parameters) {
 		if (propertyInfo.GetSetMethod() == null) {
 			string output = GetPropertyValue(instance, propertyInfo);
 			Echo(propertyInfo.Name + " is read-only!");
@@ -493,66 +489,45 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="methodName">The name of the method to find.</param>
 	/// <param name="parameters">String containing parameters to pass to the method.</param>
 	/// <returns>Boolean value indicating whether a method with the name <paramref name="methodName"/> was found, regardless of if it was called or not.</returns>
-	public static bool CallMethod(Type targetClass, string methodName, string parameters) {
+	private static bool CallMethod(Type targetClass, string methodName, string parameters) {
 		MethodInfo[] targetMethods = targetClass.GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy);
 		MethodInfo[] targetInstancedMethods = new MethodInfo[0];
 		object main = GetMainOfClass(targetClass);
 		if (main != null) {
 			targetInstancedMethods = targetClass.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy);
 		}
+		string[] parameterList = null;
 		if (parameters != null && parameters.Length != 0) {
-			string[] parameterList = parameters.SplitUnlessInContainer(' ', '\"');
-			// Try to find a static method matching name and parameters
-			if (CallMethodMatchingParameters(null, methodName, targetMethods, parameterList)) {
+			parameterList = parameters.SplitUnlessInContainer(' ', '\"');
+		}
+		// Try to find a static method matching name and parameters
+		if (CallMethodMatchingParameters(null, methodName, targetMethods, parameterList)) {
+			return true;
+		}
+		// Try to find an instanced method matching name and parameters if a main object to invoke on exists
+		if (main != null) {
+			if (CallMethodMatchingParameters(main, methodName, targetInstancedMethods, parameterList)) {
 				return true;
-			}
-			// Try to find an instanced method matching name and parameters if a main object to invoke on exists
-			if (main != null) {
-				if (CallMethodMatchingParameters(main, methodName, targetInstancedMethods, parameterList)) {
-					return true;
-				}
-			}
-			// Try to find a static method matching name with one string parameter
-			MethodInfo targetMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
-			if (targetMethod != null && !targetMethod.IsGenericMethodDefinition && IsAccessible(targetMethod)) {
-				if (!cheats && IsCheat(targetMethod)) {
-					PrintCheatMessage(targetMethod.Name);
-				} else {
-					InvokeAndEchoResult(targetMethod, null, new string[] { parameterList.ParseParameterListIntoType(typeof(string)).ToString() });
-				}
-				return true;
-			}
-			// Try to find a method matching name with one string parameter if a main object to invoke on exists
-			if (main != null) {
-				MethodInfo targetInstancedMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
-				if (targetInstancedMethod != null && !targetInstancedMethod.IsGenericMethodDefinition && IsAccessible(targetInstancedMethod)) {
-					if (!cheats && IsCheat(targetInstancedMethod)) {
-						PrintCheatMessage(targetInstancedMethod.Name);
-					} else {
-						InvokeAndEchoResult(targetInstancedMethod, main, new string[] { parameterList.ParseParameterListIntoType(typeof(string)).ToString() });
-					}
-					return true;
-				}
 			}
 		}
-		// Try to find a static parameterless method matching name
-		MethodInfo targetParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { }, null);
-		if (targetParameterlessMethod != null && !targetParameterlessMethod.IsGenericMethodDefinition && IsAccessible(targetParameterlessMethod)) {
-			if (!cheats && IsCheat(targetParameterlessMethod)) {
-				PrintCheatMessage(targetParameterlessMethod.Name);
+		// Try to find a static method matching name with one string parameter
+		MethodInfo targetMethod = targetClass.GetMethod(methodName, BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
+		if (targetMethod != null && !targetMethod.IsGenericMethodDefinition && IsAccessible(targetMethod)) {
+			if (!cheats && IsCheat(targetMethod)) {
+				PrintCheatMessage(targetMethod.Name);
 			} else {
-				InvokeAndEchoResult(targetParameterlessMethod, null, new object[] { });
+				InvokeAndEchoResult(targetMethod, null, new string[] { parameterList.ParseParameterListIntoType(typeof(string)).ToString() });
 			}
 			return true;
 		}
-		// Try to find a parameterless method matching name if a main object to invoke on exists
+		// Try to find a method matching name with one string parameter if a main object to invoke on exists
 		if (main != null) {
-			MethodInfo targetInstancedParameterlessMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { }, null);
-			if (targetInstancedParameterlessMethod != null && !targetInstancedParameterlessMethod.IsGenericMethodDefinition && IsAccessible(targetInstancedParameterlessMethod)) {
-				if (!cheats && IsCheat(targetInstancedParameterlessMethod)) {
-					PrintCheatMessage(targetInstancedParameterlessMethod.Name);
+			MethodInfo targetInstancedMethod = targetClass.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod | BindingFlags.FlattenHierarchy, null, new Type[] { typeof(string) }, null);
+			if (targetInstancedMethod != null && !targetInstancedMethod.IsGenericMethodDefinition && IsAccessible(targetInstancedMethod)) {
+				if (!cheats && IsCheat(targetInstancedMethod)) {
+					PrintCheatMessage(targetInstancedMethod.Name);
 				} else {
-					InvokeAndEchoResult(targetInstancedParameterlessMethod, main, new object[] { });
+					InvokeAndEchoResult(targetInstancedMethod, main, new string[] { parameterList.ParseParameterListIntoType(typeof(string)).ToString() });
 				}
 				return true;
 			}
@@ -591,10 +566,10 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="targetMethods">Array of <c>MethodInfo</c> objects to search through.</param>
 	/// <param name="parameterList">List of parameters to attempt to parse and match to a method in <paramref name="targetMethods"/>.</param>
 	/// <returns>Boolean value indicating whether a suitable method was found and invoked.</returns>
-	public static bool CallMethodMatchingParameters(object targetObject, string methodName, MethodInfo[] targetMethods, string[] parameterList) {
+	private static bool CallMethodMatchingParameters(object targetObject, string methodName, MethodInfo[] targetMethods, string[] parameterList) {
 		foreach (MethodInfo targetMethod in targetMethods) {
-			// Enumerating an Array and checking the method name like this is actually faster than enumerating an IEnumerable.
-			// IEnumerable.Where is a pretty fast operation but enumerating an IEnumerable costs more speed here, even without the string comparison.
+			// Enumerating an Array of all class methods and checking the method name like this is actually faster than enumerating an IEnumerable.
+			// IEnumerable.Where is a pretty fast operation but using foreach on the result costs more speed, even without the string comparison.
 			// Using IEnumerable.ToArray is even slower.
 			if (targetMethod.Name != methodName || !IsAccessible(targetMethod)) { continue; }
 			if (!cheats && IsCheat(targetMethod)) {
@@ -605,8 +580,22 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 				if (targetMethod.IsGenericMethodDefinition) {
 					genericParameters = targetMethod.GetGenericArguments();
 				}
-				if (parameterInfos.Length + genericParameters.Length != parameterList.Length) { continue; }
-				if (genericParameters.Length == 0 && parameterInfos[0].ParameterType == typeof(string) && parameterInfos.Length == 1) { continue; }
+				// If this is a non-generic method taking only one parameter, and that parameter is a string, don't handle it here.
+				if (genericParameters.Length == 0 && parameterInfos.Length == 1 && parameterInfos[0].ParameterType == typeof(string)) { continue; }
+				// Figure out the minimum and maximum number of parameters we can take
+				int numParams = (parameterList != null ? parameterList.Length : 0);
+				int minParams = genericParameters.Length;
+				foreach (ParameterInfo p in parameterInfos) {
+					if (p.DefaultValue == DBNull.Value) {
+						++minParams;
+					} else {
+						break;
+					}
+				}
+				int maxParams = genericParameters.Length + parameterInfos.Length;
+				// Fail if the number of parameters given is not in the range needed
+				if (numParams < minParams || numParams > maxParams) { continue; }
+				// Parse generic parameters
 				bool failed = false;
 				Type[] parsedGenericParameters = new Type[genericParameters.Length];
 				for (int i = 0; i < parsedGenericParameters.Length; ++i) {
@@ -614,15 +603,20 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 					if (parsedGenericParameters[i] == null) { failed = true; break; }
 				}
 				if (failed) { continue; }
+				// Parse passed parameters
 				object[] parsedParameters = new object[parameterInfos.Length];
 				for (int i = 0; i < parsedParameters.Length; ++i) {
-					// Need to split the given parameters AGAIN here if not in container, since ParseParameterListIntoType expects its parameters separately.
-					// For example, if a method takes an int and a Color as an attribute, the user could type
-					// Class.MethodName "7" "1 0.4 0.2 1"
-					// which would get split into "7" and "1 0.4 0.2 1", and this method would try to find a method matching two parameters.
-					// If such a method is found, it would further split "1 0.4 0.2 1" into four separate strings and pass them to ParseParameterListIntoType
-					parsedParameters[i] = parameterList[i + parsedGenericParameters.Length].SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType(parameterInfos[i].ParameterType);
-					if (parsedParameters[i] == null) { failed = true; break; }
+					if (numParams > i + parsedGenericParameters.Length) {
+						// Need to split the given parameters AGAIN here if not in container, since ParseParameterListIntoType expects its parameters separately.
+						// For example, if a method takes an int and a Color as an attribute, the user could type
+						// Class.MethodName "7" "1 0.4 0.2 1"
+						// which would get split into "7" and "1 0.4 0.2 1", and this method would try to find a method matching two parameters.
+						// If such a method is found, it would further split "1 0.4 0.2 1" into four separate strings and pass them to ParseParameterListIntoType
+						parsedParameters[i] = parameterList[i + parsedGenericParameters.Length].SplitUnlessInContainer(' ', '\"').ParseParameterListIntoType(parameterInfos[i].ParameterType);
+					} else {
+						parsedParameters[i] = parameterInfos[i].DefaultValue;
+					}
+					if (parsedParameters[i] == null || parsedParameters[i] == DBNull.Value) { failed = true; break; }
 				}
 				if (failed) { continue; }
 				MethodInfo methodToInvoke = targetMethod;
@@ -635,7 +629,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		}
 		return false;
 	}
-	
+
 	/// <summary>
 	/// Invokes the target method on the target object using the parameters supplied, and echoes a nice string representation of the result to the console,
 	/// or does nothing with the return value if it returns <c>void</c>.
@@ -643,7 +637,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <param name="targetMethod">The reflected <c>MethodInfo</c> of the method to invoke.</param>
 	/// <param name="targetObject">The <c>object</c> to invoke <paramref name="targetMethod"/> on, or <c>null</c> if <paramref name="targetMethod"/> is static.</param>
 	/// <param name="parameters">Parameters to pass into <paramref name="targetMethod"/>.</param>
-	public static void InvokeAndEchoResult(MethodInfo targetMethod, object targetObject, object[] parameters) {
+	private static void InvokeAndEchoResult(MethodInfo targetMethod, object targetObject, object[] parameters) {
 		if (targetMethod.ReturnType == typeof(void)) {
 			targetMethod.Invoke(targetObject, parameters);
 		} else {
@@ -682,7 +676,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// </summary>
 	/// <param name="targetClass">The class to get the singleton of.</param>
 	/// <returns>The singleton instance of <paramref name="targetClass"/>, or <c>null</c>.</returns>
-	public static object GetMainOfClass(Type targetClass) {
+	private static object GetMainOfClass(Type targetClass) {
 		FieldInfo mainField = targetClass.GetField("main", BindingFlags.Public | BindingFlags.Static);
 		if (mainField != null && mainField.FieldType.IsAssignableFrom(targetClass) && IsAccessible(mainField)) {
 			return mainField.GetValue(null);
@@ -703,7 +697,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// </summary>
 	/// <param name="member">The <c>MemberInfo</c> to check.</param>
 	/// <returns><c>true</c> if <paramref name="member"/> does NOT have an <see cref="InaccessibleAttribute"/> attribute.</returns>
-	public static bool IsAccessible(MemberInfo member) {
+	private static bool IsAccessible(MemberInfo member) {
 		if (accessibleCache.Contains(member)) { return true; }
 		if (Attribute.GetCustomAttribute(member, typeof(InaccessibleAttribute)) != null || Attribute.GetCustomAttribute(member.DeclaringType, typeof(InaccessibleAttribute)) != null) {
 			// If not accessible
@@ -726,7 +720,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// </summary>
 	/// <param name="member">The <c>MemberInfo</c> to check.</param>
 	/// <returns><c>true</c> if <paramref name="member"/> has a <see cref="CheatAttribute"/> attribute.</returns>
-	public static bool IsCheat(MemberInfo member) {
+	private static bool IsCheat(MemberInfo member) {
 		if (nonCheatCache.Contains(member)) { return false; }
 		if (Attribute.GetCustomAttribute(member, typeof(CheatAttribute)) != null || Attribute.GetCustomAttribute(member.DeclaringType, typeof(CheatAttribute)) != null) {
 			// If cheat
@@ -742,7 +736,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// </summary>
 	/// <param name="command">Command to check.</param>
 	/// <returns>Boolean value indicating whether this command is blacklisted.</returns>
-	public static bool IsBlacklisted(string command) {
+	private static bool IsBlacklisted(string command) {
 		if (whiteListedCache.Contains(command)) { return false; }
 		foreach (string cls in classBlacklist) {
 			if ((command == cls) || (command.StartsWith(cls) && command[cls.Length] == '.')) {
@@ -757,7 +751,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// Echoes a "This command is a cheat" for <paramref name="memberName"/>.
 	/// </summary>
 	/// <param name="memberName">Member to print cheat message for.</param>
-	[Inaccessible] public static void PrintCheatMessage(string memberName) {
+	private static void PrintCheatMessage(string memberName) {
 		Echo(memberName + " is a cheat command. Set \"cheats\" to 1 to use it.");
 	}
 
@@ -769,10 +763,11 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		window.open = !window.open;
 		window.textField = "";
 		if (window.open) {
+			// Execute negation of all bound inputs.
 			foreach (KeyValuePair<KeyCode, string> bind in binds) {
 				string[] cmds = bind.Value.SplitUnlessInContainer(';', '\"', StringSplitOptions.RemoveEmptyEntries);
 				foreach (string cmd in cmds) {
-					if (cmd[0] == '+') {
+					if (Input.GetKey(bind.Key) && cmd[0] == '+') {
 						Execute('-' + cmd.Substring(1));
 					}
 				}
