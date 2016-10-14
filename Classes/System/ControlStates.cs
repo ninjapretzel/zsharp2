@@ -7,6 +7,7 @@ public static class ControlStates {
 
 	/// <summary> Set of values for the current frame </summary>
 	private static Dictionary<string, string> values = new Dictionary<string,string>();
+	private static Dictionary<string, bool> wasSetThisFrame = new Dictionary<string, bool>();
 
 	/// <summary> Set of values for the previous frame </summary>
 	private static Dictionary<string, string> previous = new Dictionary<string,string>();
@@ -16,22 +17,45 @@ public static class ControlStates {
 		//I dunno how much good this actually does in terms of speed.
 		//It might be faster to just cache what axis were Unset() on a given frame.
 		//previous.Clear(); 
-		foreach (var pair in values) {
-			previous[pair.Key] = pair.Value;
-		}
+		previous = new Dictionary<string, string>(values);
+		wasSetThisFrame = new Dictionary<string, bool>();
 	}
 
 	
 	/// <summary> Set ControlState 'thing' to value 'val' </summary>
-	public static void Set(string thing, string val) { values[thing] = val; }
+	public static void Set(string thing, string val) { values[thing] = val; wasSetThisFrame[thing] = true; }
 	/// <summary> Remove ControlState 'thing' from the dictionary </summary>
 	public static void Unset(string thing) { if (values.ContainsKey(thing)) { values.Remove(thing); } }
 
 	/// <summary> Interprets '<paramref name="thing"/>' as a <c>bool</c>, binary ORs it with '<paramref name="val"/>' and sets it back. </summary>
 	public static void Or(string thing, bool val) { values[thing] = (Get<bool>(thing) | val).ToString(); }
+	/// <summary>
+	/// Interprets '<paramref name="thing"/>' as a <c>bool</c>, binary ORs it with '<paramref name="val"/>' and sets it back
+	/// if '<paramref name="thing">' was set this frame, otherwise simply sets '<paramref name="thing"/>' to '<paramref name="val"/>'.
+	/// </summary>
+	public static void OrThisFrame(string thing, bool val) {
+		if (!wasSetThisFrame.ContainsKey(thing) || !wasSetThisFrame[thing]) {
+			values[thing] = val.ToString();
+		} else {
+			values[thing] = (Get<bool>(thing) | val).ToString();
+		}
+		wasSetThisFrame[thing] = true;
+	}
 
 	/// <summary> Interprets '<paramref name="thing"/>' as a <c>float</c>, adds the value to '<paramref name="val"/>' and sets it back. </summary>
 	public static void Add(string thing, float val) { values[thing] = (Get<float>(thing) + val).ToString(); }
+	/// <summary>
+	/// Interprets '<paramref name="thing"/>' as a <c>float</c>, adds the value to '<paramref name="val"/>' and sets it back
+	/// if '<paramref name="thing">' was set this frame, otherwise simply sets '<paramref name="thing"/>' to '<paramref name="val"/>'.
+	/// </summary>
+	public static void AddThisFrame(string thing, float val) {
+		if (!wasSetThisFrame.ContainsKey(thing) || !wasSetThisFrame[thing]) {
+			values[thing] = val.ToString();
+		} else {
+			values[thing] = (Get<float>(thing) + val).ToString();
+		}
+		wasSetThisFrame[thing] = true;
+	}
 
 	/// <summary>
 	/// Gets the current state of all values in a new <c>Dictionary</c>. This <c>Dictionary</c> is a copy of the values
@@ -130,20 +154,20 @@ public static class ControlStates {
 	}
 
 	/// <summary> Standard axis wrapper property. Movement on the +/- Z axis. Typically represents the 'up/down' direction on the 'left' stick, or Keyboard W/S. </summary>
-	public static float forwardAxis { get { return Get<float>("forwardAxis"); } set { Set("forwardAxis", value.ToString()); } }
+	public static float forwardAxis { get { return Get<float>("forwardAxis"); } set { AddThisFrame("forwardAxis", value); } }
 
 	/// <summary> Standard axis wrapper property. Movement on the +/- X axis.  Typically represents the 'left/right' direction on the 'left' stick, or Keyboard A/D. </summary>
-	public static float lateralAxis { get { return Get<float>("lateralAxis"); } set { Set("lateralAxis", value.ToString()); } }
+	public static float lateralAxis { get { return Get<float>("lateralAxis"); } set { AddThisFrame("lateralAxis", value); } }
 
 	/// <summary> Standard axis wrapper property. Camera Movement around the Y axis. Typically represents the 'left/right' direction on the 'right' stick, or Arrow Keys left/right. Camera Inversion is handled in a PlayerControl script if needed. </summary>
-	public static float yawAxis { get { return Get<float>("yawAxis"); } set { Set("yawAxis", value.ToString()); } }
+	public static float yawAxis { get { return Get<float>("yawAxis"); } set { AddThisFrame("yawAxis", value); } }
 	/// <summary> Standard axis wrapper property. Camera Movement around the X axis. Typically represens the 'up/down' direction on the 'right' stick, or Arrow Keys up/down. Camera Inversion is handled in a PlayerControl script if needed. </summary>
-	public static float pitchAxis { get { return Get<float>("pitchAxis"); } set { Set("pitchAxis", value.ToString()); } }
+	public static float pitchAxis { get { return Get<float>("pitchAxis"); } set { AddThisFrame("pitchAxis", value); } }
 
 	/// <summary> Standard axis wrapper property. Camera Movement out. Typically represents a shoulder button analogs if present, or scroll wheel. </summary>
-	public static float zoomOutAxis { get { return Get<float>("zoomOutAxis"); } set { Set("zoomOutAxis", value.ToString()); } }
+	public static float zoomOutAxis { get { return Get<float>("zoomOutAxis"); } set { AddThisFrame("zoomOutAxis", value); } }
 	/// <summary> Standard axis wrapper property. Camera Movement in. Typically represents a shoulder button analogs if present, or scroll wheel. </summary>
-	public static float zoomInAxis { get { return Get<float>("zoomInAxis"); } set { Set("zoomInAxis", value.ToString()); } }
+	public static float zoomInAxis { get { return Get<float>("zoomInAxis"); } set { AddThisFrame("zoomInAxis", value); } }
 
 	/// <summary> Standard button wrapper property. Movement on the +Z axis. Typically represents the 'up' direction on the 'left' stick, or Keyboard W. </summary>
 	public static bool forward { get { return Get<bool>("forward"); } set { Set("forward", value.ToString()); } }

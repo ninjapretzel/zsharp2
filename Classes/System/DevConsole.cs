@@ -87,6 +87,8 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	private static HashSet<MemberInfo> accessibleCache = new HashSet<MemberInfo>();
 	/// <summary>Optimization: A cache of commands that have been run that are NOT marked cheats.</summary>
 	private static HashSet<MemberInfo> nonCheatCache = new HashSet<MemberInfo>();
+	/// <summary>Optimization: A cache of axis values, so we can run commands associated with axis mappings only when they change.</summary>
+	private static Dictionary<string, float> axisValueCache = new Dictionary<string, float>();
 
 	/// <summary>User-definable autoexec path, pointing to a script that will automatically execute when the game is run.</summary>
 	public static string autoexecPath = "";
@@ -155,7 +157,6 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		//Move inputs to the next frame.
 		ControlStates.NextFrame();
 
-
 		if (!window.open) {
 			foreach (KeyValuePair<KeyCode, string> pair in binds) {
 				if (Input.GetKeyDown(pair.Key)) {
@@ -171,54 +172,62 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 				}
 			}
 			foreach (KeyValuePair<string, string> pair in axisMappings) {
-				if (pair.Key[pair.Key.Length - 1] == '-') {
-					string axis = pair.Key.Substring(0, pair.Key.Length - 1);
-					if (pair.Value.Contains("%value%") || pair.Value.Contains("%nvalue%")) {
-						if (Input.GetAxisRaw(axis) <= 0) {
-							Execute(pair.Value.Replace("%value%", (-Input.GetAxisRaw(axis)).ToString()).Replace("%nvalue%", (Input.GetAxisRaw(axis)).ToString()));
-						} else if (!axisMappings.ContainsKey(pair.Key.Substring(0, pair.Key.Length - 1) + "+")) {
-							Execute(pair.Value.Replace("%value%", "0").Replace("%nvalue%", "0"));
-						}
-					} else {
-						if (Input.GetAxisRaw(axis) < -0.5f) {
-							Execute(pair.Value);
-						}
-						if (pair.Value[0] == '+') {
-							if (Input.GetAxisRaw(axis) >= -0.5f) {
-								int semicolonindex = pair.Value.IndexOf(';');
-								if (semicolonindex > 0) {
-									Execute('-' + pair.Value.Substring(1, semicolonindex - 1));
-								} else {
-									Execute('-' + pair.Value.Substring(1));
+				string axis = pair.Key;
+				if (pair.Key[pair.Key.Length - 1] == '-' || pair.Key[pair.Key.Length - 1] == '+') {
+					axis = pair.Key.Substring(0, pair.Key.Length - 1);
+				}
+				float axisValue = Input.GetAxisRaw(axis);
+				if (!axisValueCache.ContainsKey(pair.Key) || axisValueCache[pair.Key] != axisValue) {
+					if (pair.Key[pair.Key.Length - 1] == '-') {
+						if (pair.Value.Contains("%value%") || pair.Value.Contains("%nvalue%")) {
+							if (axisValue <= 0) {
+								Execute(pair.Value.Replace("%value%", (-axisValue).ToString()).Replace("%nvalue%", axisValue.ToString()));
+							} else if (!axisMappings.ContainsKey(pair.Key.Substring(0, pair.Key.Length - 1) + "+")) {
+								Execute(pair.Value.Replace("%value%", "0").Replace("%nvalue%", "0"));
+							}
+						} else {
+							if (axisValue < -0.5f) {
+								Execute(pair.Value);
+							}
+							if (pair.Value[0] == '+') {
+								if (axisValue >= -0.5f) {
+									int semicolonindex = pair.Value.IndexOf(';');
+									if (semicolonindex > 0) {
+										Execute('-' + pair.Value.Substring(1, semicolonindex - 1));
+									} else {
+										Execute('-' + pair.Value.Substring(1));
+									}
 								}
 							}
 						}
-					}
-				} else if (pair.Key[pair.Key.Length - 1] == '+') {
-					string axis = pair.Key.Substring(0, pair.Key.Length - 1);
-					if (pair.Value.Contains("%value%") || pair.Value.Contains("%nvalue%")) {
-						if (Input.GetAxisRaw(axis) >= 0) {
-							Execute(pair.Value.Replace("%value%", Input.GetAxisRaw(axis).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(axis)).ToString()));
-						} else if (!axisMappings.ContainsKey(pair.Key.Substring(0, pair.Key.Length - 1) + "-")) {
-							Execute(pair.Value.Replace("%value%", "0").Replace("%nvalue%", "0"));
-						}
-					} else {
-						if (Input.GetAxisRaw(axis) > 0.5f) {
-							Execute(pair.Value);
-						}
-						if (pair.Value[0] == '+') {
-							if (Input.GetAxisRaw(axis) <= 0.5f) {
-								int semicolonindex = pair.Value.IndexOf(';');
-								if (semicolonindex > 0) {
-									Execute('-' + pair.Value.Substring(1, semicolonindex - 1));
-								} else {
-									Execute('-' + pair.Value.Substring(1));
+					} else if (pair.Key[pair.Key.Length - 1] == '+') {
+						if (pair.Value.Contains("%value%") || pair.Value.Contains("%nvalue%")) {
+							if (axisValue >= 0) {
+								Execute(pair.Value.Replace("%value%", axisValue.ToString()).Replace("%nvalue%", (-axisValue).ToString()));
+							} else if (!axisMappings.ContainsKey(pair.Key.Substring(0, pair.Key.Length - 1) + "-")) {
+								Execute(pair.Value.Replace("%value%", "0").Replace("%nvalue%", "0"));
+							}
+						} else {
+							if (axisValue > 0.5f) {
+								Execute(pair.Value);
+							}
+							if (pair.Value[0] == '+') {
+								if (axisValue <= 0.5f) {
+									int semicolonindex = pair.Value.IndexOf(';');
+									if (semicolonindex > 0) {
+										Execute('-' + pair.Value.Substring(1, semicolonindex - 1));
+									} else {
+										Execute('-' + pair.Value.Substring(1));
+									}
 								}
 							}
 						}
+					} else {
+						Execute(pair.Value.Replace("%value%", axisValue.ToString()).Replace("%nvalue%", (-axisValue).ToString()));
 					}
-				} else {
-					Execute(pair.Value.Replace("%value%", Input.GetAxisRaw(pair.Key).ToString()).Replace("%nvalue%", (-Input.GetAxisRaw(pair.Key)).ToString()));
+					// We want to use pair.Key here becuase multiple mappings may use the same axis but a different part, like the + or -.
+					// So give each mapping its own cached value.
+					axisValueCache[pair.Key] = axisValue;
 				}
 			}
 		} else {
@@ -840,16 +849,15 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	}
 
 	/// <summary>
-	/// Creates + and - aliases for <paramref name="thing"/> which call "ControlStates.Set [thing] [value]" with value being "true" or "false" depending, and binds it to <paramref name="key"/>.
+	/// Creates + and - aliases for <paramref name="thing"/> which call "ControlStates.OrThisFrame [thing] [value]" with value being "true" or "false" depending, and binds it to <paramref name="key"/>.
 	/// </summary>
 	/// <param name="key">Key to bind</param>
 	/// <param name="thing">ControlState to set</param>
 	public static void BindButton(string key, string thing) {
-		Alias("+" + thing, "ControlStates.Set " + thing + " true");
-		Alias("-" + thing, "ControlStates.Set " + thing + " false");
+		Alias("+" + thing, "ControlStates.OrThisFrame " + thing + " true");
+		Alias("-" + thing, "ControlStates.OrThisFrame " + thing + " false");
 		Bind(key, "+"+thing);
 	}
-
 
 	/// <summary>
 	/// Parses <paramref name="st"/> into an alias. If <paramref name="st"/> is empty, runs <see cref="Alias"/>. If it has one
@@ -857,20 +865,18 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// to execute the rest of the string.
 	/// </summary>
 	/// <param name="st">Parameters.</param>
-	public static void Alias(string st) {
+	public static string Alias(string st) {
 		string[] parameters = st.SplitUnlessInContainer(' ', '\"');
 		switch (parameters.Length) {
 			case 0: {
-				Alias();
-				break;
+				return Alias();
 			}
 			case 1: {
 				if (aliases.ContainsKey(parameters[0])) {
-					Echo(parameters[0] + " is " + aliases[parameters[0]]);
+					return parameters[0] + " is " + aliases[parameters[0]];
 				} else {
-					Echo(parameters[0] + " does not exist!");
+					return parameters[0] + " does not exist!";
 				}
-				break;
 			}
 			default: {
 				bool containsQuote = (st.IndexOf('\"') >= 0);
@@ -883,7 +889,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 				} else {
 					Alias(parameters[0], parameters[1]);
 				}
-				break;
+				return "";
 			}
 		}
 
@@ -892,8 +898,8 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// <summary>
 	/// Prints a helpful message about how to use the Alias command.
 	/// </summary>
-	public static void Alias() {
-		Echo("Alias: Allows multiple commands to be executed using one command.\nUsage: Alias <name> \"command1 \'[param1\' \'[params...]\'[;][commands...]\"");
+	public static string Alias() {
+		return "Alias: Allows multiple commands to be executed using one command.\nUsage: Alias <name> \"command1 \'[param1\' \'[params...]\'[;][commands...]\"";
 
 	}
 
