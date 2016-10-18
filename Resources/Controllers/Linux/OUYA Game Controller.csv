@@ -21,3 +21,7 @@ Axis4-,Right Stick Up
 Axis4+,Right Stick Down
 Axis5-,IGNORE
 Axis5+,Right Trigger
+Axis6-,DPad Left
+Axis6+,DPad Right
+Axis7-,DPad Up
+Axis7+,DPad Down
