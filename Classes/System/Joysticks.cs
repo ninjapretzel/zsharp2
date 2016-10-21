@@ -251,6 +251,21 @@ public class Joysticks : MonoBehaviour {
 	}
 
 	/// <summary>
+	/// Gets the name of the glyph sheet associated with the controller at the specified index.
+	/// </summary>
+	/// <param name="index">Controller index.</param>
+	/// <returns>Name of the sheet associated with the controller at <paramref name="index"/>.</returns>
+	public static string GetSheet(int index) {
+		if (index >= 0 && index < joystickNames.Count) {
+			Dictionary<string, string> names = controlNames[index];
+			if (names.ContainsKey("Sheet")) {
+				return names["Sheet"];
+			}
+		}
+		return null;
+	}
+
+	/// <summary>
 	/// Gets the name for a specified axis. Out parameter will be filled with the joystick's number as determined from <param name="control"/>.
 	/// </summary>
 	/// <param name="joystickNum"><c>out</c> parameter that will be filled with the joystick's number as determined from <param name="control"/>, or -1 if not a joystick.</param>
