@@ -47,6 +47,8 @@ public class Joysticks : MonoBehaviour {
 	private static List<string> joystickNames = new List<string>(8);
 	private static List<Dictionary<string, string>> controlNames = new List<Dictionary<string, string>>(8);
 
+	public static int numJoysticks { get { return joystickNames.Count; } }
+
 	private static JsonObject glyphData;
 
 #if UNITY_STANDALONE && LG_STEAM
@@ -231,6 +233,21 @@ public class Joysticks : MonoBehaviour {
 			return name.Substring("Controller (".Length, name.Length - "Controller (".Length - 1);
 		}
 		return name.Replace(":", "").Replace("/", "").Replace("\\", "");
+	}
+
+	/// <summary>
+	/// Parses a name from an index in the joystickNames List to get the actual name of the controller.
+	/// For example, "Xbox One for Windows (Controller)" and "Controller (Xbox One for Windows)"
+	/// will both return "Xbox One for Windows".
+	/// </summary>
+	/// <param name="index">The index in the joystickNames List.</param>
+	/// <returns>The parsed name, or an empty string if the index is out of range.</returns>
+	public static string GetControllerName(int index) {
+		if (index < 0 || index >= joystickNames.Count) {
+			return "";
+		} else {
+			return GetControllerName(joystickNames[index]);
+		}
 	}
 
 	/// <summary>
