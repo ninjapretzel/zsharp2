@@ -18,10 +18,10 @@ public class FindMaterialsByShader : ZEditorWindow {
 		
 	}
 
-	string name = "";
+	string shaderToFind = "";
 	
 	void OnGUI() { 
-		name = TextField("Name of Shader", name);
+		shaderToFind = TextField("Name of Shader", shaderToFind);
 
 		if (Button("Select")) {
 			List<Material> list = new List<Material>();
@@ -30,7 +30,7 @@ public class FindMaterialsByShader : ZEditorWindow {
 
 				var mat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
 
-				if (mat != null && mat.shader.name == name) {
+				if (mat != null && mat.shader.name == shaderToFind) {
 					list.Add(mat);
 				}
 
