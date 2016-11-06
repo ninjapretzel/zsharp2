@@ -55,7 +55,7 @@ public class Joysticks : MonoBehaviour {
 	public static Dictionary<string, ControllerAnalogActionHandle_t> analogActionHandles;
 	public static Dictionary<string, ControllerDigitalActionHandle_t> digitalActionHandles;
 	public static Dictionary<string, ControllerActionSetHandle_t> actionSetHandles;
-	private static Dictionary<EControllerActionOrigin, string> actionOriginGlyphNames;
+	public static Dictionary<EControllerActionOrigin, string> actionOriginGlyphNames;
 
 	protected ulong lastControlSet = ulong.MaxValue;
 #endif
@@ -551,7 +551,7 @@ public class Joysticks : MonoBehaviour {
 		if (SteamControllerConnected(out controllerHandle)) {
 			EControllerActionOrigin[] origins = new EControllerActionOrigin[Constants.STEAM_CONTROLLER_MAX_ORIGINS];
 			if (SteamController.GetDigitalActionOrigins(controllerHandle, set, action, origins) > 0) {
-				return "{" + actionOriginGlyphNames[origins[0]] + "}";
+				return "[" + actionOriginGlyphNames[origins[0]] + "]";
 			}
 		}
 		return null;
@@ -562,7 +562,7 @@ public class Joysticks : MonoBehaviour {
 		if (SteamControllerConnected(out controllerHandle)) {
 			EControllerActionOrigin[] origins = new EControllerActionOrigin[Constants.STEAM_CONTROLLER_MAX_ORIGINS];
 			if (SteamController.GetAnalogActionOrigins(controllerHandle, set, action, origins) > 0) {
-				return "{" + actionOriginGlyphNames[origins[0]] + "}";
+				return "[" + actionOriginGlyphNames[origins[0]] + "]";
 			}
 		}
 		return null;
