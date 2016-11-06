@@ -62,6 +62,7 @@ public static class Localization {
 	}
 	public static string Localize_NOMARKUP(string name, params object[] args) {
 		if (name.Length == 0) { return name; }
+		if (!initialized) { Init(); }
 		if (_strs.ContainsKey(name)) {
 
 			JsonObject localized = _strs.Get<JsonObject>(name);
@@ -76,11 +77,12 @@ public static class Localization {
 	}
 
 	public static bool CanLocalize(string name) {
-		return _strs.ContainsKey(name);
+		return _strs != null && _strs.ContainsKey(name);
 	}
 
 	public static string Localize(string name, params object[] args) {
 		if (name == null || name.Length == 0) { return ""; }
+		if (!initialized) { Init(); }
 		if (_strs.ContainsKey(name)) {
 
 			JsonObject localized = _strs.Get<JsonObject>(name);
