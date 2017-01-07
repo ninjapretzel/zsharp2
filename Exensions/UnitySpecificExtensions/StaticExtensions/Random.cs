@@ -115,6 +115,7 @@ public static class Random {
 		seed = newSeed;
 	}
 
+
 	/// <summary> Restore the old seed, and remove it from the stack. </summary>
 	[System.Obsolete("Please use UnityEngine.Random.State Random.Pop() instead")]
 	public static int PopSeed() {
