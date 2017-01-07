@@ -7,6 +7,8 @@ using System;
 using System.IO;
 using System.Linq;
 
+// This whole file is an abortion.
+#pragma warning disable
 public class QuickPlayerSettings : EditorWindow {
 	
 	public static string path { get { return Application.dataPath + "/Data/PlayerSettingsPresets/"; } }
@@ -461,3 +463,7 @@ public class QuickPlayerSettings : EditorWindow {
 	
 }
 #endif
+
+
+// end the abortion
+#pragma warning restore
