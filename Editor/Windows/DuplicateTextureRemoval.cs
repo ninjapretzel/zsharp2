@@ -212,7 +212,9 @@ public class DuplicateTextureRemoval : ZEditorWindow {
 			TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
 			if (importer != null) {
 				importer.isReadable = false;
+#pragma warning disable
 				importer.textureFormat = TextureImporterFormat.ARGB32;
+#pragma warning restore
 				Log("Resetting " + path);
 				AssetDatabase.WriteImportSettingsIfDirty(path);
 				//EditorUtility.SetDirty(importer);
@@ -245,7 +247,9 @@ public class DuplicateTextureRemoval : ZEditorWindow {
 			TextureImporter importer = TextureImporter.GetAtPath(path) as TextureImporter;
 			if (importer != null) {
 				importer.isReadable = true;
+#pragma warning disable
 				importer.textureFormat = TextureImporterFormat.ARGB32;
+#pragma warning restore
 				AssetDatabase.WriteImportSettingsIfDirty(path);
 				
 				//EditorUtility.SetDirty(importer);
