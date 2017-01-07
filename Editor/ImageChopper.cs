@@ -57,16 +57,21 @@ public class ImageChopper : EditorWindow {
 		TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
 		
 		if (importer != null) {
-			importer.textureType = TextureImporterType.Advanced;
+			importer.textureType = TextureImporterType.Default;
+			importer.compressionQuality = 0;
+
+#pragma warning disable
 			importer.textureFormat = TextureImporterFormat.RGBA32;
-			importer.maxTextureSize = 4096;
-			importer.npotScale = TextureImporterNPOTScale.None;
-			importer.grayscaleToAlpha = false;
 			importer.generateCubemap = TextureImporterGenerateCubemap.None;
-			importer.isReadable = true;
-			importer.mipmapEnabled = false;
 			importer.normalmap = false;
 			importer.lightmap = false;
+#pragma warning restore
+
+			importer.maxTextureSize = 4096;
+			importer.npotScale = TextureImporterNPOTScale.None;
+			importer.alphaSource = TextureImporterAlphaSource.None;
+			importer.isReadable = true;
+			importer.mipmapEnabled = false;
 			
 			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 		}
