@@ -72,6 +72,10 @@ public class UGUIRoot : PageSwitcher {
 	}
 
 	#region ModalMethods
+	/// <summary> Shows a modal on the screen, with the intent of just displaying the prompt to the player. The <paramref name="responseHandler"/> always recieves the string "ok" </summary>
+	/// <param name="responseHandler">An action to happen when the modal is closed. Always recieves the string "ok" </param>
+	/// <param name="prompt">Prompt to show on the created modal.</param>
+	/// <returns>Reference to the modal window that is displayed to the user.</returns>
 	public static ModalDialog ShowAlertModal(Action<string> responseHandler, string prompt) {
 		RectTransform modalTransform = Resources.Load<RectTransform>("AlertModal");
 		if (modalTransform == null) {
@@ -80,6 +84,10 @@ public class UGUIRoot : PageSwitcher {
 		return ShowModal(modalTransform, responseHandler, prompt);
 	}
 
+	/// <summary> Shows a modal on the screen, displaying a prompt to the player, and giving the choice of Yes/No. The <paramref name="responseHandler"/> recieves the strings "yes" and "no", respectively</summary>
+	/// <param name="responseHandler">Action to happen when the user decides. Recieves the strings "yes" or "no" regardless of localization</param>
+	/// <param name="prompt">Prompt to display to the user</param>
+	/// <returns>Reference to the modal window that is displayed to the user</returns>
 	public static ModalDialog ShowYesNoModal(Action<string> responseHandler, string prompt) {
 		RectTransform modalTransform = Resources.Load<RectTransform>("YesNoModal");
 		if (modalTransform == null) {
@@ -88,6 +96,11 @@ public class UGUIRoot : PageSwitcher {
 		return ShowModal(modalTransform, responseHandler, prompt);
 	}
 
+	/// <summary> Instantiate an arbitrary <paramref name="modalPrefab"/> to the user. </summary>
+	/// <param name="modalPrefab">Prefab object representing modal window</param>
+	/// <param name="responseHandler">Action to call once the user dismisses the modal somehow. Recieves an arbitrary string, decided by the <paramref name="modalPrefab"/>'s internals</param>
+	/// <param name="prompt">Prompt to display, placed into the 'prompt' field of the ModalDialog attached to the <paramref name="modalPrefab"/></param>
+	/// <returns>Reference to the modal window that is displayed to the user.</returns>
 	public static ModalDialog ShowModal(RectTransform modalPrefab, Action<string> responseHandler, string prompt) {
 		RectTransform modal = Instantiate(modalPrefab) as RectTransform;
 		modal.gameObject.name = modal.gameObject.name.Replace("(Clone)", "");

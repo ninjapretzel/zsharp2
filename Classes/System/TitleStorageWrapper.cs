@@ -14,6 +14,7 @@ using Storage;
 
 public static class TitleStorageWrapper {
 
+	
 #if UNITY_XBOXONE && !UNITY_EDITOR
 	public static TitleStorage store = null;
 
@@ -43,8 +44,16 @@ public static class TitleStorageWrapper {
 			});
 		}
 	}
-#endif
 
+	public static void Delete(string filename) {
+		if (store != null) {
+			store.DeleteFileAsync(filename, (storage,op)=>{
+				
+			});
+		}
+	}
+#endif
+	
 	
 
 
