@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 ///Animates a fade on a LineRenderer by changing the color properties of that LineRenderer
@@ -31,9 +31,8 @@ public class LineRendererFader : MonoBehaviour {
 		c1.a = alpha;
 		c2.a = alpha;
 		
-		lineRenderer.SetColors(c1, c2);
-		
-		
+		lineRenderer.startColor = c1;
+		lineRenderer.endColor = c2;
 		
 	}
 	

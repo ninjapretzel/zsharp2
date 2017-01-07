@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -23,12 +23,12 @@ public class MassParticles : MonoBehaviour {
 			transform.position = cam.transform.position + cam.transform.forward * dist;
 			
 		}
-		
+		var psys = GetComponent<ParticleSystem>().main;
 		
 		if (worldSpace) {
-			GetComponent<ParticleSystem>().simulationSpace = ParticleSystemSimulationSpace.World;
+			psys.simulationSpace = ParticleSystemSimulationSpace.World;
 		} else {
-			GetComponent<ParticleSystem>().simulationSpace = ParticleSystemSimulationSpace.Local;
+			psys.simulationSpace = ParticleSystemSimulationSpace.Local;
 		}
 		
 	}
