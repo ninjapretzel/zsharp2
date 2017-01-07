@@ -52,7 +52,14 @@ public class BMM {
 		max = 1.1f;
 	}
 
-	///<summary> Parametered constructor </summary>
+	/// <summary> Two parameter constructor</summary>
+	public BMM(float mmin, float mmax) {
+		randomize = true;
+		min = mmin;
+		max = mmax;
+	}
+
+	///<summary> Three parametered constructor </summary>
 	public BMM(bool bb, float mmin, float mmax) {
 		randomize = bb;
 		min = mmin;
