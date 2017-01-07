@@ -9,7 +9,7 @@ public class ProfilerUtils : EditorWindow {
 
 	public ProfilerUtils() {
 		titleContent = new GUIContent("Profiler Utils");
-		samples = Profiler.maxNumberOfSamplesPerFrame;
+		samples = UnityEngine.Profiling.Profiler.maxNumberOfSamplesPerFrame;
 	}
 	
 	[MenuItem ("Utilities/Profiler Utils")]
@@ -24,7 +24,7 @@ public class ProfilerUtils : EditorWindow {
 		EditorGUILayout.BeginVertical(GUILayout.ExpandWidth(true)); {
 			samples = EditorGUILayout.IntField("Max samples", samples);
 			if (GUILayout.Button("Set")) {
-				Profiler.maxNumberOfSamplesPerFrame = samples;
+				UnityEngine.Profiling.Profiler.maxNumberOfSamplesPerFrame = samples;
 			}
 		}
 		
