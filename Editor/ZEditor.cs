@@ -7,7 +7,9 @@ using System.Collections.Generic;
 
 public static class ZEditorExtensions {
 	
-#if !UNITY_5_4 && !UNITY_5_5 && !UNITY_6
+
+	
+#if !UNITY_5_4 && !UNITY_5_5 && !UNITY_5_6 && !UNITY_6
 	[MenuItem("GameObject/Legacy Particle System")]
 	public static void LegacyParticle() {
 		
