@@ -121,12 +121,13 @@ public partial class Settings : JsonObject {
 #if !UNITY_EDITOR
 #if UNITY_STANDALONE_WIN
 			//File.WriteAllText(dataPath+"/borderlessCallback.txt", s);
+			/*
 			if (s.ToLower() == "true") {
 				WindowHandler.SetBorderless(true);
 			} else {
 				WindowHandler.SetBorderless(false);
 			}
-				
+			//*/
 			//Debug.Log("Borderless: " + s);
 #elif UNITY_STANDALONE_LINUX
 

@@ -27,7 +27,9 @@ public static class Screen {
 	public static bool fullScreen { get { return Scrn.fullScreen; } set { Scrn.fullScreen = value; } }
 #if !UNITY_4_6
 	public static bool lockCursor {
-		get { return Cursor.lockState == CursorLockMode.Locked; } 
+		get { 
+			return Cursor.lockState == CursorLockMode.Locked; 
+		} 
 		set {
 			Cursor.lockState = value ? CursorLockMode.Locked : CursorLockMode.None;
 			Cursor.visible = !value;

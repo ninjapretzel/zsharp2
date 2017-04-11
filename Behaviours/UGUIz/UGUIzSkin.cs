@@ -112,15 +112,15 @@ public class UGUIzSkin {
 		JsonObject spriteInfo = info.Get<JsonObject>("sprites");
 		JsonObject colorInfo = info.Get<JsonObject>("colors");
 
-		defaultSprite = Resources.Load<Sprite>(info.Extract<string>("defaultSprite", "UISprite"));
+		defaultSprite = Resources.Load<Sprite>(info.Pull<string>("defaultSprite", "UISprite"));
 		
 		path = info.Get<string>("path");
-		disabled = info.Extract<string>("disabled", disabled);
-		active = info.Extract<string>("active", active);
-		hover = info.Extract<string>("hover", hover);
-		off = info.Extract<string>("off", off);
-		on = info.Extract<string>("on", on);
-		fontSize = info.Extract<int>("fontSize", fontSize);
+		disabled = info.Pull<string>("disabled", disabled);
+		active = info.Pull<string>("active", active);
+		hover = info.Pull<string>("hover", hover);
+		off = info.Pull<string>("off", off);
+		on = info.Pull<string>("on", on);
+		fontSize = info.Pull<int>("fontSize", fontSize);
 
 		font = Resources.Load<Font>(info.Get<string>("font"));
 

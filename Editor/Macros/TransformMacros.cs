@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 
 public class TransformMacros : Editor {
-	[MenuItem("Macros/Snap Selection To Ground &v")]
+	[MenuItem("ZSharp/Macros/Snap Selection To Ground &v")]
 	public static void SnapToGround() {
 
 		foreach (Transform t in Selection.transforms) {
@@ -20,9 +20,9 @@ public class TransformMacros : Editor {
 		}
 		Undo.IncrementCurrentGroup();
 	}
-	
 
-	[MenuItem ("Macros/Fix Parent Rotation &#f")]
+
+	[MenuItem("ZSharp/Macros/Fix Parent Rotation &#f")]
 	public static void FixParentRotation() {
 		foreach (Transform t in Selection.transforms) {
 			Undo.RecordObject(t, "Fix Parent Rotation");
@@ -31,7 +31,7 @@ public class TransformMacros : Editor {
 		Undo.IncrementCurrentGroup();
 	}
 
-	[MenuItem("Macros/Instantiate Prefab &p")]
+	[MenuItem("ZSharp/Macros/Instantiate Prefab &p")]
 	public static void DumpPrefabInfo() {
 
 		var prefab = PrefabUtility.GetPrefabParent(Selection.activeGameObject);
@@ -60,7 +60,7 @@ public class TransformMacros : Editor {
 
 	}
 
-	[MenuItem("Macros/Duplicate &d")]
+	[MenuItem("ZSharp/Macros/Duplicate &d")]
 	public static void Duplicate() {
 		//int group = Undo.GetCurrentGroup();
 		
@@ -80,7 +80,7 @@ public class TransformMacros : Editor {
 		Undo.IncrementCurrentGroup();
 	}
 
-	[MenuItem("Macros/Toggle Active State &q")]
+	[MenuItem("ZSharp/Macros/Toggle Active State &q")]
 	public static void ToggleActive() {
 		GameObject sel = Selection.activeGameObject;
 		Undo.RecordObject(sel, "Toggle Active State");
@@ -127,7 +127,7 @@ public class TransformMacros : Editor {
 	}
 
 
-	[MenuItem("Macros/Encapsulate With Parent")]
+	[MenuItem("ZSharp/Macros/Encapsulate With Parent")]
 	public static void EncapsulateWithParent() {
 		foreach (var target in Selection.transforms) {
 			var newParent = new GameObject(target.gameObject.name);

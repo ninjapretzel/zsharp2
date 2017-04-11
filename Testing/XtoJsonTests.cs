@@ -1,9 +1,10 @@
 using UnityEngine;
-using Shouldly;
 using System;
 using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using Shouldly;
 
 #if XtoJSON
 [Test] public static class XtoJSON_Objects {
@@ -563,4 +564,7 @@ using System.Collections.Generic;
 
 	}
 }
-#endif
+#endif // XtoJSON
+
+
+#endif // UNITY_EDITOR

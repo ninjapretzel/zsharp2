@@ -21,7 +21,7 @@ public class QuickPlayerSettings : EditorWindow {
 	private static BuildTargetGroup previousCurrentPlatform = EditorUserBuildSettings.selectedBuildTargetGroup;
 	private static string saveAs = "Untitled Preset";
 	
-	[MenuItem ("Edit/Project Settings/Quick Player Settings")]
+	[MenuItem ("Edit/Project Settings/Z# Quick Player Settings")]
 	public static void ShowWindow() {
 		QuickPlayerSettings main = (QuickPlayerSettings)EditorWindow.GetWindow(typeof(QuickPlayerSettings));
 		main.minSize = new Vector2(400,0);

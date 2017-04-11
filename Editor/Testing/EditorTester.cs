@@ -84,7 +84,7 @@ public class EditorTester : ZEditorWindow {
 	}
 
 
-	[MenuItem("Testing/Testing Window")]
+	[MenuItem("ZSharp/Testing/Testing Window")]
 	public static void ShowWindow() {
 		EditorWindow.GetWindow(typeof(Tester));
 	}

@@ -1,10 +1,11 @@
 using UnityEngine;
-using Shouldly;
 using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+#if UNITY_EDITOR
+using Shouldly;
 
 /// <summary> Used to mark classes that hold the normal tests that should be run, as well as methods within those classes that serve as test methods. </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
@@ -352,3 +353,5 @@ public class Tester : ZBehaviour {
 
 
 }
+
+#endif // UNITY_EDITOR

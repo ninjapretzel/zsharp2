@@ -7,7 +7,7 @@ public class ControlStatesInspector : EditorWindow {
 		titleContent = new GUIContent("Control States");
 	}
 
-	[MenuItem ("Tools/ControlStates")]
+	[MenuItem ("ZSharp/Console/Control States Inspector")]
 	public static void ShowWindow() {
 		ControlStatesInspector main = EditorWindow.GetWindow<ControlStatesInspector>();
 		main.autoRepaintOnSceneChange = true;

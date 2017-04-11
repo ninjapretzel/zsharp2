@@ -8,7 +8,7 @@ public class RunFromScene0 {
 
 	private static Scene current;
 
-	[MenuItem("Tools/Play from scene 0 &p")]
+	[MenuItem("ZSharp/Play from scene 0 &p")]
 	public static void Play() {
 		if (!EditorApplication.isPlaying) {
 			current = EditorSceneManager.GetActiveScene();

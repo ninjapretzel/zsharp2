@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 public class DuplicateTextureRemoval : ZEditorWindow {
 	
-	[MenuItem("Window/DuplicateTextureRemoval")]
+	[MenuItem("ZSharp/Optimization/DuplicateTextureRemoval")]
 	public static void ShowWindow() { 
 		EditorWindow.GetWindow(typeof(DuplicateTextureRemoval));
 	}

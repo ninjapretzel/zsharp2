@@ -10,7 +10,7 @@ public class ImageChopper : EditorWindow {
 	public static ImageChopper window;
 	public Vector2 size;
 	
-	[MenuItem("Window/ZSharp/Texture Chopper")]
+	[MenuItem("ZSharp/Windows/Texture Chopper")]
 	static void ShowWindow() {
 		window = (ImageChopper)EditorWindow.GetWindow (typeof (ImageChopper));
 	}

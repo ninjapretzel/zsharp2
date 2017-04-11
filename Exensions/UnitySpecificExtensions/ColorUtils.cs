@@ -131,6 +131,17 @@ public static class Colors {
 		hsv.g = Mathf.Clamp01(hsv.g + saturation);
 		return hsv.HSVtoRGB();
 	}
+	///<summary>Adds Saturation to an RGB color.
+	///Lets saturation escape [0, 1]
+	///Returns an RGB color.</summary>
+	///<param name="c">Color to modify</param>
+	///<param name="saturation">Saturation to add. Range [-1, 1]</param>
+	///<returns>Input color with saturation modified</returns>
+	public static Color Oversaturate(this Color c, float saturation) {
+		Color hsv = c.RGBtoHSV();
+		hsv.g = hsv.g + saturation;
+		return hsv.HSVtoRGB();
+	}
 
 	/// <summary>
 	/// Returns HSV color matching input RGB color

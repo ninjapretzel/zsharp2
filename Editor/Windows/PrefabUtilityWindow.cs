@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 public class PrefabUtilityWindow : ZEditorWindow {
 	
-	[MenuItem("Window/PrefabUtilityWindow")]
+	[MenuItem("ZSharp/Windows/Prefab Utilities")]
 	public static void ShowWindow() { 
 		EditorWindow.GetWindow(typeof(PrefabUtilityWindow)); 
 	}

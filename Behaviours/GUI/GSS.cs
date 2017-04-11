@@ -374,7 +374,7 @@ public partial class GSS : MonoBehaviour {
 		}
 		
 		if (style.ContainsKey("fontSize")) {
-			bool scale = style.Extract("sizeScale", true);
+			bool scale = style.Pull("sizeScale", true);
 			float screenScale = 1.0f * (scale ? scaleRatio : 1f);
 			float languageScale = 1.0f;
 			if (style.ContainsKey("fontScale")) {
@@ -437,7 +437,7 @@ public partial class GSS : MonoBehaviour {
 		if (style.ContainsKey("fontStyle")) { txt.fontStyle = style.Get<FontStyle>("fontStyle"); }
 
 		if (style.ContainsKey("fontSize")) { 
-			bool scale = style.Extract("sizeScale", true);
+			bool scale = style.Pull("sizeScale", true);
 			float screenScale = 1.0f * (scale ? scaleRatio : 1f);
 			float languageScale = 1.0f;
 			if (style.ContainsKey("fontScale")) {

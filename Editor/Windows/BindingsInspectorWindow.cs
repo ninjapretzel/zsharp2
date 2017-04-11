@@ -16,7 +16,7 @@ public class BindingsInspectorWindow : EditorWindow {
 		titleContent = new GUIContent("BindingsInspectorWindow");
 	}
 
-	[MenuItem ("Tools/BindingsInspectorWindow")]
+	[MenuItem ("ZSharp/Console/Bindings Inspector")]
 	public static void ShowWindow() {
 		BindingsInspectorWindow main = EditorWindow.GetWindow<BindingsInspectorWindow>();
 		main.autoRepaintOnSceneChange = true;

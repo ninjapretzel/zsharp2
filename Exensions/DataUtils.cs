@@ -890,7 +890,15 @@ public static class DataFUnity {
 	}
 	
 	
+	/// <summary> Casts an Array of GameObjects to an array of a given component type. </summary>
+	/// <typeparam name="T"> Component type of resulting array. </typeparam>
+	/// <param name="gobs"> Array of GameObject to grab all <paramref name="T"/>s from </param>
+	/// <returns> Array containing all components of type <paramref name="T"/> in each object in <paramref name="gobs"/>. </returns>
 	public static T[] AsArrayOf<T>(this GameObject[] gobs) where T : Component { return gobs.AsListOf<T>().ToArray(); }
+	/// <summary> Casts a List of GameObjects to a List of a given component type. </summary>
+	/// <typeparam name="T"> Component type of resulting List. </typeparam>
+	/// <param name="gobs"> Array of GameObject to grab all <paramref name="T"/>s from </param>
+	/// <returns> List containing all components of type <paramref name="T"/> in each object in <paramref name="gobs"/>. </returns>
 	public static List<T> AsListOf<T>(this GameObject[] gobs) where T : Component {
 		List<T> list = new List<T>(gobs.Length);
 		foreach (GameObject gob in gobs) {

@@ -51,7 +51,8 @@ public static class TransformUtils {
 		return dir.magnitude;
 	}
 	
-	
+	/// <summary> Alphabetically sorts a transform's children. </summary>
+	/// <param name="root"> Object to sort </param>
 	public static void SortChildrenByName(this Component root) {
 		Dictionary<string, List<Transform>> children = new Dictionary<string, List<Transform>>();
 		List<string> nameList = new List<string>();
@@ -96,11 +97,18 @@ public static class TransformUtils {
 		localScale.z = dist * scale;
 		t.localScale = localScale;
 	}
-	
-	///<summary>Snaps the position/rotation of the parent of the first component 
+
+	///<summary>
+	///Positions two objects ontop of eachother, by moving the parent.
+	///
+	///Snaps the position/rotation of the parent of the first component 
 	///to line the first component up to the second component
-	///Makes t face along the same vector as o.
+	///Makes c face along the same vector as other.
 	///with the flip option, they will face in opposite directions.
+	///</summary>
+	/// <param name="c"> Transform to position. The parent of this will be moved. </param>
+	/// <param name="other"> Transform to snap to </param>
+	/// <param name="flip"> Make c and other face opposite directions (true) or same direction (false) </param>
 	public static void SnapParent(this Component c, Component other, bool flip = false) {
 		Transform t = c.transform;
 		Transform o = other.transform;
@@ -110,7 +118,6 @@ public static class TransformUtils {
 		
 		p.rotation *= q;
 		if (flip) { p.Rotate(0, 180, 0); }
-
 		
 		p.position = o.position;
 		p.position -= (t.position - p.position);
