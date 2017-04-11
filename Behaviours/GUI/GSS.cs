@@ -408,7 +408,7 @@ public partial class GSS : MonoBehaviour {
 		//Note: TextMeshPro uses different settings for for horizontalOverflow or verticalOverflow
 		if (style.ContainsKey("verticalOverflow")) { 
 			var ver = style.Get<VerticalWrapMode>("verticalOverflow");
-			tmp.OverflowMode = (ver == VerticalWrapMode.Overflow) ? TextOverflowModes.Overflow : TextOverflowModes.Truncate;
+			tmp.overflowMode = (ver == VerticalWrapMode.Overflow) ? TextOverflowModes.Overflow : TextOverflowModes.Truncate;
 		}
 
 		if (style.ContainsKey("horizontalOverflow")) {
