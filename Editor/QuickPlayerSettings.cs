@@ -182,7 +182,7 @@ public class QuickPlayerSettings : EditorWindow {
 				PlayerSettings.bundleVersion = val;
 				break;
 			case "bundleIdentifier":
-				PlayerSettings.bundleIdentifier = val;
+				PlayerSettings.applicationIdentifier = val;
 				break;
 			case "statusBarHidden":
 				PlayerSettings.statusBarHidden = Boolean.Parse(val);
@@ -395,7 +395,7 @@ public class QuickPlayerSettings : EditorWindow {
 		output += "keystorePass," + PlayerSettings.keystorePass + "\n";
 		output += "keyaliasPass," + PlayerSettings.keyaliasPass + "\n";
 		output += "bundleVersion," + PlayerSettings.bundleVersion + "\n";
-		output += "bundleIdentifier," + PlayerSettings.bundleIdentifier + "\n";
+		output += "bundleIdentifier," + PlayerSettings.applicationIdentifier + "\n";
 		output += "statusBarHidden," + PlayerSettings.statusBarHidden + "\n";
 		output += "defaultInterfaceOrientation," + PlayerSettings.defaultInterfaceOrientation + "\n";
 		output += "allowedAutorotateToPortrait," + PlayerSettings.allowedAutorotateToPortrait + "\n";
