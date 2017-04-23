@@ -27,10 +27,30 @@ public class Timer {
 	public float time = 5f;
 	/// <summary> Current timeout for this Timer </summary>
 	public float timeout = 0f;
+
+	/// <summary> Previous Timeout </summary>
+	public float lastTimeout { get; set; }
+	
+	/// <summary> Last DeltaTime that was used to tick this timer </summary>
+	public float lastDelta { get; set; }
+
 	/// <summary> Callback for when the timer ticks </summary>
 	public Action onTick = null;
 	/// <summary> Does this timer only tick once, and then stop? </summary>
 	public bool once = false; 
+
+	/// <summary> Return wether the timer just passed a given point in time </summary>
+	/// <param name="timePoint"> Time to check against </param>
+	/// <returns> True, if the timer has just passed the given time. </returns>
+	public bool Passed(float timePoint) {
+		if (!once) {
+			if (timeout < lastTimeout) {
+				float actualTimeout = lastTimeout + lastDelta;
+				return (timePoint < actualTimeout && timePoint > lastTimeout);
+			}
+		}
+		return (timePoint < timeout && timePoint > lastTimeout);
+	}
 	
 	/// <summary> Updates this timer by default scaled delta time, and return if a tick happened or not. </summary>
 	/// <returns> true if a tick occurred, false otherwise. </returns>
@@ -45,7 +65,8 @@ public class Timer {
 	/// <returns> true if a tick occurred, false otherwise. </returns>
 	public bool Tick(float elapsedTime, Action onTick = null) {
 		if (onTick == null) { onTick = this.onTick; }
-		float lastTimeout = timeout;
+		lastTimeout = timeout;
+		lastDelta = elapsedTime;
 		timeout += elapsedTime;
 		if (once) {
 			if (lastTimeout < time && timeout > time) {
