@@ -72,6 +72,14 @@ public class Fancy3dText : MonoBehaviour {
 	public float sizeScale { get { return settings.sizeScale; } }
 	///<summary> Wrapthrough to settings object </summary>
 	public Vector3 gravity { get { return settings.gravity; } }
+	///<summary> Wrapthrough to settings object </summary>
+	public Vector3 animOffset { get { return settings.animOffset; } }
+	///<summary> Wrapthrough to settings object </summary>
+	public float animTime { get { return settings.animTime; } }
+	///<summary> Wrapthrough to settings object </summary>
+	public TextDisplaySettings.AnimMode animMode { get { return settings.animMode; } }
+	///<summary> Wrapthrough to settings object </summary>
+	public TextDisplaySettings.EaseMode easeMode { get { return settings.easeMode; } }
 
 	void Start() {
 
@@ -117,11 +125,17 @@ public class Fancy3dText : MonoBehaviour {
 		for (int i = 0; i < letters.Length; i++) {
 			var letter = letters[i];
 			var t = letter.transform;
+
+			
 			t.localPosition = new Vector3(left + spacer * i, 0, 0);
+
+
 			float fadePosition = (timeout - (i * delay)) / fadeTime;
 			if (fadePosition <= 0) { continue; }
 			if (fadePosition > 1) { fadePosition = 1; }
 
+			Vector3 animPos = AnimationPosition(i);
+			t.localPosition += animPos;
 
 			float alpha = fadePosition;
 			if (timeout > lifetime - fadeTime) {
@@ -132,6 +146,34 @@ public class Fancy3dText : MonoBehaviour {
 
 		}
 
+	}
+
+
+	Vector3 AnimationPosition(int i) {
+		if (animMode == TextDisplaySettings.AnimMode.None) { return Vector3.zero; }
+		float animPosition = (timeout - (i * delay)) / animTime;
+		if (animPosition <= 0 || animPosition >= 1) { return Vector3.zero; }
+		
+		if (easeMode == TextDisplaySettings.EaseMode.Out) { animPosition *= animPosition;}
+		if (easeMode == TextDisplaySettings.EaseMode.In) { animPosition = 1f - ((1f-animPosition) * (1f - animPosition)); }
+		
+		if (animMode == TextDisplaySettings.AnimMode.Slide) {
+			return animOffset * (1.0f - animPosition);
+		}
+
+		if (animMode == TextDisplaySettings.AnimMode.OShoot) {
+			float pi = Mathf.PI;
+			float x = animPosition;
+			animPosition = Mathf.Cos(x * pi) * (pi-x*pi)/pi;
+			return animOffset * animPosition;
+		}
+		
+		if (animMode == TextDisplaySettings.AnimMode.Bounce) {
+
+		}
+
+
+		return Vector3.zero;
 	}
 	
 }

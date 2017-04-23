@@ -5,6 +5,18 @@ using System.Collections.Generic;
 /// <summary> Generic Text Display settings, for both 2d and 3d text objects.</summary>
 [System.Serializable]
 public class TextDisplaySettings {
+
+	public enum AnimMode {
+		None,
+		Slide,
+		OShoot,
+		Bounce,
+		Wobble,
+	}
+	public enum EaseMode {
+		None, In, Out
+	}
+
 	/// <summary> Factory property that generates a basic 2d object, based off a screen size of 720p </summary>
 	public static TextDisplaySettings sets2d { get { return new TextDisplaySettings(); } }
 	public static TextDisplaySettings sets3d { 
@@ -41,6 +53,18 @@ public class TextDisplaySettings {
 	public Vector3 gravity = new Vector3(0, 500, 0);
 	///<summary> Get a random velocity </summary>
 	public Vector3 velocity { get { return baseVelocity + randVelocity * Random.unit; } }
+
+	/// <summary> Time it takes a single letter to slide into place </summary>
+	public float animTime = 0f;
+	/// <summary> Offset </summary>
+	public Vector3 animOffset = Vector3.zero;
+
+	/// <summary> Extra animation to add, if any. </summary>
+	public AnimMode animMode = AnimMode.None;
+
+	/// <summary> Easing to apply to animation, if any. </summary>
+	public EaseMode easeMode = EaseMode.None;
+
 
 
 	/// <summary> Is spacing fixed to a value, or dependant on screen size? </summary>
