@@ -51,7 +51,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 	/// Since these run every frame regardless, use them sparingly. In the command <c>%value%</c> will be replaced with the value of the axis,
 	/// and <c>%nvalue%</c> will be replaced with the value of the axis multiplied by -1.</summary>
 	private static Dictionary<string, string> axisMappings = new Dictionary<string, string>();
-#if UNITY_XBOXONE && !UNITY_EDITOR
+#if UNITY_XBOXONE
 	/// <summary>Was the config successfully loaded from ConnectedStorage? See <see cref="LoadConfigFileForUser"/>.</summary>
 	public static bool configLoaded { get; private set; }
 #endif
@@ -1278,7 +1278,7 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 #endif
 	}
 
-#if UNITY_XBOXONE && !UNITY_EDITOR
+#if UNITY_XBOXONE
 	/// <summary>Loads the config file for the specified user.</summary>
 	/// <param name="user">User to load config for.</param>
 	public static void LoadConfigFileForUser(User user) {
@@ -1289,7 +1289,9 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		if (!user.IsSignedIn || !StorageManager.AmFullyInitialized()) {
 			return;
 		}
+#if !UNITY_EDITOR
 		ConnectedStorageWrapper.LoadData(user, configPath);
+#endif
 	}
 
 	/// <summary>
@@ -1354,13 +1356,15 @@ public class DevConsole : MonoBehaviour, ILogHandler {
 		if (user == null || !user.IsSignedIn || !StorageManager.AmFullyInitialized()) {
 			return;
 		}
+#if !UNITY_EDITOR
 		ConnectedStorageWrapper.SaveData(user, configPath, GetConfigString().GetBytes());
+#endif
 	}
 #endif
 
-	/// <summary>
-	/// Creates a new Window to use as the interface for the console.
-	/// </summary>
+		/// <summary>
+		/// Creates a new Window to use as the interface for the console.
+		/// </summary>
 	private void InstantiateWindowObject() {
 		window = (ConsoleWindow)new ConsoleWindow()
 			.Named("Developer Console")

@@ -13,7 +13,18 @@ using Storage;
 /// This class holds settings information for things.
 /// </summary>
 public partial class Settings {
-	public static Settings instance = new Settings();
+	public static Settings instance {
+		get {
+			if (_instance == null) {
+				_instance = new Settings();
+			}
+			return _instance;
+		}
+		set {
+			_instance = value;
+		}
+	}
+	private static Settings _instance;
 
 }
 
@@ -137,7 +148,7 @@ public partial class Settings : JsonObject {
 		});
 
 		Register("language", (s) => {
-			//Debug.Log("Callback: language to to " + s);
+			//Debug.Log("Callback: language set to " + s);
 			Localization.language = (Language) Enum.Parse(typeof(Language), s);
 			GSS.restyleEverything = true;
 		});
@@ -157,7 +168,8 @@ public partial class Settings : JsonObject {
 	/// <summary> Load hax to avoid the static initializer </summary>
 	public static bool loaded = DoLoad();
 	/// <summary> Load method. </summary>
-	static bool DoLoad() {
+	public static bool DoLoad() {
+		Debug.Log("Settings.DoLoad()");
 		callbacks = new Dictionary<string,Action<string>>();
 		RegisterDefaultCallbacks();
 		Load();
@@ -193,17 +205,19 @@ public partial class Settings : JsonObject {
 #endif
 	}
 
-#if UNITY_XBOXONE && !UNITY_EDITOR
+#if UNITY_XBOXONE
 	/// <summary> Load settings from Connected Storage (or, default settings if none are saved) for the given user, and apply them. </summary>
 	public static void Load(User user, string file = "settings") {
 		if (user == null) {
-			OnSaveDataDidNotExist(user, "settings");
+			OnSaveDataDidNotExist(user, file);
 			return;
 		}
 		if (!user.IsSignedIn || !StorageManager.AmFullyInitialized()) {
 			return;
 		}
+#if !UNITY_EDITOR
 		ConnectedStorageWrapper.LoadData(user, file);
+#endif
 	}
 
 	/// <summary>
@@ -227,10 +241,12 @@ public partial class Settings : JsonObject {
 		"ShadowType",
 		"ShadowResolution",
 		"ShadowCascades",
+		"color",
+		"resolution"
 	};
 	private static void OnSaveDataRetrieved(User user, string name, byte[] bytes) {
 		if (name == "settings") {
-			Debug.Log("Settings data loaded");
+			//Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 			TextAsset defaultSettingsFile = Resources.Load<TextAsset>("xboxDefaultSettings");
 			string json = defaultSettingsFile != null ? defaultSettingsFile.text : "{}";
 			JsonObject jobj = Json.Parse(json) as JsonObject;
@@ -238,13 +254,26 @@ public partial class Settings : JsonObject {
 			string prefs = bytes.GetString();
 			JsonObject pobj = Json.Parse(prefs) as JsonObject;
 
-			jobj.Set(jobj);
+			//Debug.Log("Settings jobj:\n" + jobj.ToString() + "\nSettings pobj:\n" + pobj.ToString());
+
+			jobj.Set(pobj);
 			
 			instance = new Settings();
-			foreach (var pair in pobj) {
-				if (xboxBlacklist.Contains(pair.Key.stringVal)) { continue; }
-				instance.Apply(pair.Key, pair.Value);
+			//Debug.Log("Applying loaded settings. Merged jobj:\n" + jobj.ToString());
+			foreach (var pair in jobj) {
+				//try {
+					if (xboxBlacklist.Contains(pair.Key.stringVal)) {
+						//Debug.Log("Setting " + (string)pair.Key + ": " + (string)pair.Value + " is blacklisted.");
+						continue;
+					}
+					//Debug.Log("Applying setting " + (string)pair.Key + ": " + (string)pair.Value + "");
+					instance.Apply(pair.Key, pair.Value);
+					//Debug.Log("Applied setting " + (string)pair.Key + ": " + (string)pair.Value + "");
+				//} catch(Exception e) {
+				//	Debug.Log("Setting " + (string)pair.Key + " is throwing an exception!\n+" + e.ToString());
+				//}
 			}
+			//Debug.Log("Applied loaded settings");
 		}
 	}
 
@@ -271,11 +300,14 @@ public partial class Settings : JsonObject {
 			return;
 		}
 		string json = instance.ToString();
+		Debug.Log("Saving settings to connected storage. Raw JSON:\n" + json);
+#if !UNITY_EDITOR
 		ConnectedStorageWrapper.SaveData(user, file, json.GetBytes());
+#endif
 	}
 #endif
 
-	/// <summary> Load settings from json (or, default settings if none are saved), and apply them. </summary>
+		/// <summary> Load settings from json (or, default settings if none are saved), and apply them. </summary>
 	public static void Load(string file = "settings") {
 		string defaultSettingsFilename = 
 #if UNITY_XBOXONE && !UNITY_EDITOR
@@ -332,14 +364,12 @@ public partial class Settings : JsonObject {
 
 	/// <summary> Set setting 'key' to 'value' and call the associated callback. </summary>
 	public void Apply(string key, object value) {
-		JsonValue val = Json.Reflect(value);
+		JsonValue val = (value is JsonValue) ? (JsonValue)value : Json.Reflect(value);
 		this[key] = val;
 		changed = true;
-		
-		string strValue = value.ToString();
-		if (val.isString) { strValue = val.stringVal; }
 
-		Callback(key, strValue); 
+		string strValue = val.isString ? val.stringVal : val.ToString();
+		Callback(key, strValue);
 	}
 
 	/// <summary> Call the callback for setting 'key' set to 'value' </summary>
