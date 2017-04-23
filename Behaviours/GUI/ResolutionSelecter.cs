@@ -108,9 +108,11 @@ public class ResolutionSelecter : OptionSelecter {
 		fullScreen = Screen.fullScreen;
 
 #if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+		/*
 		if (borderless && !fullScreen) {
 			WindowHandler.SetBorderless(borderless);
 		}
+		//*/
 #endif
 
 
@@ -124,6 +126,7 @@ public class ResolutionSelecter : OptionSelecter {
 	protected override void Update() {
 		// Must wait one frame after switching out of fullscreen before applying borderless mode.
 		base.Update();
+		/*
 		if (applyBorderless) {
 			++frameCounter;
 			if (frameCounter >= 2) {
@@ -132,6 +135,7 @@ public class ResolutionSelecter : OptionSelecter {
 				applyBorderless = false;
 			}
 		}
+		//*/
 	}
 #endif
 

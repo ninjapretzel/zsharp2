@@ -57,7 +57,7 @@ public class ItemEditorWindow : ZEditorWindow {
 	
 	//private int numStringOptions;
 	
-	[MenuItem ("Window/Item Database")]
+	[MenuItem ("ZSharp/Legacy/Item Database")]
 	static void ShowWindow() {
 		EditorWindow.GetWindow(typeof(ItemEditorWindow));
 		

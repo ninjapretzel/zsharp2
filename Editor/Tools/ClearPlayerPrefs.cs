@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class ClearPlayerPrefs {
 	
-	[MenuItem("Tools/Clear PlayerPrefs")]
+	[MenuItem("ZSharp/Clear PlayerPrefs")]
 	public static void Clear() {
 		PlayerPrefs.DeleteAll();
 		PlayerPrefs.Save();

@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 public class ZTextWindow : ZEditorWindow {
 	
-	[MenuItem("Window/ZTextWindow")]
+	[MenuItem("ZSharp/Legacy/ZTextWindow")]
 	public static void ShowWindow() { 
 		EditorWindow.GetWindow(typeof(ZTextWindow)); 
 	}

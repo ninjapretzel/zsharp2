@@ -7,12 +7,12 @@ public class RectTransformUtils : ZEditorWindow {
 	
 	public static RectTransformUtils window;
 
-	[MenuItem("Utilities/UGUI Rect Utils")]
+	[MenuItem("ZSharp/UGUI/Rect Utils")]
 	public static void ShowWindow() {
 		window = (RectTransformUtils) EditorWindow.GetWindow(typeof(RectTransformUtils));
 	}
 
-	[MenuItem("Macros/UGUIToggleRectUtils &a")]
+	[MenuItem("ZSharp/UGUI/ToggleRectUtils &a")]
 	public static void ToggleAnchorMode() {
 		anchorMode = !anchorMode;
 	}

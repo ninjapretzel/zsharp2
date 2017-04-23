@@ -18,7 +18,7 @@ public class TimeScaleWindow : ZEditorWindow {
 	
 	public static TimeScaleWindow window;
 	
-	[MenuItem ("Utilities/Time Scale")]
+	[MenuItem ("ZSharp/Windows/Time Scale")]
 	static void ShowWindow() {
 		window = EditorWindow.GetWindow(typeof(TimeScaleWindow)) as TimeScaleWindow;
 		

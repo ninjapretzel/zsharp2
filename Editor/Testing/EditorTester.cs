@@ -15,7 +15,7 @@ sealed class ZTest : Attribute { }
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
 sealed class ZTestTests : Attribute { }
 
-public class Tester : ZEditorWindow {
+public class EditorTester : ZEditorWindow {
 
 	public const string PASS = "Pass!";
 	public const string FAILED = "Failed";
@@ -84,7 +84,7 @@ public class Tester : ZEditorWindow {
 	}
 
 
-	[MenuItem("Testing/Testing Window")]
+	[MenuItem("ZSharp/Testing/Testing Window")]
 	public static void ShowWindow() {
 		EditorWindow.GetWindow(typeof(Tester));
 	}

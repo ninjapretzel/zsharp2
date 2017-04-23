@@ -17,7 +17,7 @@ public class StaticExtensionGenerator : EditorWindow {
 	public Type type = null;
 	public string typeName = "UnityEngine.Physics,UnityEngine";
 
-	[MenuItem("Utilities/Static Class Extension Generator")]
+	[MenuItem("ZSharp/Windows/Static Class Extension Generator")]
 	public static void ShowWindow() {
 		StaticExtensionGenerator main = (StaticExtensionGenerator)EditorWindow.GetWindow(typeof(StaticExtensionGenerator));
 		main.minSize = new Vector2(300, 20);

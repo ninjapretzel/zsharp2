@@ -23,8 +23,8 @@ public class ImageTransparency : ZEditorWindow {
 		}
 		
 	}
-	
-	[MenuItem("Window/ZSharp/Texture Transparency")]
+
+	[MenuItem("ZSharp/Windows/Texture Transparency")]
 	static void ShowWindow() {
 		window = (ImageTransparency)EditorWindow.GetWindow (typeof (ImageTransparency));
 		

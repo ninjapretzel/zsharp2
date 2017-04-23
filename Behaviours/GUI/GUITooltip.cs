@@ -23,8 +23,8 @@ public class GUITooltip : MonoBehaviour {
 	void DrawTooltip(JsonObject tooltip) {
 		float x = tooltip.GetFloat("x");
 		float y = tooltip.GetFloat("y");
-		float sizex = tooltip.Extract<float>("sizex", 2);
-		float sizey = tooltip.Extract<float>("sizey", 2);
+		float sizex = tooltip.Pull<float>("sizex", 2);
+		float sizey = tooltip.Pull<float>("sizey", 2);
 		
 		string content = tooltip.GetString("content");
 		

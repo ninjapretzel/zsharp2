@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 public class DuplicateWindow : ZEditorWindow {
 	
-	[MenuItem("Window/Duplicate Wizard")]
+	[MenuItem("ZSharp/Windows/Duplicate Wizard")]
 	public static void ShowWindow() { 
 		EditorWindow.GetWindow(typeof(DuplicateWindow)); 
 	}

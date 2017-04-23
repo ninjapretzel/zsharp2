@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 public class FindMaterialsByShader : ZEditorWindow {
 	
-	[MenuItem("Window/FindMaterialsByShader")]
+	[MenuItem("ZSharp/Optimization/FindMaterialsByShader")]
 	public static void ShowWindow() { 
 		EditorWindow.GetWindow(typeof(FindMaterialsByShader)); 
 	}

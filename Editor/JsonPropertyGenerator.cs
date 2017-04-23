@@ -17,27 +17,31 @@ public class JsonPropertyGenerator : ZEditorWindow {
 	[System.NonSerialized] int timeout;
 	Vector2 scroll;
 
-	[MenuItem("Window/ZSharp/JsonAccessors")]
+	[MenuItem("ZSharp/Windows/Json Accessor Builder")]
 	public static void ShowWindow() {
 		EditorWindow.GetWindow(typeof(JsonPropertyGenerator));
 		
 	}
 	
 	public JsonPropertyGenerator() : base() {
+		
+		
+	}
+
+	void OnEnable() {
 		list = new List<string>();
 		if (!Directory.Exists(sourcePath)) {
 			Directory.CreateDirectory(sourcePath);
 			AssetDatabase.Refresh();
 		}
-		
+
 		if (!Directory.Exists(targetPath)) {
 			Directory.CreateDirectory(targetPath);
 			AssetDatabase.Refresh();
 		}
-		
-		
+
+
 		RefreshList();
-		
 	}
 	
 	

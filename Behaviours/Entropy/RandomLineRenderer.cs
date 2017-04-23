@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class RandomLineRenderer : MonoBehaviour {
@@ -19,11 +19,12 @@ public class RandomLineRenderer : MonoBehaviour {
 		Color c1 = startColors.Lerp(Random.value);
 		Color c2 = endColors.Lerp(Random.value);
 		if (changeColor) {
-			lr.SetColors(c1, c2);
+			lr.startColor = c1;
+			lr.endColor = c2;
 		}
 		
 		float w = width.value;
-		lr.SetWidth(w, w);
+		lr.endWidth = lr.startWidth = w;
 		lr.SetPosition(0, Vector3.zero);
 		lr.SetPosition(1, Vector3.forward * length.value);
 		

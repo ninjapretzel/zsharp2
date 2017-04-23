@@ -5,6 +5,7 @@ using System.Diagnostics;
 
 public class FPSDisplay : MonoBehaviour {
 
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
 	private static List<float> deltaTimes = new List<float>();
 	private bool down = false;
 	private static bool show = false;
@@ -13,7 +14,6 @@ public class FPSDisplay : MonoBehaviour {
 	[SerializeField] private float greenFPS = 30;
 	[SerializeField] private float yellowFPS = 15;
 
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
 	protected void Update() {
 		if (show) {
 			deltaTimes.Add(Time.unscaledDeltaTime);

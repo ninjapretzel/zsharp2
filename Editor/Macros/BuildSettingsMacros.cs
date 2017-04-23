@@ -8,7 +8,7 @@ using UnityEditor;
 
 public class BuildSettingsMacros {
 	public string[] scenes;
-	private static string[] ReadNames() {
+	public static string[] ReadSceneNames() {
 		List<string> temp = new List<string>();
 		foreach (UnityEditor.EditorBuildSettingsScene S in UnityEditor.EditorBuildSettings.scenes) {
 			if (S.enabled) {
@@ -20,12 +20,18 @@ public class BuildSettingsMacros {
 		return temp.ToArray();
 	}
 
-	[UnityEditor.MenuItem("Utilities/Update Scene Names")]
+	public static string[] ReadScenePaths() {
+		List<string> temp = new List<string>();
+		foreach (UnityEditor.EditorBuildSettingsScene S in UnityEditor.EditorBuildSettings.scenes) {
+			if (S.enabled) { temp.Add(S.path); }
+		}
+		return temp.ToArray();
+	}
+
+	[UnityEditor.MenuItem("ZSharp/Macros/Update Scene Names")]
 	private static void UpdateNames(UnityEditor.MenuCommand command) {
-		//ReadSceneNames context = (ReadSceneNames)command.context;
-		//context.scenes = ReadNames();
 		JsonArray names = new JsonArray();
-		foreach (string name in ReadNames()) {
+		foreach (string name in ReadSceneNames()) {
 			names.Add(name);
 		}
 		string path = Application.dataPath + "/Data/Resources/sceneNames.json";
@@ -34,7 +40,7 @@ public class BuildSettingsMacros {
 
 
 	private void Reset() {
-		scenes = ReadNames();
+		scenes = ReadSceneNames();
 	}
 
 

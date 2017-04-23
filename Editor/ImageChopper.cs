@@ -10,7 +10,7 @@ public class ImageChopper : EditorWindow {
 	public static ImageChopper window;
 	public Vector2 size;
 	
-	[MenuItem("Window/ZSharp/Texture Chopper")]
+	[MenuItem("ZSharp/Windows/Texture Chopper")]
 	static void ShowWindow() {
 		window = (ImageChopper)EditorWindow.GetWindow (typeof (ImageChopper));
 	}
@@ -58,15 +58,20 @@ public class ImageChopper : EditorWindow {
 		
 		if (importer != null) {
 			importer.textureType = TextureImporterType.Default;
+			importer.compressionQuality = 0;
+
+#pragma warning disable
 			importer.textureFormat = TextureImporterFormat.RGBA32;
-			importer.maxTextureSize = 4096;
-			importer.npotScale = TextureImporterNPOTScale.None;
-			importer.grayscaleToAlpha = false;
 			importer.generateCubemap = TextureImporterGenerateCubemap.None;
-			importer.isReadable = true;
-			importer.mipmapEnabled = false;
 			importer.normalmap = false;
 			importer.lightmap = false;
+#pragma warning restore
+
+			importer.maxTextureSize = 4096;
+			importer.npotScale = TextureImporterNPOTScale.None;
+			importer.alphaSource = TextureImporterAlphaSource.None;
+			importer.isReadable = true;
+			importer.mipmapEnabled = false;
 			
 			AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
 		}

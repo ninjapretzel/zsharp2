@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR && !UNITY_WEBPLAYER
+#if UNITY_EDITOR && !UNITY_WEBPLAYER
 using UnityEngine;
 using UnityEditor;
 using System;
@@ -16,7 +16,7 @@ public class DatastructureAccessorWindow : ZEditorWindow {
 	[System.NonSerialized] int timeout;
 	Vector2 scroll;
 	
-	[MenuItem ("Window/Accessors")]
+	[MenuItem ("ZSharp/Legacy/Accessors")]
 	public static void ShowWindow() {
 		EditorWindow.GetWindow(typeof(DatastructureAccessorWindow));
 		
@@ -24,20 +24,24 @@ public class DatastructureAccessorWindow : ZEditorWindow {
 	}
 	
 	public DatastructureAccessorWindow() : base() {
+		
+		
+	}
+
+	void OnEnable() {
 		list = new List<string>();
 		if (!Directory.Exists(sourcePath)) {
 			Directory.CreateDirectory(sourcePath);
 			AssetDatabase.Refresh();
 		}
-		
+
 		if (!Directory.Exists(targetPath)) {
 			Directory.CreateDirectory(targetPath);
 			AssetDatabase.Refresh();
 		}
-		
-		
+
+
 		RefreshList();
-		
 	}
 	
 	void RefreshList() {
@@ -86,6 +90,7 @@ public class DatastructureAccessorWindow : ZEditorWindow {
 		
 		BeginVertical("box"); {
 			Label(list.Count + " File(s) Found");
+			Label("Looking in " + sourcePath);
 			if (Button("Build All")) {
 				Build();
 			}

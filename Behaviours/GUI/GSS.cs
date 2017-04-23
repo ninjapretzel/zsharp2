@@ -374,7 +374,7 @@ public partial class GSS : MonoBehaviour {
 		}
 		
 		if (style.ContainsKey("fontSize")) {
-			bool scale = style.Extract("sizeScale", true);
+			bool scale = style.Pull("sizeScale", true);
 			float screenScale = 1.0f * (scale ? scaleRatio : 1f);
 			float languageScale = 1.0f;
 			if (style.ContainsKey("fontScale")) {
@@ -408,7 +408,7 @@ public partial class GSS : MonoBehaviour {
 		//Note: TextMeshPro uses different settings for for horizontalOverflow or verticalOverflow
 		if (style.ContainsKey("verticalOverflow")) { 
 			var ver = style.Get<VerticalWrapMode>("verticalOverflow");
-			tmp.OverflowMode = (ver == VerticalWrapMode.Overflow) ? TextOverflowModes.Overflow : TextOverflowModes.Truncate;
+			tmp.overflowMode = (ver == VerticalWrapMode.Overflow) ? TextOverflowModes.Overflow : TextOverflowModes.Truncate;
 		}
 
 		if (style.ContainsKey("horizontalOverflow")) {
@@ -437,7 +437,7 @@ public partial class GSS : MonoBehaviour {
 		if (style.ContainsKey("fontStyle")) { txt.fontStyle = style.Get<FontStyle>("fontStyle"); }
 
 		if (style.ContainsKey("fontSize")) { 
-			bool scale = style.Extract("sizeScale", true);
+			bool scale = style.Pull("sizeScale", true);
 			float screenScale = 1.0f * (scale ? scaleRatio : 1f);
 			float languageScale = 1.0f;
 			if (style.ContainsKey("fontScale")) {

@@ -12,7 +12,7 @@ using TMPro;
 
 public class TextMeshMacros : ZEditorWindow {
 	
-	[UnityEditor.MenuItem("Macros/Replace Text with TextMeshPro &l")]
+	[UnityEditor.MenuItem("ZSharp/TMPro/Replace Text with TextMeshPro &l")]
 	public static void ReplaceTextWithPro() {
 		var selection = Selection.transforms;
 		foreach (var obj in selection) {

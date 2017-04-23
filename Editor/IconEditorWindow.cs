@@ -8,7 +8,7 @@ using System.IO;
 using System.Collections.Generic;
 
 public class IconEditorWindow : ZEditorWindow {
-	[MenuItem("Window/Define Icons")]
+	[MenuItem("ZSharp/Windows/Define Icons")]
 	public static void ShowWindow() {
 		EditorWindow.GetWindow(typeof(IconEditorWindow));
 	}
