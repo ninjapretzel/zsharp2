@@ -489,10 +489,7 @@ public partial class GSS : MonoBehaviour {
 		if (style.ContainsKey("scrollSensitivity")) { scr.scrollSensitivity = style.Get<float>("scrollSensitivity"); }
 
 	}
-
-
-
-
+	
 
 	static void ApplySelectableStyle(Selectable sct, JsonObject style) {
 		if (style.ContainsKey("interactable")) { sct.interactable = style.Get<bool>("interactable"); }
@@ -523,5 +520,38 @@ public partial class GSS : MonoBehaviour {
 	static Color GetColor(JsonObject o, string k) { return Colors.ParseHex(o.Get<string>(k)); }
 }
 
+/// <summary>
+/// Hax class, to ensure the proper code gets compiled AoT since some platforms can't use JIT.
+/// </summary>
+internal class SpriteStateEqualityComparer : EqualityComparer<SpriteState> {
+	public override bool Equals(SpriteState s1, SpriteState s2) {
+		return false;
+	}
+
+	public override int GetHashCode(SpriteState s) {
+		return base.GetHashCode();
+	}
+
+	private void AoTCompile() {
+		Dictionary<SpriteState, int> dummy = new Dictionary<SpriteState, int>(this);
+	}
+}
+
+/// <summary>
+/// Hax class, to ensure the proper code gets compiled AoT since some platforms can't use JIT.
+/// </summary>
+internal class ColorBlockEqualityComparer : EqualityComparer<ColorBlock> {
+	public override bool Equals(ColorBlock s1, ColorBlock s2) {
+		return false;
+	}
+
+	public override int GetHashCode(ColorBlock s) {
+		return base.GetHashCode();
+	}
+
+	private void AoTCompile() {
+		Dictionary<ColorBlock, int> dummy = new Dictionary<ColorBlock, int>(this);
+	}
+}
 
 #endif

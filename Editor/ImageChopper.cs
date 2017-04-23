@@ -57,7 +57,7 @@ public class ImageChopper : EditorWindow {
 		TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
 		
 		if (importer != null) {
-			importer.textureType = TextureImporterType.Advanced;
+			importer.textureType = TextureImporterType.Default;
 			importer.textureFormat = TextureImporterFormat.RGBA32;
 			importer.maxTextureSize = 4096;
 			importer.npotScale = TextureImporterNPOTScale.None;
