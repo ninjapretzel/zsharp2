@@ -49,7 +49,9 @@ public class Joysticks : MonoBehaviour {
 
 	public static int numJoysticks { get { return joystickNames.Count; } }
 
+#if XtoJSON
 	private static JsonObject glyphData;
+#endif
 
 #if UNITY_STANDALONE && LG_STEAM
 	public static Dictionary<string, ControllerAnalogActionHandle_t> analogActionHandles;
@@ -85,15 +87,18 @@ public class Joysticks : MonoBehaviour {
 		}
 #endif
 
+#if XtoJSON
 		JsonObject gameActions = Json.Parse(Resources.Load<TextAsset>("GameActions").text) as JsonObject;
 		glyphData = gameActions.Get<JsonObject>("GlyphSets");
+#endif
 
 #if UNITY_STANDALONE && LG_STEAM
 
 		actionSetHandles = new Dictionary<string, ControllerActionSetHandle_t>();
 		analogActionHandles = new Dictionary<string, ControllerAnalogActionHandle_t>();
 		digitalActionHandles = new Dictionary<string, ControllerDigitalActionHandle_t>();
-		
+
+#if XtoJSON
 		JsonArray actionSets = gameActions.Get<JsonArray>("ActionSets");
 		JsonArray analogActions = gameActions.Get<JsonArray>("AnalogActions");
 		JsonArray digitalActions = gameActions.Get<JsonArray>("DigitalActions");
@@ -114,6 +119,7 @@ public class Joysticks : MonoBehaviour {
 				}
 			}
 		}
+#endif
 
 		actionOriginGlyphNames = new Dictionary<EControllerActionOrigin, string>() {
 			{ EControllerActionOrigin.k_EControllerActionOrigin_A, "steam_button_a" },
@@ -414,6 +420,7 @@ public class Joysticks : MonoBehaviour {
 	/// <returns>The name of the glyph to use in place of this control (in the format "{glyphname}"),
 	/// or if no glyph replacement is available, a human-readable string of the relevant controls.</returns>
 	public static string Glyph(string thing) {
+#if XtoJSON
 		if (glyphData != null) {
 			JsonObject glyph = glyphData.Get<JsonObject>(thing);
 			if (glyph != null) {
@@ -504,7 +511,7 @@ public class Joysticks : MonoBehaviour {
 				}
 			}
 		}
-
+#endif
 		return thing;
 	}
 

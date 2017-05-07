@@ -19,15 +19,19 @@ public enum Language {
 
 public static class Localization {
 
+#if XtoJSON
 	private static JsonObject _strs;
+#endif
 
 	public static Language language = Language.english;
 	public static bool initialized { get; private set; }
 
 	public static void Init() {
 		string text = Resources.Load<TextAsset>("strings").text.ConvertNewlines();
+#if XtoJSON
 		//JsonArray levelsArray = JsonArray.ParseCSV(text, '|');
 		_strs = JsonObject.ParseCSV(text, '|');
+#endif
 		//Debug.Log(_strs.PrettyPrint());
 #if LG_STEAM
 		// Use a switch here instead of parsing the enum (we don't support all those langauges yet!)
@@ -63,6 +67,7 @@ public static class Localization {
 	public static string Localize_NOMARKUP(string name, params object[] args) {
 		if (name.Length == 0) { return name; }
 		if (!initialized) { Init(); }
+#if XtoJSON
 		if (_strs.ContainsKey(name)) {
 
 			JsonObject localized = _strs.Get<JsonObject>(name);
@@ -73,16 +78,22 @@ public static class Localization {
 			}
 
 		}
+#endif
 		return name;
 	}
 
 	public static bool CanLocalize(string name) {
+#if XtoJSON
 		return _strs != null && _strs.ContainsKey(name);
+#else
+		return false;
+#endif
 	}
 
 	public static string Localize(string name, params object[] args) {
 		if (name == null || name.Length == 0) { return ""; }
 		if (!initialized) { Init(); }
+#if XtoJSON
 		if (_strs.ContainsKey(name)) {
 
 			JsonObject localized = _strs.Get<JsonObject>(name);
@@ -96,6 +107,7 @@ public static class Localization {
 #endif
 			}
 		}
+#endif
 #if UNITY_EDITOR
 		return "<color=#ff00ffff>" + name + "</color>";
 #else
